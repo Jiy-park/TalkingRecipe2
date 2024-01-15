@@ -1,5 +1,6 @@
 package com.dd2d.talkingrecipe2
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,6 +38,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.dd2d.talkingrecipe2.ui.theme.kotex
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
@@ -166,3 +169,40 @@ suspend fun uploadUserProfileImage(
 }
 
 fun getMimeType(context: Context, uri: Uri) = context.contentResolver.getType(uri)
+
+
+@SuppressLint("UnrememberedMutableState")
+@Composable
+@Preview(showSystemUi = true)
+fun ComposeTest(
+    modifier: Modifier = Modifier
+){
+    var t by remember { mutableStateOf("") }
+    var tt by remember { mutableStateOf("") }
+    var ttt by remember { mutableStateOf("") }
+    var s by mutableStateOf("")
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+    ){
+        TextField(value = tt, onValueChange = { tt = it })
+        TextField(value = ttt, onValueChange = { ttt = it })
+        View2(t, { t = it }, s, { s = it })
+    }
+
+
+}
+
+@Composable
+fun View2(
+    t: String,
+    onChangeT: (String)->Unit,
+    s: String,
+    onChangeS: (String)->Unit,
+){
+        TextField(value = t, onValueChange = { onChangeT(it) })
+        TextField(value = s, onValueChange = { onChangeS(it) })
+
+}

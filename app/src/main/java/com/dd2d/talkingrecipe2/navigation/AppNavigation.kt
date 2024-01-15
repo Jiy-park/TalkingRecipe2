@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dd2d.talkingrecipe2.alog
+import com.dd2d.talkingrecipe2.view.create_screen.CreateScreen
 import com.dd2d.talkingrecipe2.view.main_screen.MainScreen
 
 @Composable
@@ -23,7 +24,7 @@ fun AppNavigation(
             MainScreen(
                 onClickSearchTrigger = { navController.navigate(route = Screen.Search.route) },
                 onClickSavePost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.SavePost}") },
-                onClickCreate = { navController.navigate(route = Screen.Create.route) },
+                onClickCreate = { navController.navigate(route = "${Screen.Create.route}/${CreateScreen.CreateMode}") },
                 onClickMyPost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.MyPost}") },
                 onClickSetting = { /*TODO("다이얼로그로 ")*/ },
                 onClickRecentRecipe = { recipeId-> navController.navigate(route = "${Screen.Recipe.route}/$recipeId") },

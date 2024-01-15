@@ -38,7 +38,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 fun RecipeViewer(
     modifier: Modifier = Modifier,
     recipe: Recipe,
-    onClick: (recipeId: Int) -> Unit,
+    onClick: (recipeId: String) -> Unit,
 ){
     val innerModifier = Modifier
     Row(

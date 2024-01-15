@@ -34,7 +34,7 @@ private val supabase = createSupabaseClient(
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val userViewModel = UserViewModel(supabase = supabase, userId = 1_000_001)
+//        val userViewModel = UserViewModel(supabase = supabase, userId = 1_000_001)
         super.onCreate(savedInstanceState)
         setContent {
             TalkingRecipe2Theme {
@@ -42,7 +42,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
                     App()
                 }
             }

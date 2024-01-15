@@ -9,4 +9,6 @@ fun logging(msg: String = ""){
 fun Any.alog(msg: String = ""){
     Log.d("LOG_CHECK","$msg -> value : $this")
 }
-fun llog(msg: String):()->Unit =  { logging(msg) }
+fun llog(msg: String): ()->Unit = {
+    logging(msg)
+}

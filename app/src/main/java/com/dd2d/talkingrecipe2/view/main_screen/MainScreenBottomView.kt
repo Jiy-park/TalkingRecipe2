@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.dd2d.talkingrecipe2.R
 import com.dd2d.talkingrecipe2.data_struct.Recipe
-import com.dd2d.talkingrecipe2.data_struct.sampleRecipe
 import com.dd2d.talkingrecipe2.ui.CircleIconButton
 import com.dd2d.talkingrecipe2.ui.RecipeViewer
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
@@ -32,12 +31,12 @@ import com.dd2d.talkingrecipe2.ui.theme.kopupFontFamily
 @Composable
 fun MainScreenBottomView(
     modifier: Modifier = Modifier,
-    recentRecipe: Recipe = sampleRecipe,
+    recentRecipe: Recipe?,
     onClickSavePost: ()->Unit,
     onClickCreate: ()->Unit,
     onClickMyPost: ()->Unit,
     onClickSetting: ()->Unit,
-    onClickRecentRecipe: (recipeId: Int)->Unit,
+    onClickRecentRecipe: (recipeId: String)->Unit,
 ){
     Surface(
         color = Color.White,
@@ -50,7 +49,7 @@ fun MainScreenBottomView(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(start = 20.dp, end = 20.dp, top = 30.dp)
+                .padding(horizontal = 20.dp, vertical = 30.dp)
         ){
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -89,13 +88,15 @@ fun MainScreenBottomView(
                 )
             }
 
-            RecentRecipe(
-                recipe = recentRecipe,
-                onClick = { recipeId-> onClickRecentRecipe(recipeId) },
-                modifier = modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-            )
+            recentRecipe?.let {
+                RecentRecipe(
+                    recipe = recentRecipe,
+                    onClick = { recipeId-> onClickRecentRecipe(recipeId) },
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                )
+            }
         }
     }
 }
@@ -104,7 +105,7 @@ fun MainScreenBottomView(
 fun RecentRecipe(
     modifier: Modifier = Modifier,
     recipe: Recipe,
-    onClick: (recipeId: Int)->Unit,
+    onClick: (recipeId: String)->Unit,
 ){
     Column(
         horizontalAlignment = Alignment.Start,

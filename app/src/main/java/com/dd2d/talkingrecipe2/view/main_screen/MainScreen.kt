@@ -18,7 +18,7 @@ fun MainScreen(
     onClickCreate: ()->Unit,
     onClickMyPost: ()->Unit,
     onClickSetting: ()->Unit,
-    onClickRecentRecipe: (recipeId: Int)->Unit,
+    onClickRecentRecipe: (recipeId: String)->Unit,
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -32,6 +32,7 @@ fun MainScreen(
             onClickSearchTrigger = { onClickSearchTrigger() }
         )
         MainScreenBottomView(
+            recentRecipe = null,
             onClickSavePost = { onClickSavePost() },
             onClickCreate = { onClickCreate() },
             onClickMyPost = { onClickMyPost() },
