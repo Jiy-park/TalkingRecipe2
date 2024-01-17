@@ -104,4 +104,7 @@ dependencies {
     // coil
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("io.coil-kt:coil-gif:2.5.0")
+
+    // draggable lazy list
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 }

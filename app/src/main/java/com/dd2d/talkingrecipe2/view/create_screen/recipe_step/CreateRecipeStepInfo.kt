@@ -1,0 +1,214 @@
+package com.dd2d.talkingrecipe2.view.create_screen.recipe_step
+
+import android.content.Context
+import android.net.Uri
+import android.provider.ContactsContract
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.logging
+import com.dd2d.talkingrecipe2.navigation.CreateScreenMode
+import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
+import com.dd2d.talkingrecipe2.ui.theme.HintText
+import com.dd2d.talkingrecipe2.ui.theme.MainText
+import com.dd2d.talkingrecipe2.ui.theme.kotex
+import com.dd2d.talkingrecipe2.ui.theme.textFieldColor
+import com.dd2d.talkingrecipe2.ui.theme.textFieldStyle
+import com.dd2d.talkingrecipe2.view.create_screen.CreateScreenValue.StepInfoViewHeight
+import com.dd2d.talkingrecipe2.view_model.CreateViewModel
+import com.dd2d.talkingrecipe2.view_model.StepInfo
+import kotlinx.datetime.LocalDateTime
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun CreateRecipeStepInfo(
+    modifier: Modifier = Modifier,
+    createViewModel: CreateViewModel = viewModel { CreateViewModel(createScreenMode = CreateScreenMode.Create) }
+){
+    val context = LocalContext.current
+    val state = rememberReorderableLazyListState(
+        onMove = { from, to ->
+            createViewModel.stepInfoList = createViewModel.stepInfoList.apply {
+                add(to.index, removeAt(from.index))
+            }
+        }
+    )
+
+    var selectedIndex = -1
+    val galleryLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){ res->
+        res?.let { uri->
+            val stepInfo = createViewModel.stepInfoList[selectedIndex]
+            createViewModel.stepInfoList[selectedIndex] = stepInfo.copy(imageUri = uri)
+        }
+    }
+    LazyColumn(
+        state = state.listState,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+        modifier = modifier
+            .fillMaxSize()
+            .reorderable(state)
+            .detectReorderAfterLongPress(state)
+    ){
+        itemsIndexed(items = createViewModel.stepInfoList, key = { _, info -> info.no }){ index, info ->
+            ReorderableItem(reorderableState = state, key = info) { _ ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = modifier
+                        .padding(horizontal = 15.dp)
+                        .animateItemPlacement()
+                ){
+                    StepInfoView(
+                        context = context,
+                        stepExplanation = info.explanation,
+                        stepImageUri = info.imageUri,
+                        onChangeExplanation = { createViewModel.stepInfoList[index] = info.copy(explanation = it) },
+                        onClickImage = {
+                            selectedIndex = index
+                            galleryLauncher.launch("image/*")
+                        },
+                        onClickAdd = { createViewModel.stepInfoList.add(index+1, StepInfo(order = createViewModel.stepInfoList.size)) },
+                        onClickRemove = { createViewModel.stepInfoList.removeAt(index) }
+                    )
+                }
+                Divider(modifier = modifier.fillMaxWidth(), thickness = 1.dp, color = HintText)
+            }
+        }
+    }
+}
+
+@Composable
+fun StepInfoView(
+    modifier: Modifier = Modifier,
+    context: Context,
+    stepExplanation: String,
+    onChangeExplanation: (String) -> Unit,
+    stepImageUri: Uri,
+    onClickImage: ()->Unit,
+    onClickAdd: ()->Unit,
+    onClickRemove: ()->Unit,
+){
+    val model = if(stepImageUri == Uri.EMPTY) R.drawable.recipe_step_info_default_image else stepImageUri
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxWidth()
+    ){
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .height(StepInfoViewHeight)
+        ) {
+            TextField(
+                value = stepExplanation,
+                onValueChange = { onChangeExplanation(it) },
+                colors = textFieldColor(removeIndicator = true),
+                textStyle = textFieldStyle(size = 15.sp),
+                placeholder = { kotex(text = "내용을 입력해주세요.", color = HintText) },
+                modifier = modifier
+                    .weight(0.6F)
+                    .fillMaxHeight()
+            )
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(model)
+                    .build(),
+                contentDescription = "step image",
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .weight(0.5F)
+                    .aspectRatio(1.6F / 1.2F)
+                    .background(color = Color.DarkGray, shape = RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickableWithoutRipple {
+                        onClickImage()
+                    }
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .background(color = Color.White)
+        ) {
+            Icon(imageVector = Icons.Default.Menu, contentDescription = null, tint = HintText)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier
+            ) {
+                IconButton(onClick = { onClickAdd() }) {
+                    kotex(text = "추가")
+                }
+                IconButton(onClick = { onClickRemove() }) {
+                    kotex(text = "삭제")
+                }
+            }
+        }
+    }
+}

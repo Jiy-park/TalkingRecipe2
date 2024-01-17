@@ -1,11 +1,7 @@
 package com.dd2d.talkingrecipe2.data_struct
 
-import android.net.Uri
 import com.dd2d.talkingrecipe2.R
-import com.dd2d.talkingrecipe2.view_model.Ingredient
-import com.dd2d.talkingrecipe2.view_model.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.view_model.ShareOption
-import com.dd2d.talkingrecipe2.view_model.StepInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

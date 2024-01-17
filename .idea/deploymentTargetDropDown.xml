@@ -2,18 +2,6 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="ComposeTest">
-        <State />
-      </entry>
-      <entry key="CreateRecipeBasicInfo">
-        <State />
-      </entry>
-      <entry key="CreateScreen">
-        <State />
-      </entry>
-      <entry key="TestingView">
-        <State />
-      </entry>
       <entry key="app">
         <State />
       </entry>

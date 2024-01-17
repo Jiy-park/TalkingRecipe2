@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,11 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dd2d.talkingrecipe2.data_struct.Level
@@ -44,80 +41,70 @@ import com.dd2d.talkingrecipe2.ui.theme.BackgroundGray
 import com.dd2d.talkingrecipe2.ui.theme.HintText
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.MainText
-import com.dd2d.talkingrecipe2.ui.theme.SubColor
 import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.textFieldColor
 import com.dd2d.talkingrecipe2.ui.theme.textFieldStyle
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 import com.dd2d.talkingrecipe2.view_model.Ingredient
-import com.dd2d.talkingrecipe2.view_model.RecipeBasicInfo
 
 @Composable
-//@Preview(showSystemUi = true)
 fun CreateRecipeBasicInfo(
-    modifier: Modifier = Modifier,
-    recipeBasicInfo: RecipeBasicInfo,
-    ingredientList: List<Ingredient>,
-    onChangeIngredient: (index: Int, ingredient: Ingredient) -> Unit,
-    onCLickAdd: () -> Unit,
-    onClickRemove: (pos: Int) -> Unit,
-    onChangeRecipeBasicInfo: (recipeBasicInfo: RecipeBasicInfo) -> Unit,
+    modifier : Modifier = Modifier,
+    createViewModel: CreateViewModel,
 ){
-    Box(modifier = modifier.fillMaxSize()){
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 15.dp)
+            .verticalScroll(state = rememberScrollState())
+    ){
+        TextField(
+            value = createViewModel.recipeBasicInfo.title,
+            onValueChange = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(title = it) },
+            placeholder = { kotex(text = "레시피 제목", color = HintText, size = 20.sp, weight = FontWeight.Bold) },
+            singleLine = true,
+            colors = textFieldColor(),
+            textStyle = textFieldStyle(size = 20.sp),
             modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 15.dp)
-                .verticalScroll(state = rememberScrollState())
-        ){
-            TextField(
-                value = recipeBasicInfo.title,
-                onValueChange = { onChangeRecipeBasicInfo(recipeBasicInfo.copy(title = it)) },
-                placeholder = { kotex(text = "레시피 제목", color = HintText, size = 20.sp, weight = FontWeight.Bold) },
-                singleLine = true,
-                colors = textFieldColor(),
-                textStyle = textFieldStyle(size = 20.sp),
-                modifier = modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            )
+                .fillMaxWidth()
+                .wrapContentHeight()
+        )
 
-            TextField(
-                value = recipeBasicInfo.description,
-                onValueChange = { onChangeRecipeBasicInfo(recipeBasicInfo.copy(description = it)) },
-                placeholder = { kotex(text = "한 줄 소개", color = HintText) },
-                singleLine = true,
-                colors = textFieldColor(removeIndicator = true),
-                textStyle = textFieldStyle(size = 15.sp),
-                modifier = modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            )
+        TextField(
+            value = createViewModel.recipeBasicInfo.description,
+            onValueChange = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(description = it) },
+            placeholder = { kotex(text = "한 줄 소개", color = HintText) },
+            singleLine = true,
+            colors = textFieldColor(removeIndicator = true),
+            textStyle = textFieldStyle(size = 15.sp),
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        )
 
-            Divider(modifier = modifier
-                .fillMaxWidth())
+        Divider(modifier = modifier
+            .fillMaxWidth())
 
-            QuestionField(
-                time = recipeBasicInfo.time,
-                amount = recipeBasicInfo.amount,
-                onChangeTime = { onChangeRecipeBasicInfo(recipeBasicInfo.copy(time = it)) },
-                onChangeAmount = { onChangeRecipeBasicInfo(recipeBasicInfo.copy(amount = it)) }
-            )
+        QuestionField(
+            time = createViewModel.recipeBasicInfo.time,
+            amount = createViewModel.recipeBasicInfo.amount,
+            onChangeTime = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(time = it) },
+            onChangeAmount = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(amount = it) }
+        )
 
-            LevelSelection(
-                selectedLevel = recipeBasicInfo.level,
-                onChangeLevel = { onChangeRecipeBasicInfo(recipeBasicInfo.copy(level = it)) }
-            )
+        LevelSelection(
+            selectedLevel = createViewModel.recipeBasicInfo.level,
+            onChangeLevel = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(level = it) }
+        )
 
-            IngredientField(
-                ingredientList = ingredientList,
-                onChangeIngredient = { index, ingredient ->  onChangeIngredient(index, ingredient)},
-                onCLickAdd = { onCLickAdd() },
-                onClickRemove = { pos-> onClickRemove(pos) }
-            )
-        }
+        IngredientField(
+            ingredientList = createViewModel.ingredientList,
+            onChangeIngredient = { index, ingredient ->  createViewModel.ingredientList[index] = ingredient},
+            onCLickAdd = { createViewModel.ingredientList.add(Ingredient(no = createViewModel.ingredientList.size)) },
+            onClickRemove = { index-> createViewModel.ingredientList.removeAt(index) }
+        )
     }
 }
 
@@ -127,7 +114,7 @@ fun IngredientField(
     ingredientList: List<Ingredient>,
     onChangeIngredient: (index: Int, ingredient: Ingredient) -> Unit,
     onCLickAdd: ()->Unit,
-    onClickRemove: (pos: Int)->Unit,
+    onClickRemove: (index: Int)->Unit,
 ){
     Column(
         horizontalAlignment = Alignment.Start,

@@ -25,14 +25,14 @@ fun buttonColor() = ButtonDefaults
     )
 
 /** 레시피 만들기에서 다음 단계 혹은 이전 단계로 이동하기 위한 버튼.
- * @param onNextStep 다음 단계로 넘거감. null일 경우 다음 단계가 없는 것.
- * @param onPrevStep 이전 단계로 넘어감. null일 경우 이전 단계가 없는 것.*/
+ * @param onClickNextStep 다음 단계로 넘거감. null일 경우 다음 단계가 없는 것.
+ * @param onClickPrevStep 이전 단계로 넘어감. null일 경우 이전 단계가 없는 것.*/
 @Composable
 fun CreateStepMoveButton(
     modifier: Modifier = Modifier,
     createStep: CreateStep,
-    onNextStep: ()->Unit,
-    onPrevStep: ()->Unit,
+    onClickNextStep: ()->Unit,
+    onClickPrevStep: ()->Unit,
 ){
     val innerModifier = Modifier
     Row(
@@ -41,7 +41,7 @@ fun CreateStepMoveButton(
     ) {
         if(createStep.step > CreateStep.values().first().step){
             Button(
-                onClick = { onPrevStep() },
+                onClick = { onClickPrevStep() },
                 shape = RectangleShape,
                 colors = buttonColor(),
                 modifier = innerModifier
@@ -57,7 +57,7 @@ fun CreateStepMoveButton(
         }
         if(createStep.step < CreateStep.values().last().step){
             Button(
-                onClick = { onNextStep() },
+                onClick = { onClickNextStep() },
                 shape = RectangleShape,
                 colors = buttonColor(),
                 modifier = innerModifier
