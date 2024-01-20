@@ -130,8 +130,8 @@ fun CreateRecipeStepInfo(
                         onClickAdd = { createViewModel.stepInfoList.add(index+1, StepInfo(order = createViewModel.stepInfoList.size)) },
                         onClickRemove = { createViewModel.stepInfoList.removeAt(index) }
                     )
+                    Divider(modifier = modifier.fillMaxWidth(), thickness = 1.dp, color = HintText)
                 }
-                Divider(modifier = modifier.fillMaxWidth(), thickness = 1.dp, color = HintText)
             }
         }
     }
@@ -157,7 +157,7 @@ fun StepInfoView(
             .fillMaxWidth()
     ){
         Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+//            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .height(StepInfoViewHeight)
@@ -193,7 +193,8 @@ fun StepInfoView(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
-                .height(40.dp)
+//                .height(40.dp)
+                .wrapContentHeight()
                 .background(color = Color.White)
         ) {
             Icon(imageVector = Icons.Default.Menu, contentDescription = null, tint = HintText)
@@ -201,6 +202,7 @@ fun StepInfoView(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
+                    .wrapContentHeight()
             ) {
                 IconButton(onClick = { onClickAdd() }) {
                     kotex(text = "추가")

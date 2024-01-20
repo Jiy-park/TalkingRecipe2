@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="CreateRecipeEnd">
+        <State />
+      </entry>
       <entry key="app">
         <State />
       </entry>

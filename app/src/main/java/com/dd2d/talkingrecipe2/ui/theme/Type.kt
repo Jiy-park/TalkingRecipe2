@@ -79,3 +79,26 @@ fun kotex(
     )
 }
 
+@Composable
+fun matex(
+    modifier: Modifier = Modifier,
+    text: String = "",
+    weight: FontWeight = FontWeight.Light,
+    color: Color = MainText,
+    size: TextUnit = 15.sp,
+    maxLine: Int = 1,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    align: TextAlign = TextAlign.Start,
+){
+    Text(
+        text = text,
+        fontFamily = MapleFontFamily,
+        fontWeight = weight,
+        color = color,
+        textAlign = align,
+        fontSize = size,
+        maxLines = maxLine,
+        overflow = overflow,
+        modifier = modifier,
+    )
+}

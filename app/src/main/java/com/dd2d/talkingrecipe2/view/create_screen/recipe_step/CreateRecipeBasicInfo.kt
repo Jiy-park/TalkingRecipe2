@@ -94,7 +94,7 @@ fun CreateRecipeBasicInfo(
             onChangeAmount = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(amount = it) }
         )
 
-        LevelSelection(
+        LevelSelector(
             selectedLevel = createViewModel.recipeBasicInfo.level,
             onChangeLevel = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(level = it) }
         )
@@ -261,7 +261,7 @@ fun QuestionBox(
 }
 
 @Composable
-fun LevelSelection(
+fun LevelSelector(
     modifier: Modifier = Modifier,
     selectedLevel: Level,
     onChangeLevel: (Level)->Unit,
