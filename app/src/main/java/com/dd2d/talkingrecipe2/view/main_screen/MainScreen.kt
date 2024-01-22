@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dd2d.talkingrecipe2.navigation.TestingUserId
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
+import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-//    userViewModel: UserViewModel = viewModel(),
+    userViewModel: UserViewModel = viewModel{ UserViewModel(TestingUserId) },
     onClickSearchTrigger: () -> Unit,
     onClickSavePost: ()->Unit,
     onClickCreate: ()->Unit,
@@ -32,12 +35,16 @@ fun MainScreen(
             onClickSearchTrigger = { onClickSearchTrigger() }
         )
         MainScreenBottomView(
-            recentRecipe = null,
             onClickSavePost = { onClickSavePost() },
             onClickCreate = { onClickCreate() },
             onClickMyPost = { onClickMyPost() },
             onClickSetting = { onClickSetting() },
-            onClickRecentRecipe = { recipeId-> onClickRecentRecipe(recipeId) },
+        )
+        RecentRecipe(
+            recipeBasicInfo = userViewModel.recentRecipeBasicInfo,
+            recipeAuthor = userViewModel.recentRecipeAuthor,
+            recipeThumbnail = userViewModel.recentRecipeThumbnail,
+            onClick = { onClickRecentRecipe(it) }
         )
     }
 }

@@ -61,6 +61,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.logging
 import com.dd2d.talkingrecipe2.navigation.CreateScreenMode
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
@@ -71,7 +72,6 @@ import com.dd2d.talkingrecipe2.ui.theme.textFieldColor
 import com.dd2d.talkingrecipe2.ui.theme.textFieldStyle
 import com.dd2d.talkingrecipe2.view.create_screen.CreateScreenValue.StepInfoViewHeight
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
-import com.dd2d.talkingrecipe2.view_model.StepInfo
 import kotlinx.datetime.LocalDateTime
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -82,7 +82,7 @@ import org.burnoutcrew.reorderable.reorderable
 @Composable
 fun CreateRecipeStepInfo(
     modifier: Modifier = Modifier,
-    createViewModel: CreateViewModel = viewModel { CreateViewModel(createScreenMode = CreateScreenMode.Create) }
+    createViewModel: CreateViewModel
 ){
     val context = LocalContext.current
     val state = rememberReorderableLazyListState(

@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.kotex
@@ -41,8 +42,6 @@ import com.dd2d.talkingrecipe2.view.create_screen.recipe_step.CreateRecipeEnd
 import com.dd2d.talkingrecipe2.view.create_screen.recipe_step.CreateRecipeStepInfo
 import com.dd2d.talkingrecipe2.view.create_screen.recipe_step.CreateRecipeThumbnail
 import com.dd2d.talkingrecipe2.view.create_screen.recipe_step.CreateStepMoveButton
-import com.dd2d.talkingrecipe2.view_model.CreateState
-import com.dd2d.talkingrecipe2.view_model.CreateStep
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 
 
@@ -50,14 +49,11 @@ import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 fun CreateScreenCenterView(
     modifier: Modifier = Modifier,
     createViewModel: CreateViewModel,
+    createStep: CreateStep,
     onClickMoveToMain: ()->Unit,
     onClickMoveToRecipe: () -> Unit
 ){
-    val createState by createViewModel.createState.collectAsState()
-    val createStep by createViewModel.createStep.collectAsState()
-    if(createState is CreateState.OnFetching){
-        LoadingView()
-    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -66,7 +62,6 @@ fun CreateScreenCenterView(
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
-                .padding(bottom = BottomButtonHeight)
         ){
             when(createStep){
                 CreateStep.RecipeBasicInfo -> {

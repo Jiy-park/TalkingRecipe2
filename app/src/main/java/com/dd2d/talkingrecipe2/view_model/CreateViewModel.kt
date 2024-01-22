@@ -1,69 +1,54 @@
 package com.dd2d.talkingrecipe2.view_model
 
+import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
-import androidx.lifecycle.ViewModel
+import androidx.core.net.toUri
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.BuildConfig
-import com.dd2d.talkingrecipe2.data_struct.Level
-import com.dd2d.talkingrecipe2.data_struct.RecipeDTO
-import com.dd2d.talkingrecipe2.logging
+import com.dd2d.talkingrecipe2.createThumbnailImagePath
+import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
+import com.dd2d.talkingrecipe2.data_struct.recipe.IngredientDTO
+import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
+import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfoDTO
+import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
+import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfoDTO
+import com.dd2d.talkingrecipe2.data_struct.recipe.createStepInfoImagePath
+import com.dd2d.talkingrecipe2.data_struct.recipe.toDTO
+import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateState
+import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
 import com.dd2d.talkingrecipe2.navigation.CreateScreenMode
 import com.dd2d.talkingrecipe2.toSupabaseUrl
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order.ASCENDING
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
+import io.github.jan.supabase.storage.upload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration.Companion.minutes
 
-/**
- *- [Init] - [CreateViewModel]의 초기화.
- *- [OnFetching] - 레시피 관련 정보를 다운 중.
- *- [EndFetching] - 레시피를 다운 완료함. 레시피 수정 모드에서만 진입 가능. 해당 상태에서 다운 받은 레시피의 정보를 뷰 코드애서 가져감.
- *- [Stable] - 특별한 상태가 없음.
- *- [OnError] - 레시피 다운 중 에러 발생*/
-sealed class CreateState {
-    object Init: CreateState(){
-        init { Log.d("LOG_CHECK", "Create State : Init -> initial view model") }
-    }
-    class OnFetching(msg: String): CreateState(){
-        init { Log.d("LOG_CHECK", "Create State : OnFetching -> $msg") }
-    }
-    class EndFetching(msg: String): CreateState(){
-        init { Log.d("LOG_CHECK", "Create State : EndFetching -> $msg") }
-    }
-    class Stable(msg: String): CreateState(){
-        init { Log.d("LOG_CHECK", "Create State : Stable -> $msg") }
-    }
-    class OnError(cause: String): CreateState(){
-        init { Log.e("LOG_CHECK", "Create State : OnError -> $cause") }
-    }
-}
-
-enum class CreateStep(val step: Int) {
-    RecipeBasicInfo(step = 0),
-    RecipeStepInfo(step = 1),
-    RecipeThumbnail(step = 2),
-    EndCreate(step = 3),
-}
-
 /** @param createScreenMode 레시피 수정 모드 판단. 파라미터로 받은 값이 [CreateScreenMode.Modify]일 경우 레시피 수정 모드*/
-class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
+class CreateViewModel(
+    private val userId: String,
+    val createScreenMode: CreateScreenMode,
+    application: Application,
+): AndroidViewModel(application = application) {
     private lateinit var database: SupabaseClient
 
     private var _createState = MutableStateFlow<CreateState>(CreateState.Init)
@@ -72,25 +57,101 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
     private var _createStep = MutableStateFlow<CreateStep>(CreateStep.RecipeBasicInfo)
     val createStep: StateFlow<CreateStep> = _createStep.asStateFlow()
 
-    var recipeBasicInfo by mutableStateOf(RecipeBasicInfoDTO())
+    var recipeBasicInfo by mutableStateOf(RecipeBasicInfo())
     var thumbnailUri by mutableStateOf<Uri>(Uri.EMPTY)
     var ingredientList = mutableListOf<Ingredient>().toMutableStateList()
-    var stepInfoList = mutableListOf<StepInfo>(
-        StepInfo(0, 0, "1", Uri.EMPTY),
-        StepInfo(1, 1, "2", Uri.EMPTY),
-        StepInfo(2, 2, "3", Uri.EMPTY),
-        StepInfo(3, 3, "4", Uri.EMPTY),
-        StepInfo(4, 4, "5", Uri.EMPTY),
-        StepInfo(5, 5, "6", Uri.EMPTY),
-    ).toMutableStateList()
+    var stepInfoList = mutableListOf<StepInfo>(StepInfo(order = 0)).toMutableStateList()
 
-    fun test(s: String){
-        logging(s)
+    private fun createRecipeId(): String{
+        val format = DateTimeFormatter.ofPattern("yyMMdd_HHmm")
+        val createdAt = LocalDateTime.now().format(format)
+        val recipeId = "${userId}_$createdAt"
+        Log.d("LOG_CHECK", "createRecipeId()::recipe id is created. author id -> $userId. recipe id -> $recipeId")
+        return recipeId
     }
 
-    init {
-        if(_createState.value == CreateState.Init){
-            initDatabase()
+    private fun uploadRecipe(){
+        if(createScreenMode is CreateScreenMode.Create){
+            recipeBasicInfo.recipeId = createRecipeId()
+            recipeBasicInfo.authorId = userId
+        }
+
+        val recipeId = recipeBasicInfo.recipeId
+        viewModelScope.launch(Dispatchers.IO) {
+            _createState.value = CreateState.OnUploading("uploadRecipe()::start uploading recipe. author id -> $userId. recipe id -> $recipeId")
+
+            uploadRecipeBasicInfo()
+            uploadIngredientList(recipeId = recipeId)
+            uploadStepInfoList(recipeId = recipeId)
+            uploadThumbnail(recipeId = recipeId)
+
+            _createState.value = CreateState.Stable("uploadRecipe()::finished uploading recipe. author id -> $userId. recipe id -> $recipeId")
+        }
+    }
+
+    private suspend fun uploadThumbnail(recipeId: String){
+        val context = getApplication<Application>().applicationContext
+        try {
+            _createState.value = CreateState.OnUploading("uploadThumbnail()::uploading recipe thumbnail image.\n" +
+                    "upload -> $thumbnailUri")
+            val imagePath = thumbnailUri.createThumbnailImagePath(recipeId = recipeId, context = context)
+            database.storage.from("$RecipeImageTable/$recipeId").upload(uri = thumbnailUri, path = imagePath, upsert = true)
+        }
+        catch (e: Exception){
+            _createState.value = CreateState.OnError("uploadThumbnail()::fail to uploading recipe thumbnail -> $thumbnailUri\nmessage -> $e")
+        }
+    }
+
+    private suspend fun uploadStepInfoList(recipeId: String){
+        val context = getApplication<Application>().applicationContext
+        val bucket = database.storage.from("$RecipeImageTable/$recipeId/$StepInfoImageTable")
+        val uploadData = stepInfoList.mapIndexed { order, stepInfo->
+            var imagePath = ""
+            if(stepInfo.imageUri != Uri.EMPTY){
+                imagePath = stepInfo.imageUri.createStepInfoImagePath(order = order, context = context)
+                try{
+                    _createState.value = CreateState.OnUploading("uploadStepInfoList()::uploading recipe step info image.\n" +
+                            "upload -> ${stepInfo.imageUri}")
+                    bucket.upload(uri = stepInfo.imageUri, path = imagePath, upsert = true)
+                }
+                catch (e: Exception){
+                    _createState.value = CreateState.OnError("uploadStepInfoList()::fail to upload recipe step info image -> ${stepInfo.imageUri}\nmessage -> $e")
+                }
+            }
+            stepInfo.toDTO(recipeId = recipeId, order = order, imagePath = imagePath)
+        }
+
+        try {
+            _createState.value = CreateState.OnUploading("uploadStepInfoList()::uploading recipe step info list.\n" +
+                    "upload -> $uploadData")
+            database.from(StepInfoTable).upsert(uploadData, onConflict = StepInfoUpsertField)
+        }
+        catch (e: Exception){
+            _createState.value = CreateState.OnError("uploadStepInfoList()::fail to upload recipe step info list -> $stepInfoList\nmessage -> $e")
+        }
+    }
+
+    private suspend fun uploadIngredientList(recipeId: String){
+        val uploadData = ingredientList.toList().toDTO(recipeId)
+        try{
+            _createState.value = CreateState.OnUploading("uploadIngredientList()::uploading recipe ingredient list.\n" +
+                    "upload -> $uploadData")
+            database.from(IngredientTable).upsert(uploadData, onConflict = IngredientUpsertField)
+        }
+        catch (e: Exception){
+            _createState.value = CreateState.OnError("uploadIngredientList()::fail to upload recipe ingredient list -> $ingredientList\nupload -> $uploadData\nmessage -> $e")
+        }
+    }
+
+    private suspend fun uploadRecipeBasicInfo(){
+        val uploadData = recipeBasicInfo.toDTO()
+        try{
+            _createState.value = CreateState.OnUploading("uploadRecipeBasicInfo()::uploading recipe basic info.\n" +
+                    "upload -> $uploadData")
+            database.from(RecipeTable).upsert(value = uploadData, onConflict = RecipeBasicInfoUpsertField)
+        }
+        catch (e: Exception){
+            _createState.value = CreateState.OnError("uploadRecipeBasicInfo()::fail to upload recipe basic info -> $recipeBasicInfo\nupload -> $uploadData\nmessage -> $e")
         }
     }
 
@@ -98,6 +159,9 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
         val currentStep = _createStep.value.step
         if(currentStep >= CreateStep.values().last().step) return
         _createStep.value = CreateStep.values()[currentStep+1]
+        if(_createStep.value == CreateStep.EndCreate){
+            uploadRecipe()
+        }
     }
 
     fun moveToPrevStep(){
@@ -106,7 +170,7 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
         _createStep.value = CreateStep.values()[currentStep-1]
     }
 
-    private fun initDatabase(){
+    fun init(){
         database = createSupabaseClient(
             supabaseUrl = BuildConfig.SUPABASE_URL,
             supabaseKey = BuildConfig.SUPABASE_KEY
@@ -115,13 +179,15 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
             install(Storage)
         }
 
-        _createState.value = CreateState.Stable("initDatabase()::connect database.")
         if(createScreenMode is CreateScreenMode.Modify) {
-            fetchModifyRecipe(createScreenMode.recipeId)
+            fetchRecipe(createScreenMode.recipeId)
+        }
+        else{
+            _createState.value = CreateState.Stable("initDatabase()::connect database.")
         }
     }
 
-    private fun fetchModifyRecipe(recipeId: String){
+    private fun fetchRecipe(recipeId: String){
         viewModelScope.launch(Dispatchers.IO) {
             fetchRecipeById(recipeId = recipeId)
         }
@@ -131,17 +197,7 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
         _createState.value = CreateState.OnFetching("fetchRecipeById()::start fetch recipe data. recipe id -> $recipeId")
 
         fetchRecipeBasicInfoById(recipeId = recipeId){ res->
-            recipeBasicInfo = RecipeBasicInfoDTO(
-                recipeId = res.recipeId,
-                authorId = res.authorId,
-                title = res.title,
-                description = res.description,
-                level = Level.values()[res.level],
-                shareOption = ShareOption.values()[res.shareOption],
-                time = res.time.toString(),
-                amount = res.amount.toString(),
-                calorie = res.calorie.toString(),
-            )
+            recipeBasicInfo = res
         }
 
         fetchIngredientListById(recipeId = recipeId){ res->
@@ -156,23 +212,25 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
             thumbnailUri = Uri.parse(thumbnailUrl)
         }
 
-        _createState.value = CreateState.EndFetching("fetchRecipeById()::finished fetching recipe data. recipe id -> $recipeId")
+        _createState.value = CreateState.Stable("fetchRecipeById()::finished fetching recipe data. recipe id -> $recipeId")
     }
 
     /** [recipeId]에 맞는 레시피의 기본 정보를 받아옴.*/
     private suspend fun fetchRecipeBasicInfoById(
         recipeId: String,
-        onLoadData: (recipe: RecipeDTO) -> Unit,
+        onLoadData: (recipe: RecipeBasicInfo) -> Unit,
     ){
+        val columns = Columns.list("recipe_id", "author_id", "title", "description", "level", "time", "amount", "share_option", "calorie")
         try {
             _createState.value = CreateState.OnFetching("fetchRecipeBasicInfoById()::start fetch recipe basic info. recipe id -> $recipeId")
             val recipeBasicInfo = database.from(RecipeTable)
-                .select{
+                .select(columns = columns){
                     filter{
                         eq(RecipeId, recipeId)
                     }
                 }
-                .decodeSingle<RecipeDTO>()
+                .decodeSingle<RecipeBasicInfoDTO>()
+                .toRecipeBasicInfo()
             onLoadData(recipeBasicInfo)
         }
         catch (e: Exception){
@@ -197,6 +255,9 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
         }
     }
 
+    /** 레시피의 각 단계 정보를 받아옴,
+     * 1. 문자로 이루어진 데이터부터 받아옴 = [StepInfoDTO].
+     * 2. 받아온 데이터로부터 imagePath를 얻고, [recipeId]와 조합하여 각 단계의 이미지를 받아옴.*/
     private suspend fun fetchStepInfoListById(
         recipeId: String,
         onLoadData: (List<StepInfo>)->Unit,
@@ -213,17 +274,16 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
                     }
                     .decodeList<StepInfoDTO>()
 
-
                 try {
                     _createState.value = CreateState.OnFetching("fetchStepInfoListById()::start fetch recipe step info image list. recipe id -> $recipeId")
                     val res = stepInfo.map { dto->
-                        val imageUrl = database
+                        val imageUri = database
                             .storage
                             .from("$RecipeImageTable/$recipeId/$StepInfoImageTable")
                             .createSignedUrl(path = dto.imagePath, expiresIn = ExpiresIn)
                             .toSupabaseUrl()
-
-                        dto.toStepInfo(imageUrl = imageUrl)
+                            .toUri()
+                        dto.toStepInfo(imageUri = imageUri)
                     }
 
                     onLoadData(res)
@@ -237,6 +297,8 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
             _createState.value = CreateState.OnError("fetchStepInfoListById():: fail to fetch recipe step info list : recipe id -> $recipeId, message -> ${e.message}")
         }
     }
+
+    /** [recipeId]에 맞는 레시피의 재료 정보를 받아옴.*/
     private suspend fun fetchIngredientListById(
         recipeId: String,
         onLoadData: (List<Ingredient>)->Unit
@@ -260,7 +322,7 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
         }
     }
 
-    companion object {
+    private companion object {
         const val RecipeId = "recipe_id"
         const val RecipeTable = "recipes"
         const val IngredientTable = "recipe_ingredient"
@@ -268,91 +330,9 @@ class CreateViewModel(val createScreenMode: CreateScreenMode): ViewModel() {
         const val RecipeImageTable = "recipe_image"
         const val StepInfoImageTable = "step_info"
         const val OrderBy = "order"
+        const val RecipeBasicInfoUpsertField = "recipe_id"
+        const val IngredientUpsertField = "no,recipe_id"
+        const val StepInfoUpsertField = "no,recipe_id"
         val ExpiresIn = 30.minutes
     }
 }
-
-data class RecipeBasicInfoDTO(
-    var recipeId: String = "",
-    val authorId: String = "",
-    var title: String = "",
-    var description: String = "",
-    var level: Level = Level.Normal,
-    var time: String = "",
-    var amount: String = "",
-    var calorie: String = "",
-    var shareOption: ShareOption = ShareOption.All
-)
-
-data class Ingredient(
-    val no: Int,
-    val name: String = "",
-    val amount: String = "",
-){
-    fun toDTO(recipeId: String) = IngredientDTO(
-        no = this.no,
-        recipeId = recipeId,
-        name = this.name,
-        amount = this.amount
-    )
-}
-
-@Serializable
-data class IngredientDTO(
-    @SerialName("no")
-    val no: Int,
-    @SerialName("recipe_id")
-    val recipeId: String,
-    @SerialName("name")
-    val name: String,
-    @SerialName("amount")
-    val amount: String,
-){
-    fun toIngredient() = Ingredient(
-        no = this.no,
-        name = this.name,
-        amount = this.amount
-    )
-}
-
-data class StepInfo(
-    val no: Long = System.currentTimeMillis(),
-    val order: Int,
-    val explanation: String = "",
-    val imageUri: Uri = Uri.EMPTY,
-){
-    fun toDTO(recipeId: String) = StepInfoDTO(
-        no = this.no,
-        recipeId = recipeId,
-        order = this.order,
-        explanation = this.explanation,
-        imagePath = "${this.order}.jpeg"
-    )
-}
-
-
-@Serializable
-data class StepInfoDTO(
-    @SerialName("no")
-    val no: Long,
-    @SerialName("recipe_id")
-    val recipeId: String,
-    @SerialName("order")
-    val order: Int,
-    @SerialName("step_image_path")
-    val imagePath: String,
-    @SerialName("explanation")
-    val explanation: String = "",
-){
-    fun toStepInfo(imageUrl: String) = StepInfo(
-        no = this.no,
-        order = this.order,
-        explanation = this.explanation,
-        imageUri = Uri.parse(imageUrl)
-    )
-}
-
-enum class ShareOption(val description: String){
-    NotShare("나만 공개"), Friends("친구 공개"), All("모두 공개")
-}
-

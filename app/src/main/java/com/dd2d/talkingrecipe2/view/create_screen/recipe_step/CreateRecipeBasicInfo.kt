@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dd2d.talkingrecipe2.data_struct.Level
+import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGray
 import com.dd2d.talkingrecipe2.ui.theme.HintText
@@ -45,7 +46,6 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.textFieldColor
 import com.dd2d.talkingrecipe2.ui.theme.textFieldStyle
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
-import com.dd2d.talkingrecipe2.view_model.Ingredient
 
 @Composable
 fun CreateRecipeBasicInfo(
@@ -102,7 +102,7 @@ fun CreateRecipeBasicInfo(
         IngredientField(
             ingredientList = createViewModel.ingredientList,
             onChangeIngredient = { index, ingredient ->  createViewModel.ingredientList[index] = ingredient},
-            onCLickAdd = { createViewModel.ingredientList.add(Ingredient(no = createViewModel.ingredientList.size)) },
+            onCLickAdd = { createViewModel.ingredientList.add(Ingredient(no = createViewModel.ingredientList.size+1)) },
             onClickRemove = { index-> createViewModel.ingredientList.removeAt(index) }
         )
     }

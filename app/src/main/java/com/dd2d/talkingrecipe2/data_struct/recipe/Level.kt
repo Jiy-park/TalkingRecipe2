@@ -1,7 +1,6 @@
-package com.dd2d.talkingrecipe2.data_struct
+package com.dd2d.talkingrecipe2.data_struct.recipe
 
 import com.dd2d.talkingrecipe2.R
-
 
 /** 레시피의 난이도
  * @property Unknown 난이도를 알 수 없음.*/

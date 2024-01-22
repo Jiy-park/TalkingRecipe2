@@ -1,27 +1,20 @@
 package com.dd2d.talkingrecipe2
 
 import android.annotation.SuppressLint
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import android.text.TextUtils.split
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -40,14 +33,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter.State.Empty.painter
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.dd2d.talkingrecipe2.ui.theme.kotex
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
-import io.github.jan.supabase.storage.UploadData
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.upload
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +45,8 @@ import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
-import kotlin.time.Duration.Companion.hours
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration.Companion.minutes
 
 private val supabase = createSupabaseClient(
@@ -66,6 +55,13 @@ private val supabase = createSupabaseClient(
 ) {
     install(Postgrest)
     install(Storage)
+}
+
+@Composable
+@Preview
+fun View3(){
+    val bucket = supabase.storage["d"].bucketId
+    bucket.alog("as")
 }
 
 

@@ -44,12 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.data_struct.recipe.ShareOption
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.HintText
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
-import com.dd2d.talkingrecipe2.view_model.ShareOption
 
 @Composable
 fun CreateRecipeThumbnail(
@@ -176,7 +176,7 @@ fun ThumbnailView(
             AsyncImage(
                 model = model,
                 contentDescription = null,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
             if(uri != Uri.EMPTY && isChecked){
                 Box(

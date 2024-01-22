@@ -16,6 +16,8 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.ImageDecoderDecoder
 import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.ui.theme.kotex
+import com.dd2d.talkingrecipe2.ui.theme.matex
 
 @Composable
 fun LoadingView(
@@ -38,5 +40,19 @@ fun LoadingView(
             modifier = modifier
                 .size(200.dp)
         )
+    }
+}
+
+@Composable
+fun ErrorView(
+    modifier: Modifier = Modifier,
+    cause: String,
+){
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize()
+    ){
+        matex(text = "에러 발생\n$cause")
     }
 }

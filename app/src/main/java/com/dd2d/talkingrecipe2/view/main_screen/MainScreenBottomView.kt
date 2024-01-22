@@ -1,5 +1,6 @@
 package com.dd2d.talkingrecipe2.view.main_screen
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.dd2d.talkingrecipe2.R
-import com.dd2d.talkingrecipe2.data_struct.Recipe
+import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.ui.CircleIconButton
 import com.dd2d.talkingrecipe2.ui.RecipeViewer
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
@@ -31,12 +32,10 @@ import com.dd2d.talkingrecipe2.ui.theme.kopupFontFamily
 @Composable
 fun MainScreenBottomView(
     modifier: Modifier = Modifier,
-    recentRecipe: Recipe?,
     onClickSavePost: ()->Unit,
     onClickCreate: ()->Unit,
     onClickMyPost: ()->Unit,
     onClickSetting: ()->Unit,
-    onClickRecentRecipe: (recipeId: String)->Unit,
 ){
     Surface(
         color = Color.White,
@@ -87,16 +86,6 @@ fun MainScreenBottomView(
                     modifier = modifier.weight(1F)
                 )
             }
-
-            recentRecipe?.let {
-                RecentRecipe(
-                    recipe = recentRecipe,
-                    onClick = { recipeId-> onClickRecentRecipe(recipeId) },
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                )
-            }
         }
     }
 }
@@ -104,7 +93,9 @@ fun MainScreenBottomView(
 @Composable
 fun RecentRecipe(
     modifier: Modifier = Modifier,
-    recipe: Recipe,
+    recipeBasicInfo: RecipeBasicInfo,
+    recipeAuthor: String,
+    recipeThumbnail: Uri,
     onClick: (recipeId: String)->Unit,
 ){
     Column(
@@ -114,7 +105,9 @@ fun RecentRecipe(
     ){
         Text(text = "최근 본 레시피", fontFamily = kopupFontFamily, fontWeight = FontWeight.Medium, color = MainText, fontSize = 15.sp, modifier = modifier.fillMaxWidth())
         RecipeViewer(
-            recipe = recipe,
+            recipeBasicInfo = recipeBasicInfo,
+            recipeAuthor = recipeAuthor,
+            recipeThumbnail = recipeThumbnail,
             onClick = { recipeId-> onClick(recipeId) },
             modifier = Modifier.fillMaxWidth()
         )

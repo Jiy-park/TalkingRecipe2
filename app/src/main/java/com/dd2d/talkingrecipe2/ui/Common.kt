@@ -1,7 +1,7 @@
 package com.dd2d.talkingrecipe2.ui
 
+import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -28,7 +27,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dd2d.talkingrecipe2.data_struct.Recipe
+import coil.compose.AsyncImage
+import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGray
 import com.dd2d.talkingrecipe2.ui.theme.MainText
 import com.dd2d.talkingrecipe2.ui.theme.kopupFontFamily
@@ -37,7 +37,9 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 @Composable
 fun RecipeViewer(
     modifier: Modifier = Modifier,
-    recipe: Recipe,
+    recipeBasicInfo: RecipeBasicInfo,
+    recipeAuthor: String,
+    recipeThumbnail: Uri,
     onClick: (recipeId: String) -> Unit,
 ){
     val innerModifier = Modifier
@@ -45,10 +47,13 @@ fun RecipeViewer(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.Top,
         modifier = modifier
-            .clickableWithoutRipple { onClick(recipe.recipeId) }
+            .clickableWithoutRipple { onClick(recipeBasicInfo.recipeId) }
     ) {
         Surface(shape = RoundedCornerShape(15.dp)) {
-            Image(painter = painterResource(id = recipe.thumbnailPath), contentDescription = "thumbnail image")
+            AsyncImage(
+                model = recipeThumbnail,
+                contentDescription = "recent recipe thumbnail image"
+            )
         }
         Spacer(modifier = innerModifier.width(15.dp))
         Column(
@@ -57,12 +62,12 @@ fun RecipeViewer(
             modifier = innerModifier
                 .fillMaxWidth()
         ){
-            kotex(text = recipe.title, weight = FontWeight.Bold, size = 20.sp)
+            kotex(text = recipeBasicInfo.title, weight = FontWeight.Bold, size = 20.sp)
 
             Spacer(modifier = modifier.height(5.dp))
 
-            kotex(text = recipe.author)
-            kotex(text = recipe.description)
+            kotex(text = recipeAuthor)
+            kotex(text = recipeBasicInfo.description)
 
             Spacer(modifier = modifier.height(5.dp))
 
@@ -72,10 +77,10 @@ fun RecipeViewer(
                 modifier = modifier
                     .horizontalScroll(state = rememberScrollState())
             ) {
-                TagView(text = "${recipe.time}분")
-                TagView(text = "${recipe.amount}인분")
-                TagView(text = recipe.level.description)
-                TagView(text = "${recipe.calorie}kcal")
+                TagView(text = "${recipeBasicInfo.time}분")
+                TagView(text = "${recipeBasicInfo.amount}인분")
+                TagView(text = recipeBasicInfo.level.description)
+                TagView(text = "${recipeBasicInfo.calorie}kcal")
             }
         }
     }

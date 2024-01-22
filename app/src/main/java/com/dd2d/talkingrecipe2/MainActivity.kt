@@ -26,13 +26,6 @@ import com.dd2d.talkingrecipe2.view_model.UserViewModel
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 
-private val supabase = createSupabaseClient(
-    supabaseUrl = BuildConfig.SUPABASE_URL,
-    supabaseKey = BuildConfig.SUPABASE_KEY
-) {
-    install(Postgrest)
-}
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 //        val userViewModel = UserViewModel(supabase = supabase, userId = 1_000_001)
