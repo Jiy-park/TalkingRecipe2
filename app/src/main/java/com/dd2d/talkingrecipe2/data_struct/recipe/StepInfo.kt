@@ -44,7 +44,7 @@ data class StepInfoDTO(
     )
 }
 
-/** [CreateScreen]의 레시피 업로드 시 사용. [StepInfo]의 imageUri -> imagePath 로 변환. 이떄 imagePath는 [order.tpye]이 됨.
+/** [CreateScreen]의 레시피 업로드 시 사용. [StepInfo]의 imageUri -> imagePath 로 변환. 이떄 imagePath는 order.tpye이 됨.
  * @param order 이미지의 순서
  * @param context 이미지의 mime type 추정에 사용*/
 fun Uri.createStepInfoImagePath(order: Int, context: Context): String{

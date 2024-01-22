@@ -9,14 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.ImageDecoderDecoder
 import com.dd2d.talkingrecipe2.R
-import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.matex
 
 @Composable

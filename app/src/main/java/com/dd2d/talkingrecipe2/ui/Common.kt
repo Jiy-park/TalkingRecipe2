@@ -1,7 +1,6 @@
 package com.dd2d.talkingrecipe2.ui
 
 import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -4,27 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.dd2d.talkingrecipe2.navigation.AppNavigation
-import com.dd2d.talkingrecipe2.navigation.Screen
-import com.dd2d.talkingrecipe2.navigation.SubScreenDestination
-import com.dd2d.talkingrecipe2.navigation.subScreenGraph
 import com.dd2d.talkingrecipe2.ui.theme.TalkingRecipe2Theme
-import com.dd2d.talkingrecipe2.view.main_screen.MainScreen
-import com.dd2d.talkingrecipe2.view.sub_screen.SubScreen
-import com.dd2d.talkingrecipe2.view_model.UserViewModel
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.postgrest.Postgrest
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
