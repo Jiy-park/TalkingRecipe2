@@ -1,6 +1,5 @@
 package com.dd2d.talkingrecipe2.data_struct.recipe
 
-import com.dd2d.talkingrecipe2.data_struct.Level
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

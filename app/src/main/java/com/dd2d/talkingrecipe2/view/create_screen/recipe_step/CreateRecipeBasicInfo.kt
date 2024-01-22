@@ -35,8 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dd2d.talkingrecipe2.data_struct.Level
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
+import com.dd2d.talkingrecipe2.data_struct.recipe.Level
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGray
 import com.dd2d.talkingrecipe2.ui.theme.HintText
