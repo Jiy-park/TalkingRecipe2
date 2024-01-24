@@ -26,12 +26,10 @@ import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class RecipeRepository: RecipeFetch{
+class RecipeFetchRepository: RecipeFetch{
     private val database = createSupabaseClient(
         supabaseUrl = BuildConfig.SUPABASE_URL,
         supabaseKey = BuildConfig.SUPABASE_KEY
@@ -43,7 +41,7 @@ class RecipeRepository: RecipeFetch{
     override suspend fun fetRecipeById(
         recipeId: String,
         onChangeFetchingState: (msg: String) -> Unit
-    ): Flow<Recipe>{
+    ): Recipe {
         try {
             return withContext(Dispatchers.IO){
                 onChangeFetchingState("start fetching recipe basic info")
@@ -58,13 +56,11 @@ class RecipeRepository: RecipeFetch{
                 onChangeFetchingState("start fetching recipe thumbnail image uri")
                 val thumbnailUri = fetchRecipeThumbnailUriById(recipeId)
 
-                flowOf(
-                    Recipe(
-                        basicInfo = basicInfo,
-                        ingredientList = ingredientList,
-                        stepInfoList = stepInfoList,
-                        thumbnailUri = thumbnailUri
-                    )
+                Recipe(
+                    basicInfo = basicInfo,
+                    ingredientList = ingredientList,
+                    stepInfoList = stepInfoList,
+                    thumbnailUri = thumbnailUri
                 )
             }
         }

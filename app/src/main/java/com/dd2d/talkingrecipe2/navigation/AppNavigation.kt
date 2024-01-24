@@ -34,8 +34,8 @@ fun AppNavigation(
             )
         }
         subScreenGraph(navController = navController)
-        createScreenGraph(navController = navController)
-        searchScreenGraph(navController = navController)
-        recipeScreenGraph(navController = navController)
+        recipeWriteScreenGraph(navController = navController)
+        recipeSearchScreenGraph(navController = navController)
+        recipeReadScreenGraph(navController = navController)
     }
 }

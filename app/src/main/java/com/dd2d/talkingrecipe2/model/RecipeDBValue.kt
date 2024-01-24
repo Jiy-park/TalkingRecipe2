@@ -25,5 +25,8 @@ object RecipeDBValue{
 
     object Field{
         val BasicInfoField = listOf("recipe_id", "author_id", "title", "description", "level", "time", "amount", "share_option", "calorie")
+        const val RecipeBasicInfoUpsertField = "recipe_id"
+        const val IngredientUpsertField = "no,recipe_id"
+        const val StepInfoUpsertField = "no,recipe_id"
     }
 }

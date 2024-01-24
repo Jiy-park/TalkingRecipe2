@@ -13,6 +13,10 @@ data class StepInfo(
     val explanation: String = "",
     val imageUri: Uri = Uri.EMPTY,
 ){
+    /** [StepInfo]의 내용물이 비었는지 확인.
+     * @return [explanation] 또는 [imageUri] 중 하나라도 내용물이 비었다면 true 반납*/
+    fun isEmpty() = this.explanation.isEmpty() || this.imageUri == Uri.EMPTY
+
     fun toDTO(recipeId: String, order: Int, imagePath: String) = StepInfoDTO(
         no = this.no,
         recipeId = recipeId,

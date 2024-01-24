@@ -7,14 +7,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingUserId
-import com.dd2d.talkingrecipe2.view.recipe_write_screen.RecipeWriteScreen
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.CreateScreenValue
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.RecipeWriteScreen
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 
-fun NavGraphBuilder.createScreenGraph(
+fun NavGraphBuilder.recipeWriteScreenGraph(
     navController: NavController
 ){
-
     composable(route = "${Screen.RecipeWrite.route}/{recipeId}"){ backStack->
         /** 레시피 수정 모드. 수정 모드일 경우 [RecipeWriteScreen]에 매개변수로 수정할 레시피의 아이디값을 넘겨줌. 아닐 경우 [CreateScreenValue.CreateMode]을 받음.*/
         val mode = backStack.arguments?.getString("recipeId")?.let { recipeId->

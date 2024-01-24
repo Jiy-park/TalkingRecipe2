@@ -10,7 +10,7 @@ import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.llog
 import com.dd2d.talkingrecipe2.logging
-import com.dd2d.talkingrecipe2.model.RecipeRepository
+import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingAuthor
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import com.dd2d.talkingrecipe2.view.ErrorView
@@ -23,7 +23,7 @@ import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
 @Preview(showSystemUi = true)
 fun RecipeReadScreen(
     modifier: Modifier = Modifier,
-    recipeViewModel: RecipeViewModel = viewModel { RecipeViewModel(RecipeRepository(), TestingRecipeId) },
+    recipeViewModel: RecipeViewModel = viewModel { RecipeViewModel(RecipeFetchRepository(), TestingRecipeId) },
     onClickBack: ()->Unit = llog("click back"),
     onClickAuthorProfileImage: () -> Unit = llog("click author profile image"),
     onClickFavorite: () -> Unit = llog("click favorite"),
@@ -35,10 +35,8 @@ fun RecipeReadScreen(
     val recipeState by recipeViewModel.recipeState.collectAsState()
 
     when(recipeState){
-        is RecipeState.Init -> {}
-        is RecipeState.OnLoading -> {
-            LoadingView()
-        }
+        is RecipeState.Init -> { recipeViewModel.init() }
+        is RecipeState.OnLoading -> { LoadingView() }
         is RecipeState.Stable -> {
             val recipe by (recipeState as RecipeState.Stable).recipe.collectAsState(initial = Recipe())
             val authorInfo = TestingAuthor

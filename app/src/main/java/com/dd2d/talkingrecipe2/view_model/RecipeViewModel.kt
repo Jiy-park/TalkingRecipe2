@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.data_struct.Recipe
-import com.dd2d.talkingrecipe2.model.RecipeRepository
+import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
 import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipe
 import com.dd2d.talkingrecipe2.view.ErrorView
@@ -43,24 +43,23 @@ sealed class RecipeState{
  * @see [Screen.RecipeRead]
  * @see [Screen.RecipeWrite]*/
 class RecipeViewModel(
-    private val recipeRepo: RecipeRepository,
-    val recipeId: String?,
+    private val recipeRepo: RecipeFetchRepository,
+    private val recipeId: String?,
 ): ViewModel() {
     private var _recipeState = MutableStateFlow<RecipeState>(RecipeState.Init)
     val recipeState = _recipeState.asStateFlow()
 
     /** 처음 초기화 됐을 경우에만 시행.
      *[recipeId] 값이 null인 경우 OnError, 아닌 경우 [recipeId]에 맞는 레시피의 정보를 가져옴. */
-    init {
+    fun init(){
         if(_recipeState.value is RecipeState.Init) {
             recipeId?.let {
                 fetchRecipe(recipeId = recipeId)
-            } ?: run {
+            }?: run {
                 _recipeState.value = RecipeState.OnError("init::recipe id is null value")
             }
         }
     }
-
 
     private fun fetchRecipe(recipeId: String){
         _recipeState.value = RecipeState.OnLoading("start fetching recipe. recipe id -> $recipeId")
