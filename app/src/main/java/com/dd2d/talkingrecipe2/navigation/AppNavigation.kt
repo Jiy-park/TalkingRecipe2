@@ -6,9 +6,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.dd2d.talkingrecipe2.alog
-import com.dd2d.talkingrecipe2.view.create_screen.CreateScreen
+import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import com.dd2d.talkingrecipe2.view.main_screen.MainScreen
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.CreateScreenValue
 
 @Composable
 fun AppNavigation(
@@ -22,12 +22,15 @@ fun AppNavigation(
     ){
         composable(route = Screen.Main.route){
             MainScreen(
-                onClickSearchTrigger = { navController.navigate(route = Screen.Search.route) },
+                onClickSearchTrigger = { navController.navigate(route = Screen.RecipeSearch.route) },
                 onClickSavePost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.SavePost}") },
-                onClickCreate = { navController.navigate(route = "${Screen.Create.route}/${CreateScreen.CreateMode}") },
+                onClickCreate = { navController.navigate(route = "${Screen.RecipeWrite.route}/${CreateScreenValue.CreateMode}") },
                 onClickMyPost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.MyPost}") },
-                onClickSetting = { /*TODO("다이얼로그로 ")*/ },
-                onClickRecentRecipe = { recipeId-> navController.navigate(route = "${Screen.Recipe.route}/$recipeId") },
+                onClickSetting = {
+                     /*TODO("다이얼로그로 ")*/
+                    navController.navigate(route = "${Screen.RecipeRead.route}/$TestingRecipeId")
+                },
+                onClickRecentRecipe = { recipeId-> navController.navigate(route = "${Screen.RecipeRead.route}/$recipeId") },
             )
         }
         subScreenGraph(navController = navController)

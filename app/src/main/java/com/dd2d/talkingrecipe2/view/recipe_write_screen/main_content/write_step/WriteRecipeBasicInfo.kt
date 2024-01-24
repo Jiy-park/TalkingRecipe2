@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.create_screen.recipe_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -48,7 +48,7 @@ import com.dd2d.talkingrecipe2.ui.theme.textFieldStyle
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 
 @Composable
-fun CreateRecipeBasicInfo(
+fun WriteRecipeBasicInfo(
     modifier : Modifier = Modifier,
     createViewModel: CreateViewModel,
 ){
@@ -173,7 +173,7 @@ fun IngredientInput(
         )
         TextField(
             value = amount,
-            onValueChange = {onChangeAmount(it) },
+            onValueChange = { onChangeAmount(it) },
             colors = textFieldColor(),
             textStyle = textFieldStyle(size = 13.sp),
             placeholder = { kotex(text = "필요양", size = 13.sp, color = HintText) },

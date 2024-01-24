@@ -3,7 +3,7 @@ package com.dd2d.talkingrecipe2.data_struct.recipe
 import android.content.Context
 import android.net.Uri
 import com.dd2d.talkingrecipe2.alog
-import com.dd2d.talkingrecipe2.view.create_screen.CreateScreen
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.RecipeWriteScreen
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -44,7 +44,7 @@ data class StepInfoDTO(
     )
 }
 
-/** [CreateScreen]의 레시피 업로드 시 사용. [StepInfo]의 imageUri -> imagePath 로 변환. 이떄 imagePath는 order.tpye이 됨.
+/** [RecipeWriteScreen]의 레시피 업로드 시 사용. [StepInfo]의 imageUri -> imagePath 로 변환. 이떄 imagePath는 order.tpye이 됨.
  * @param order 이미지의 순서
  * @param context 이미지의 mime type 추정에 사용*/
 fun Uri.createStepInfoImagePath(order: Int, context: Context): String{

@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.create_screen
+package com.dd2d.talkingrecipe2.view.recipe_write_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,22 +8,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
-import com.dd2d.talkingrecipe2.view.create_screen.recipe_step.CreateRecipeBasicInfo
-import com.dd2d.talkingrecipe2.view.create_screen.recipe_step.CreateRecipeEnd
-import com.dd2d.talkingrecipe2.view.create_screen.recipe_step.CreateRecipeStepInfo
-import com.dd2d.talkingrecipe2.view.create_screen.recipe_step.CreateRecipeThumbnail
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.EndWrite
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeBasicInfo
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeStepInfo
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeThumbnail
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 
 
 @Composable
-fun CreateScreenCenterView(
+fun RecipeWriteScreenCenterView(
     modifier: Modifier = Modifier,
     createViewModel: CreateViewModel,
     createStep: CreateStep,
     onClickMoveToMain: ()->Unit,
     onClickMoveToRecipe: () -> Unit
 ){
-
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -35,16 +34,16 @@ fun CreateScreenCenterView(
         ){
             when(createStep){
                 CreateStep.RecipeBasicInfo -> {
-                    CreateRecipeBasicInfo(createViewModel = createViewModel)
+                    WriteRecipeBasicInfo(createViewModel = createViewModel)
                 }
                 CreateStep.RecipeStepInfo -> {
-                    CreateRecipeStepInfo(createViewModel = createViewModel)
+                    WriteRecipeStepInfo(createViewModel = createViewModel)
                 }
                 CreateStep.RecipeThumbnail -> {
-                    CreateRecipeThumbnail(createViewModel = createViewModel)
+                    WriteRecipeThumbnail(createViewModel = createViewModel)
                 }
                 CreateStep.EndCreate -> {
-                    CreateRecipeEnd(
+                    EndWrite(
                         onClickMoveToMain = { onClickMoveToMain() },
                         onClickMoveToRecipe = { onClickMoveToRecipe() }
                     )

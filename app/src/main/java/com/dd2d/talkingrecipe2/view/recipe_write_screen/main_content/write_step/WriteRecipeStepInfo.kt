@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.create_screen.recipe_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
 
 import android.content.Context
 import android.net.Uri
@@ -38,12 +38,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.dd2d.talkingrecipe2.R
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
+import com.dd2d.talkingrecipe2.ui.CommonValue.StepInfoViewHeight
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.HintText
 import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.textFieldColor
 import com.dd2d.talkingrecipe2.ui.theme.textFieldStyle
-import com.dd2d.talkingrecipe2.view.create_screen.CreateScreenValue.StepInfoViewHeight
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -52,7 +52,7 @@ import org.burnoutcrew.reorderable.reorderable
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CreateRecipeStepInfo(
+fun WriteRecipeStepInfo(
     modifier: Modifier = Modifier,
     createViewModel: CreateViewModel
 ){
@@ -129,7 +129,6 @@ fun StepInfoView(
             .fillMaxWidth()
     ){
         Row(
-//            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .height(StepInfoViewHeight)
@@ -165,7 +164,6 @@ fun StepInfoView(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
-//                .height(40.dp)
                 .wrapContentHeight()
                 .background(color = Color.White)
         ) {

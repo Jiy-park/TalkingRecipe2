@@ -33,18 +33,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
+import com.dd2d.talkingrecipe2.data_struct.recipe.IngredientDTO
+import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
+import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfoDTO
+import com.dd2d.talkingrecipe2.model.RecipeDBValue.Field.BasicInfoField
+import com.dd2d.talkingrecipe2.model.RecipeDBValue.Filter.RecipeIdEqualTo
+import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.upload
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
+import java.io.IOException
 import kotlin.time.Duration.Companion.minutes
 
 private val supabase = createSupabaseClient(
@@ -58,8 +69,55 @@ private val supabase = createSupabaseClient(
 @Composable
 @Preview
 fun View3(){
-    val bucket = supabase.storage["d"].bucketId
-    bucket.alog("as")
+    LaunchedEffect(key1 = Unit){
+        withContext(Dispatchers.IO){
+            async {
+                fetch1().alog("ok1")
+            }
+            async{
+                fetch2().alog("ok2")
+            }
+        }
+    }
+}
+
+suspend fun fetch1(): RecipeBasicInfo{
+    logging("1")
+    try {
+        return withContext(Dispatchers.IO){
+            supabase
+                .from("recipes")
+                .select(columns = Columns.list(BasicInfoField)) {
+                    filter {
+                        eq(RecipeIdEqualTo, TestingRecipeId)
+                    }
+                }
+                .decodeSingle<RecipeBasicInfoDTO>()
+                .toRecipeBasicInfo()
+        }
+    }
+    catch (e: Exception){
+        throw IOException("으아아ㅏㅇ아 -> e: $e")
+    }
+}
+suspend fun fetch2(): List<Ingredient>{
+    logging("2")
+    try {
+        return withContext(Dispatchers.IO){
+            supabase
+                .from("recipe_ingredient")
+                .select{
+                    filter {
+                        eq(RecipeIdEqualTo, TestingRecipeId)
+                    }
+                }
+                .decodeList<IngredientDTO>()
+                .map { it.toIngredient() }
+        }
+    }
+    catch (e: Exception){
+        throw IOException("으아아ㅏㅇ아 -> e: $e")
+    }
 }
 
 

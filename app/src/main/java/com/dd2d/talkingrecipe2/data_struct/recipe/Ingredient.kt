@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 data class Ingredient(
-    val no: Int? = null,
+    val no: Int,
     val name: String = "",
     val amount: String = "",
 ){
@@ -19,7 +19,7 @@ data class Ingredient(
 @Serializable
 data class IngredientDTO(
     @SerialName("no")
-    val no: Int?,
+    val no: Int,
     @SerialName("recipe_id")
     val recipeId: String,
     @SerialName("name")

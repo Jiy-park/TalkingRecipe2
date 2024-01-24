@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.create_screen.recipe_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
 
 import android.net.Uri
 import android.widget.Toast
@@ -48,7 +48,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 
 @Composable
-fun CreateRecipeThumbnail(
+fun WriteRecipeThumbnail(
     modifier: Modifier = Modifier,
     createViewModel: CreateViewModel
 ){

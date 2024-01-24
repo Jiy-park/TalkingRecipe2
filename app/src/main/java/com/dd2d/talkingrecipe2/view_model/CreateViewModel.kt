@@ -226,7 +226,7 @@ class CreateViewModel(
             val recipeBasicInfo = database.from(RecipeTable)
                 .select(columns = columns){
                     filter{
-                        eq(RecipeId, recipeId)
+                        eq(RecipeIdEqualTo, recipeId)
                     }
                 }
                 .decodeSingle<RecipeBasicInfoDTO>()
@@ -268,7 +268,7 @@ class CreateViewModel(
                 val stepInfo = database.from(StepInfoTable)
                     .select {
                         filter {
-                            eq(RecipeId, recipeId)
+                            eq(RecipeIdEqualTo, recipeId)
                         }
                         order(OrderBy, ASCENDING)
                     }
@@ -309,7 +309,7 @@ class CreateViewModel(
                 val res = database.from(IngredientTable)
                     .select {
                         filter {
-                            eq(RecipeId, recipeId)
+                            eq(RecipeIdEqualTo, recipeId)
                         }
                     }
                     .decodeList<IngredientDTO>()
@@ -323,7 +323,7 @@ class CreateViewModel(
     }
 
     private companion object {
-        const val RecipeId = "recipe_id"
+        const val RecipeIdEqualTo = "recipe_id"
         const val RecipeTable = "recipes"
         const val IngredientTable = "recipe_ingredient"
         const val StepInfoTable = "recipe_step_info"

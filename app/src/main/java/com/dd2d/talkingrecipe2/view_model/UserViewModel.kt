@@ -47,7 +47,7 @@ class UserViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            fetchUserData()
+//            fetchUserData()
         }
     }
 

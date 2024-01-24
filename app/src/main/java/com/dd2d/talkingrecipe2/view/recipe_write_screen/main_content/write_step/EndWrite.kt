@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.create_screen.recipe_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dd2d.talkingrecipe2.R
@@ -29,7 +28,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.matex
 
 @Composable
-fun CreateRecipeEnd(
+fun EndWrite(
     modifier: Modifier = Modifier,
     onClickMoveToMain: ()->Unit,
     onClickMoveToRecipe: ()->Unit

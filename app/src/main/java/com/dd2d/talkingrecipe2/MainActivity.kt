@@ -8,7 +8,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import com.dd2d.talkingrecipe2.navigation.AppNavigation
 import com.dd2d.talkingrecipe2.ui.theme.TalkingRecipe2Theme
 
@@ -30,7 +29,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-@Preview(showSystemUi = true)
-fun App(modifier: Modifier = Modifier){
+fun App(
+    modifier: Modifier = Modifier,
+){
     AppNavigation(modifier = modifier)
 }

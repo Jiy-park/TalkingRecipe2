@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.recipe_screen
+package com.dd2d.talkingrecipe2.view.recipe_search_screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,15 +9,14 @@ import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.ui.theme.kotex
 
 @Composable
-fun RecipeScreen(
+fun RecipeSearchScreen(
     modifier: Modifier = Modifier,
-    recipeId: Int,
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ){
-        kotex(text = Screen.Recipe.route + " " + recipeId)
+        kotex(text = Screen.RecipeSearch.route)
     }
 }

@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.create_screen.recipe_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -12,15 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
+import com.dd2d.talkingrecipe2.ui.CommonValue.BottomButtonHeight
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 import com.dd2d.talkingrecipe2.ui.theme.kotex
-import com.dd2d.talkingrecipe2.view.create_screen.CreateScreenValue.BottomButtonHeight
 
 /** 레시피 만들기에서 다음 단계 혹은 이전 단계로 이동하기 위한 버튼.
  * @param onClickNextStep 다음 단계로 넘거감. null일 경우 다음 단계가 없는 것.
  * @param onClickPrevStep 이전 단계로 넘어감. null일 경우 이전 단계가 없는 것.*/
 @Composable
-fun CreateStepMoveButton(
+fun WriteStepMoveButton(
     modifier: Modifier = Modifier,
     createStep: CreateStep,
     visible: Boolean,

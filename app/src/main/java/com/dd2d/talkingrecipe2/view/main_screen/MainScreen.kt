@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.dd2d.talkingrecipe2.navigation.TestingUserId
+import com.dd2d.talkingrecipe2.ui.TestingValue.TestingUserId
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
