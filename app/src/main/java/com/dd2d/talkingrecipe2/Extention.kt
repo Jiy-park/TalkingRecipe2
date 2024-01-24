@@ -20,7 +20,7 @@ fun Int.toUriWithDrawable() = "android.resource://com.dd2d.talkingrecipe2/$this"
 
 /** 리스트의 내용물 중 빈 내용물을 필터링 함.
  * @return 이름 또는 양 중 하나라도 공백인 요소를 제외한 모든 아이템.*/
-fun List<Ingredient>.removeEmptyElement() = this.filterNot { ingredient-> ingredient.isEmpty() }
+fun List<Ingredient>.removeEmptyElement(dummy: Any? = null) = this.filterNot { ingredient-> ingredient.isEmpty() }
 
 /** 리스트의 내용물 중 빈 내용물을 필터링 함.
  * @return 이름 또는 양 중 하나라도 공백인 요소를 제외한 모든 아이템.*/

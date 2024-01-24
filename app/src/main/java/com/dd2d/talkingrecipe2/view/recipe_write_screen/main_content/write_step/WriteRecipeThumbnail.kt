@@ -40,22 +40,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.ShareOption
+import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.HintText
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.kotex
-import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 
 @Composable
 fun WriteRecipeThumbnail(
     modifier: Modifier = Modifier,
-    createViewModel: CreateViewModel
+    basicInfo: RecipeBasicInfo,
+    onChangeBasicInfo: (RecipeBasicInfo)->Unit,
+    stepInfoList: List<StepInfo>,
+    thumbnailUri: Uri,
+    onChangeThumbnailUri: (Uri)->Unit,
 ){
 
     val context = LocalContext.current
-    val thumbnailImageUriList = createViewModel
-        .stepInfoList
+    val thumbnailImageUriList = stepInfoList
         .asSequence()
         .filterNot { it.imageUri == Uri.EMPTY }
         .map { it.imageUri }
@@ -69,7 +73,7 @@ fun WriteRecipeThumbnail(
             }
             else{
                 defaultThumbnail = uri
-                createViewModel.thumbnailUri = uri
+                onChangeThumbnailUri(uri)
             }
         }
     }
@@ -94,16 +98,16 @@ fun WriteRecipeThumbnail(
             item {
                 ThumbnailView(
                     uri = defaultThumbnail,
-                    isChecked = createViewModel.thumbnailUri == defaultThumbnail,
+                    isChecked = thumbnailUri == defaultThumbnail,
                     onClick = { galleryLauncher.launch("image/*") },
                 )
             }
             itemsIndexed(items = thumbnailImageUriList){ index, item ->
                 ThumbnailView(
                     uri = item,
-                    isChecked = createViewModel.thumbnailUri == item,
+                    isChecked = thumbnailUri == item,
                     onClick = {
-                        createViewModel.thumbnailUri = item
+                        onChangeThumbnailUri(item)
                     },
                 )
             }
@@ -118,23 +122,22 @@ fun WriteRecipeThumbnail(
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
-            ShareOption.values().forEach {
+            ShareOption.values().forEach { shareOption->
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = modifier
                         .weight(1F)
                         .height(40.dp)
                         .background(
-                            color = if (createViewModel.recipeBasicInfo.shareOption == it) MainColor else HintText,
+                            color = if (basicInfo.shareOption == shareOption) MainColor else HintText,
                             shape = RoundedCornerShape(30.dp)
                         )
                         .clickableWithoutRipple {
-                            createViewModel.recipeBasicInfo =
-                                createViewModel.recipeBasicInfo.copy(shareOption = it)
+                            onChangeBasicInfo(basicInfo.copy(shareOption = shareOption))
                         }
                 ){
                     kotex(
-                        text = it.description,
+                        text = shareOption.description,
                         size = 15.sp,
                         color = Color.White,
                         weight = FontWeight.Bold,

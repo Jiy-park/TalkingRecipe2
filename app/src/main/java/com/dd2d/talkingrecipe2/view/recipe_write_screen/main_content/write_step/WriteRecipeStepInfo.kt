@@ -44,7 +44,6 @@ import com.dd2d.talkingrecipe2.ui.theme.HintText
 import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.textFieldColor
 import com.dd2d.talkingrecipe2.ui.theme.textFieldStyle
-import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
@@ -54,22 +53,26 @@ import org.burnoutcrew.reorderable.reorderable
 @Composable
 fun WriteRecipeStepInfo(
     modifier: Modifier = Modifier,
-    createViewModel: CreateViewModel
+    stepInfoList: List<StepInfo>,
+    onChangeStepInfoList: (List<StepInfo>)->Unit,
 ){
     val context = LocalContext.current
     val state = rememberReorderableLazyListState(
         onMove = { from, to ->
-            createViewModel.stepInfoList = createViewModel.stepInfoList.apply {
+            val updateList = stepInfoList.toMutableList()
+            updateList.apply {
                 add(to.index, removeAt(from.index))
             }
+            onChangeStepInfoList(updateList)
         }
     )
 
     var selectedIndex = -1
     val galleryLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){ res->
         res?.let { uri->
-            val stepInfo = createViewModel.stepInfoList[selectedIndex]
-            createViewModel.stepInfoList[selectedIndex] = stepInfo.copy(imageUri = uri)
+            val updateList = stepInfoList.toMutableList()
+            updateList[selectedIndex] = stepInfoList[selectedIndex].copy(imageUri = uri)
+            onChangeStepInfoList(updateList)
         }
     }
     LazyColumn(
@@ -81,7 +84,7 @@ fun WriteRecipeStepInfo(
             .reorderable(state)
             .detectReorderAfterLongPress(state)
     ){
-        itemsIndexed(items = createViewModel.stepInfoList, key = { _, info -> info.no }){ index, info ->
+        itemsIndexed(items = stepInfoList, key = { _, info -> info.no }){ index, info ->
             ReorderableItem(reorderableState = state, key = info) { _ ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -94,13 +97,25 @@ fun WriteRecipeStepInfo(
                         context = context,
                         stepExplanation = info.explanation,
                         stepImageUri = info.imageUri,
-                        onChangeExplanation = { createViewModel.stepInfoList[index] = info.copy(explanation = it) },
+                        onChangeExplanation = { update->
+                            val updateList = stepInfoList.toMutableList()
+                            updateList[selectedIndex] = stepInfoList[selectedIndex].copy(explanation = update)
+                            onChangeStepInfoList(updateList)
+                        },
                         onClickImage = {
                             selectedIndex = index
                             galleryLauncher.launch("image/*")
                         },
-                        onClickAdd = { createViewModel.stepInfoList.add(index+1, StepInfo(order = createViewModel.stepInfoList.size)) },
-                        onClickRemove = { createViewModel.stepInfoList.removeAt(index) }
+                        onClickAdd = {
+                            val updateList = stepInfoList.toMutableList()
+                            updateList.add(index+1, StepInfo(order = stepInfoList.size+1))
+                            onChangeStepInfoList(updateList)
+                        },
+                        onClickRemove = {
+                            val updateList = stepInfoList.toMutableList()
+                            updateList.removeAt(index)
+                            onChangeStepInfoList(updateList)
+                        }
                     )
                     Divider(modifier = modifier.fillMaxWidth(), thickness = 1.dp, color = HintText)
                 }

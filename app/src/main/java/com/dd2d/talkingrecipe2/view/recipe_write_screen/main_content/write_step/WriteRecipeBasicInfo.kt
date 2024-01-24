@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.Level
+import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGray
 import com.dd2d.talkingrecipe2.ui.theme.HintText
@@ -45,12 +46,14 @@ import com.dd2d.talkingrecipe2.ui.theme.MainText
 import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.textFieldColor
 import com.dd2d.talkingrecipe2.ui.theme.textFieldStyle
-import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 
 @Composable
 fun WriteRecipeBasicInfo(
     modifier : Modifier = Modifier,
-    createViewModel: CreateViewModel,
+    basicInfo: RecipeBasicInfo,
+    onChangeBasicInfo: (RecipeBasicInfo)->Unit,
+    ingredientList: List<Ingredient>,
+    onChangeIngredientList: (List<Ingredient>) -> Unit,
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -61,8 +64,8 @@ fun WriteRecipeBasicInfo(
             .verticalScroll(state = rememberScrollState())
     ){
         TextField(
-            value = createViewModel.recipeBasicInfo.title,
-            onValueChange = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(title = it) },
+            value = basicInfo.title,
+            onValueChange = { updateTitle-> onChangeBasicInfo(basicInfo.copy(title = updateTitle)) },
             placeholder = { kotex(text = "레시피 제목", color = HintText, size = 20.sp, weight = FontWeight.Bold) },
             singleLine = true,
             colors = textFieldColor(),
@@ -73,8 +76,8 @@ fun WriteRecipeBasicInfo(
         )
 
         TextField(
-            value = createViewModel.recipeBasicInfo.description,
-            onValueChange = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(description = it) },
+            value = basicInfo.description,
+            onValueChange = { updateDescription-> onChangeBasicInfo(basicInfo.copy(description = updateDescription)) },
             placeholder = { kotex(text = "한 줄 소개", color = HintText) },
             singleLine = true,
             colors = textFieldColor(removeIndicator = true),
@@ -88,22 +91,34 @@ fun WriteRecipeBasicInfo(
             .fillMaxWidth())
 
         QuestionField(
-            time = createViewModel.recipeBasicInfo.time,
-            amount = createViewModel.recipeBasicInfo.amount,
-            onChangeTime = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(time = it) },
-            onChangeAmount = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(amount = it) }
+            time = basicInfo.time,
+            amount = basicInfo.amount,
+            onChangeTime = { updateTime-> onChangeBasicInfo(basicInfo.copy(time = updateTime)) },
+            onChangeAmount = { updateAmount-> onChangeBasicInfo(basicInfo.copy(amount = updateAmount)) }
         )
 
         LevelSelector(
-            selectedLevel = createViewModel.recipeBasicInfo.level,
-            onChangeLevel = { createViewModel.recipeBasicInfo = createViewModel.recipeBasicInfo.copy(level = it) }
+            selectedLevel = basicInfo.level,
+            onChangeLevel = { updateLevel-> onChangeBasicInfo(basicInfo.copy(level = updateLevel)) }
         )
 
         IngredientField(
-            ingredientList = createViewModel.ingredientList,
-            onChangeIngredient = { index, ingredient ->  createViewModel.ingredientList[index] = ingredient},
-            onCLickAdd = { createViewModel.ingredientList.add(Ingredient(no = createViewModel.ingredientList.size+1)) },
-            onClickRemove = { index-> createViewModel.ingredientList.removeAt(index) }
+            ingredientList = ingredientList,
+            onChangeIngredient = { index, ingredient ->
+                val updatedList = ingredientList.toMutableList()
+                updatedList[index] = ingredient
+                onChangeIngredientList(updatedList)
+            },
+            onCLickAdd = {
+                val updatedList = ingredientList.toMutableList()
+                updatedList.add(Ingredient(no = ingredientList.size+1))
+                onChangeIngredientList(updatedList)
+            },
+            onClickRemove = { index->
+                val updatedList = ingredientList.toMutableList()
+                updatedList.removeAt(index)
+                onChangeIngredientList(updatedList)
+            }
         )
     }
 }
@@ -128,8 +143,12 @@ fun IngredientField(
             IngredientInput(
                 name = ingredient.name,
                 amount = ingredient.amount,
-                onChangeName = { onChangeIngredient(i, ingredient.copy(name = it)) },
-                onChangeAmount = { onChangeIngredient(i, ingredient.copy(amount = it)) },
+                onChangeName = { updateName->
+                    onChangeIngredient(i, ingredient.copy(name = updateName))
+                },
+                onChangeAmount = { updateAmount->
+                    onChangeIngredient(i, ingredient.copy(amount = updateAmount))
+                },
                 onClickRemove = { onClickRemove(i) }
             )
         }

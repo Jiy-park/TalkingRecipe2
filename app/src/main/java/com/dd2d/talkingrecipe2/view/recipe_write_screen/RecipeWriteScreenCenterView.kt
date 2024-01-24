@@ -7,21 +7,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.EndWrite
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeBasicInfo
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeStepInfo
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeThumbnail
-import com.dd2d.talkingrecipe2.view_model.CreateViewModel
 
 
 @Composable
 fun RecipeWriteScreenCenterView(
     modifier: Modifier = Modifier,
-    createViewModel: CreateViewModel,
+    recipe: Recipe,
+    onChangeRecipe: (Recipe)->Unit,
     createStep: CreateStep,
-    onClickMoveToMain: ()->Unit,
-    onClickMoveToRecipe: () -> Unit
 ){
     Box(
         modifier = modifier
@@ -34,18 +33,38 @@ fun RecipeWriteScreenCenterView(
         ){
             when(createStep){
                 CreateStep.RecipeBasicInfo -> {
-                    WriteRecipeBasicInfo(createViewModel = createViewModel)
+                    WriteRecipeBasicInfo(
+                        basicInfo = recipe.basicInfo,
+                        ingredientList = recipe.ingredientList,
+                        onChangeBasicInfo = { update->
+                            onChangeRecipe(recipe.copy(basicInfo = update))
+                        },
+                        onChangeIngredientList = { update->
+                            onChangeRecipe(recipe.copy(ingredientList = update))
+                        }
+                    )
                 }
                 CreateStep.RecipeStepInfo -> {
-                    WriteRecipeStepInfo(createViewModel = createViewModel)
+                    WriteRecipeStepInfo(
+                        stepInfoList = recipe.stepInfoList,
+                        onChangeStepInfoList = { update->
+                            onChangeRecipe(recipe.copy(stepInfoList = update))
+                        }
+                    )
                 }
                 CreateStep.RecipeThumbnail -> {
-                    WriteRecipeThumbnail(createViewModel = createViewModel)
+                    WriteRecipeThumbnail(
+                        basicInfo = recipe.basicInfo,
+                        onChangeBasicInfo = { update-> onChangeRecipe(recipe.copy(basicInfo = update)) },
+                        stepInfoList = recipe.stepInfoList,
+                        thumbnailUri = recipe.thumbnailUri,
+                        onChangeThumbnailUri = { update-> onChangeRecipe(recipe.copy(thumbnailUri = update)) }
+                    )
                 }
                 CreateStep.EndCreate -> {
                     EndWrite(
-                        onClickMoveToMain = { onClickMoveToMain() },
-                        onClickMoveToRecipe = { onClickMoveToRecipe() }
+//                        onClickMoveToMain = { onClickMoveToMain() },
+//                        onClickMoveToRecipe = { onClickMoveToRecipe() }
                     )
                 }
             }

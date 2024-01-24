@@ -22,7 +22,7 @@ sealed class WriteState{
     object Init: WriteState(){
         init { Log.d("LOG_CHECK", "Write State : Init -> initial view model") }
     }
-    class OnLoading(msg: String): WriteState(){
+    class OnFetching(msg: String): WriteState(){
         init { Log.d("LOG_CHECK", "Write State : OnFetching -> $msg") }
     }
     class OnUploading(msg: String): WriteState(){
@@ -75,17 +75,17 @@ class RecipeWriteViewModel(
     }
 
     /** 데이터베이스에서 [recipeId]에 맞는 레시피를 가져옴.
-     * 가져오는 동안 [WriteState.OnLoading] 상태이며 가져온 레시피는 [Flow]형태임.
+     * 가져오는 동안 [WriteState.OnFetching] 상태이며 가져온 레시피는 [Flow]형태임.
      * [writeState]의 값이 [WriteState.Stable]일 때 레시피에 접근 가능.*/
     private fun fetchRecipe(recipeId: String){
-        _writeState.value = WriteState.OnLoading("start fetch recipe. recipe id -> $recipeId")
+        _writeState.value = WriteState.OnFetching("start fetch recipe. recipe id -> $recipeId")
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _recipe.value = recipeFetchRepo
                     .fetRecipeById(
                         recipeId = recipeId,
                         onChangeFetchingState = { msg->
-                            _writeState.value = WriteState.OnLoading(msg)
+                            _writeState.value = WriteState.OnFetching(msg)
                         }
                     )
 

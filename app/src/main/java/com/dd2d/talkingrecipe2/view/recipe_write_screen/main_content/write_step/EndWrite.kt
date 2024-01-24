@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.llog
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.kotex
@@ -30,8 +31,8 @@ import com.dd2d.talkingrecipe2.ui.theme.matex
 @Composable
 fun EndWrite(
     modifier: Modifier = Modifier,
-    onClickMoveToMain: ()->Unit,
-    onClickMoveToRecipe: ()->Unit
+    onClickMoveToMain: ()->Unit = llog("click to main"),
+    onClickMoveToRecipe: ()->Unit = llog("click to recipe")
 ){
     Box(
         modifier = modifier

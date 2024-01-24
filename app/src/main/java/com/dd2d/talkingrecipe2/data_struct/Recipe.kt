@@ -7,8 +7,8 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 
 data class Recipe(
     var basicInfo: RecipeBasicInfo = RecipeBasicInfo(),
-    var ingredientList: MutableList<Ingredient> = mutableListOf(),
-    var stepInfoList: MutableList<StepInfo> = mutableListOf(),
+    var ingredientList: List<Ingredient> = mutableListOf(),
+    var stepInfoList: List<StepInfo> = mutableListOf(),
     var thumbnailUri: Uri = Uri.EMPTY
 ){
     constructor(recipeId: String) : this() {
