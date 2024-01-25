@@ -11,18 +11,17 @@ import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.BuildConfig
-import com.dd2d.talkingrecipe2.createThumbnailImagePath
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.IngredientDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfoDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfoDTO
-import com.dd2d.talkingrecipe2.data_struct.recipe.createStepInfoImagePath
 import com.dd2d.talkingrecipe2.data_struct.recipe.toDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateState
 import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
 import com.dd2d.talkingrecipe2.navigation.CreateScreenMode
+import com.dd2d.talkingrecipe2.toImagePath
 import com.dd2d.talkingrecipe2.toSupabaseUrl
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
@@ -94,7 +93,7 @@ class CreateViewModel(
         try {
             _createState.value = CreateState.OnUploading("uploadThumbnail()::uploading recipe thumbnail image.\n" +
                     "upload -> $thumbnailUri")
-            val imagePath = thumbnailUri.createThumbnailImagePath(recipeId = recipeId, context = context)
+            val imagePath = thumbnailUri.toImagePath(path = "${recipeId}_thumbnail", context = context)
             database.storage.from("$RecipeImageTable/$recipeId").upload(uri = thumbnailUri, path = imagePath, upsert = true)
         }
         catch (e: Exception){
@@ -108,7 +107,7 @@ class CreateViewModel(
         val uploadData = stepInfoList.mapIndexed { order, stepInfo->
             var imagePath = ""
             if(stepInfo.imageUri != Uri.EMPTY){
-                imagePath = stepInfo.imageUri.createStepInfoImagePath(order = order, context = context)
+                imagePath = stepInfo.imageUri.toImagePath(path = "$order", context = context)
                 try{
                     _createState.value = CreateState.OnUploading("uploadStepInfoList()::uploading recipe step info image.\n" +
                             "upload -> ${stepInfo.imageUri}")

@@ -50,8 +50,7 @@ fun NavGraphBuilder.recipeWriteScreenGraph(
             writeViewModel = writeViewModel,
             onClickBack = { navController.navigateUp() },
             onClickMoveToMain = { navController.navigateUp() },
-            onClickMoveToRecipe = {
-                val recipeId = writeViewModel.recipe.value.basicInfo.recipeId
+            onClickMoveToRecipe = { recipeId->
                 navController.navigate(route = "${Screen.RecipeRead.route}/$recipeId")
             }
         )

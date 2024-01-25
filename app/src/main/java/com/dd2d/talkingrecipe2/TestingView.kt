@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.IngredientDTO
@@ -47,8 +48,10 @@ import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.upload
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.readBytes
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.burnoutcrew.reorderable.ReorderableItem
@@ -69,16 +72,26 @@ private val supabase = createSupabaseClient(
 @Composable
 @Preview
 fun View3(){
+    val context = LocalContext.current
+    val uri = "https://zuubwaidnjukuunkrlyk.supabase.co/storage/v1/object/sign/recipe_image/TalkingRecipe_240124_1526/step_info/2.jpeg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJyZWNpcGVfaW1hZ2UvVGFsa2luZ1JlY2lwZV8yNDAxMjRfMTUyNi9zdGVwX2luZm8vMi5qcGVnIiwiaWF0IjoxNzA2MTgxNDgzLCJleHAiOjE3MDY3ODYyODN9.zdiBGsabr8CJVlpBn0ZpT99yz5XE0Ew0QUSs81lXHjM&t=2024-01-25T11%3A18%3A04.718Z"
+        .toUri()
     LaunchedEffect(key1 = Unit){
         withContext(Dispatchers.IO){
-            async {
-                fetch1().alog("ok1")
+            try {
+
+                val data = HttpClient().get(uri.toString()).readBytes()
+
+//                val request = ImageRequest.Builder(context).data(uri.toString()).build()
+//                val res = ImageLoader(context).execute(request).drawable?.toBitmap()
+
+                supabase.storage.from("users_image").upload(data = data, path = "1.jpeg", upsert = true)
             }
-            async{
-                fetch2().alog("ok2")
+            catch (e: Exception){
+                e.alog("error")
             }
         }
     }
+
 }
 
 suspend fun fetch1(): RecipeBasicInfo{

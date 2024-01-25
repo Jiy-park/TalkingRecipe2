@@ -99,7 +99,7 @@ fun WriteRecipeStepInfo(
                         stepImageUri = info.imageUri,
                         onChangeExplanation = { update->
                             val updateList = stepInfoList.toMutableList()
-                            updateList[selectedIndex] = stepInfoList[selectedIndex].copy(explanation = update)
+                            updateList[index] = stepInfoList[index].copy(explanation = update)
                             onChangeStepInfoList(updateList)
                         },
                         onClickImage = {

@@ -6,14 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
 import com.dd2d.talkingrecipe2.navigation.Screen
-import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipe
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -27,9 +25,8 @@ sealed class RecipeState{
     class OnLoading(msg: String): RecipeState(){
         init { Log.d("LOG_CHECK", "Recipe State : OnLoading -> $msg") }
     }
-    /** 레시피의 다운이 완료되어 레시피 보기가 가능한 상태.
-     * @param recipe 해당 값을 통해 레시피를 [Flow] 형태로 받을 수 있음.*/
-    class Stable(val recipe: Flow<Recipe>): RecipeState(){
+    /** 레시피의 다운이 완료되어 레시피 보기가 가능한 상태.*/
+    object Stable: RecipeState(){
         init { Log.d("LOG_CHECK", "Recipe State : Stable") }
     }
     /** 레시피의 정보를 다운 받는 중 에러가 발생한 상태. 이 상태에서는 [ErrorView]가 보여짐.*/
@@ -49,6 +46,9 @@ class RecipeViewModel(
     private var _recipeState = MutableStateFlow<RecipeState>(RecipeState.Init)
     val recipeState = _recipeState.asStateFlow()
 
+    private var _recipe = MutableStateFlow<Recipe>(Recipe())
+    val recipe = _recipe.asStateFlow()
+
     /** 처음 초기화 됐을 경우에만 시행.
      *[recipeId] 값이 null인 경우 OnError, 아닌 경우 [recipeId]에 맞는 레시피의 정보를 가져옴. */
     fun init(){
@@ -66,17 +66,17 @@ class RecipeViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 withContext(Dispatchers.IO){
-//                    val recipe = recipeRepo.fetRecipeById(
-//                        recipeId = recipeId,
-//                        onChangeFetchingState = { msg->
-//                            _recipeState.value = RecipeState.OnLoading(msg)
-//                        }
-//                    )
+                    _recipe.value = recipeRepo.fetRecipeById(
+                        recipeId = recipeId,
+                        onChangeFetchingState = { msg->
+                            _recipeState.value = RecipeState.OnLoading(msg)
+                        }
+                    )
 
 //                    TODO("테스트용임. 테스트 끝나면 위 주석 해제하고 하래 한 줄 지우면 됨.")
-                    val recipe = flowOf(TestingRecipe)
+//                    val recipe = flowOf(TestingRecipe)
 
-                    _recipeState.value = RecipeState.Stable(recipe = recipe)
+                    _recipeState.value = RecipeState.Stable
                 }
             }
             catch (e: Exception){

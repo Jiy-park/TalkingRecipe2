@@ -73,7 +73,7 @@ fun ErrorView(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize().padding(20.dp)
     ){
         matex(text = "에러 발생\n$cause", align = TextAlign.Center, maxLine = Int.MAX_VALUE)
         TextButton(onClick = { onClickBack() }) {

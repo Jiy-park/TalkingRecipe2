@@ -3,9 +3,11 @@ package com.dd2d.talkingrecipe2.view.recipe_write_screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.dd2d.talkingrecipe2.data_struct.recipe_create.WriteStep
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
-import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.CreateView
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.RecipeWriteView
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.EndWrite
 import com.dd2d.talkingrecipe2.view_model.RecipeWriteViewModel
 import com.dd2d.talkingrecipe2.view_model.WriteState
 
@@ -14,7 +16,7 @@ fun RecipeWriteScreen(
     writeViewModel: RecipeWriteViewModel,
     onClickBack: () -> Unit,
     onClickMoveToMain: ()->Unit,
-    onClickMoveToRecipe: ()->Unit,
+    onClickMoveToRecipe: (recipeId: String)->Unit,
 ){
     val createState by writeViewModel.writeState.collectAsState()
     val recipe by writeViewModel.recipe.collectAsState()
@@ -28,21 +30,31 @@ fun RecipeWriteScreen(
             LoadingView()
         }
         is WriteState.Stable -> {
-            CreateView(
+            RecipeWriteView(
                 recipe = recipe,
                 onChangeRecipe = { update-> writeViewModel.onChangeRecipe(update) },
                 writeStep = writeStep,
                 writeMode = writeViewModel.writeScreenMode,
                 onClickBack = { onClickBack() },
-                onClickNextStep = { writeViewModel.moveToNextStep() },
+                onClickNextStep = {
+                    if(writeStep == WriteStep.RecipeThumbnail){
+                        writeViewModel.endWrite()
+                    }
+                    else{
+                        writeViewModel.moveToNextStep()
+                    }
+                },
                 onClickPrevStep = { writeViewModel.moveToPrevStep() },
             )
         }
         is WriteState.OnUploading -> {
             LoadingView()
         }
-        is WriteState.OnEnd -> {
-//            TODO("레시피 업로드 완료 후 나오는 페이지.")
+        is WriteState.OnEndUploading -> {
+            EndWrite(
+                onClickMoveToMain = { onClickMoveToMain() },
+                onClickMoveToRecipe = { onClickMoveToRecipe(recipe.basicInfo.recipeId) }
+            )
         }
         is WriteState.OnError -> {
             ErrorView(cause = (createState as WriteState.OnError).cause){ onClickBack() }

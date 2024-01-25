@@ -6,3 +6,9 @@ enum class CreateStep(val step: Int) {
     RecipeThumbnail(step = 2),
     EndCreate(step = 3),
 }
+
+enum class WriteStep(val step: Int){
+    RecipeBasicInfo(step = 0),
+    RecipeStepInfo(step = 1),
+    RecipeThumbnail(step = 2),
+}

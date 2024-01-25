@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
+import com.dd2d.talkingrecipe2.data_struct.recipe_create.WriteStep
 import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
 import com.dd2d.talkingrecipe2.model.RecipeUploadRepository
 import com.dd2d.talkingrecipe2.navigation.CreateScreenMode
@@ -31,8 +32,8 @@ sealed class WriteState{
     object Stable: WriteState(){
         init { Log.d("LOG_CHECK", "Recipe State : Stable") }
     }
-    object OnEnd: WriteState(){
-        init { Log.d("LOG_CHECK", "Recipe State : OnEnd -> write recipe is finished.") }
+    object OnEndUploading: WriteState(){
+        init { Log.d("LOG_CHECK", "Recipe State : OnEndUploading -> upload recipe is finished.") }
     }
     class OnError(val cause: String): WriteState(){
         init { Log.e("LOG_CHECK", "Write State : OnError -> $cause") }
@@ -48,8 +49,8 @@ class RecipeWriteViewModel(
     private var _writeState = MutableStateFlow<WriteState>(WriteState.Init)
     val writeState: StateFlow<WriteState> = _writeState.asStateFlow()
 
-    private var _writeStep = MutableStateFlow<CreateStep>(CreateStep.RecipeBasicInfo)
-    val writeStep: StateFlow<CreateStep> = _writeStep.asStateFlow()
+    private var _writeStep = MutableStateFlow<WriteStep>(WriteStep.RecipeBasicInfo)
+    val writeStep: StateFlow<WriteStep> = _writeStep.asStateFlow()
 
     private var _recipe = MutableStateFlow(Recipe())
     val recipe: StateFlow<Recipe> = _recipe.asStateFlow()
@@ -71,6 +72,14 @@ class RecipeWriteViewModel(
                 }
             }
 
+        }
+    }
+
+    /** 레시피 작성이 완료되어 업로드를 시작함.
+     * [_writeState]의 값이 [WriteState.Stable]이면서 [_writeStep]의 값이 [WriteStep.RecipeThumbnail]일 때만 작동해야 함.*/
+    fun endWrite(){
+        if(_writeState.value == WriteState.Stable && _writeStep.value == WriteStep.RecipeThumbnail){
+            uploadRecipe()
         }
     }
 
@@ -97,13 +106,17 @@ class RecipeWriteViewModel(
         }
     }
 
-    private fun uploadRecipe(){
-        _writeState.value = WriteState.OnUploading("start upload recipe.")
-        val recipeId = createRecipeId()
-        val updateBasicInfo = _recipe.value.basicInfo.copy(recipeId = recipeId)
-        _recipe.value = _recipe.value.copy(basicInfo = updateBasicInfo)
-
+    private fun uploadRecipe() {
         viewModelScope.launch(Dispatchers.IO) {
+            _writeState.value = WriteState.OnUploading("start upload recipe.")
+            if(writeScreenMode is CreateScreenMode.Create){
+                val recipeId = createRecipeId()
+                val updateBasicInfo = _recipe.value.basicInfo.copy(recipeId = recipeId)
+                _recipe.value = _recipe.value.copy(basicInfo = updateBasicInfo)
+            }
+
+            val recipeId = _recipe.value.basicInfo.recipeId
+
             try {
                 recipeUploadRepo.uploadRecipe(
                     recipe = _recipe.value,
@@ -111,7 +124,7 @@ class RecipeWriteViewModel(
                         _writeState.value = WriteState.OnUploading(msg)
                     },
                     onEndUpload = {
-                        _writeState.value = WriteState.OnEnd
+                        _writeState.value = WriteState.OnEndUploading
                     }
                 )
             }
@@ -132,12 +145,12 @@ class RecipeWriteViewModel(
     fun moveToNextStep(){
         val currentStep = _writeStep.value.step
         if(currentStep >= CreateStep.values().last().step) return
-        _writeStep.value = CreateStep.values()[currentStep+1]
+        _writeStep.value = WriteStep.values()[currentStep+1]
     }
 
     fun moveToPrevStep(){
         val currentStep = _writeStep.value.step
         if(currentStep <= 0) return
-        _writeStep.value = CreateStep.values()[currentStep-1]
+        _writeStep.value = WriteStep.values()[currentStep-1]
     }
 }

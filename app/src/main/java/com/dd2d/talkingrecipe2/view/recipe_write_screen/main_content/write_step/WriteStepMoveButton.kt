@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
+import com.dd2d.talkingrecipe2.data_struct.recipe_create.WriteStep
 import com.dd2d.talkingrecipe2.ui.CommonValue.BottomButtonHeight
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 import com.dd2d.talkingrecipe2.ui.theme.kotex
@@ -22,48 +23,45 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 @Composable
 fun WriteStepMoveButton(
     modifier: Modifier = Modifier,
-    createStep: CreateStep,
-    visible: Boolean,
+    writeStep: WriteStep,
     onClickNextStep: ()->Unit,
     onClickPrevStep: ()->Unit,
 ){
-    if(visible){
-        val innerModifier = Modifier
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.height(BottomButtonHeight)
-        ) {
-            if(createStep.step > CreateStep.values().first().step){
-                Button(
-                    onClick = { onClickPrevStep() },
-                    shape = RectangleShape,
-                    colors = buttonColor(),
-                    modifier = innerModifier
-                        .background(brush = BackgroundGradient)
-                        .weight(1F)
-                ) {
-                    kotex(
-                        text = "이전",
-                        color = Color.White,
-                        weight = FontWeight.Bold
-                    )
-                }
+    val innerModifier = Modifier
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.height(BottomButtonHeight)
+    ) {
+        if(writeStep.step > CreateStep.values().first().step){
+            Button(
+                onClick = { onClickPrevStep() },
+                shape = RectangleShape,
+                colors = buttonColor(),
+                modifier = innerModifier
+                    .background(brush = BackgroundGradient)
+                    .weight(1F)
+            ) {
+                kotex(
+                    text = "이전",
+                    color = Color.White,
+                    weight = FontWeight.Bold
+                )
             }
-            if(createStep.step < CreateStep.values().last().step){
-                Button(
-                    onClick = { onClickNextStep() },
-                    shape = RectangleShape,
-                    colors = buttonColor(),
-                    modifier = innerModifier
-                        .background(brush = BackgroundGradient)
-                        .weight(1F)
-                ) {
-                    kotex(
-                        text = if(createStep.step == CreateStep.values().lastIndex-1) "완료" else "다음",
-                        color = Color.White,
-                        weight = FontWeight.Bold
-                    )
-                }
+        }
+        if(writeStep.step < CreateStep.values().last().step){
+            Button(
+                onClick = { onClickNextStep() },
+                shape = RectangleShape,
+                colors = buttonColor(),
+                modifier = innerModifier
+                    .background(brush = BackgroundGradient)
+                    .weight(1F)
+            ) {
+                kotex(
+                    text = if(writeStep.step == CreateStep.values().lastIndex-1) "완료" else "다음",
+                    color = Color.White,
+                    weight = FontWeight.Bold
+                )
             }
         }
     }

@@ -38,7 +38,7 @@ fun RecipeReadScreen(
         is RecipeState.Init -> { recipeViewModel.init() }
         is RecipeState.OnLoading -> { LoadingView() }
         is RecipeState.Stable -> {
-            val recipe by (recipeState as RecipeState.Stable).recipe.collectAsState(initial = Recipe())
+            val recipe by recipeViewModel.recipe.collectAsState()
             val authorInfo = TestingAuthor
             RecipeReadView(
                 recipe = recipe,
