@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.dd2d.talkingrecipe2.data_struct.Recipe
-import com.dd2d.talkingrecipe2.data_struct.recipe_create.WriteStep
+import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeBasicInfo
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeStepInfo
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeThumbnail
@@ -19,7 +19,7 @@ fun RecipeWriteScreenCenterView(
     modifier: Modifier = Modifier,
     recipe: Recipe,
     onChangeRecipe: (Recipe)->Unit,
-    writeStep: WriteStep,
+    writeStep: RecipeWriteStep,
 ){
     Box(
         contentAlignment = Alignment.Center,
@@ -28,7 +28,7 @@ fun RecipeWriteScreenCenterView(
             .background(color = Color.White)
     ){
         when(writeStep){
-            WriteStep.RecipeBasicInfo -> {
+            RecipeWriteStep.RecipeBasicInfo -> {
                 WriteRecipeBasicInfo(
                     basicInfo = recipe.basicInfo,
                     ingredientList = recipe.ingredientList,
@@ -40,7 +40,7 @@ fun RecipeWriteScreenCenterView(
                     }
                 )
             }
-            WriteStep.RecipeStepInfo -> {
+            RecipeWriteStep.RecipeStepInfo -> {
                 WriteRecipeStepInfo(
                     stepInfoList = recipe.stepInfoList,
                     onChangeStepInfoList = { update->
@@ -48,7 +48,7 @@ fun RecipeWriteScreenCenterView(
                     }
                 )
             }
-            WriteStep.RecipeThumbnail -> {
+            RecipeWriteStep.RecipeThumbnail -> {
                 WriteRecipeThumbnail(
                     basicInfo = recipe.basicInfo,
                     onChangeBasicInfo = { update-> onChangeRecipe(recipe.copy(basicInfo = update)) },

@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.BuildConfig
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
-import com.dd2d.talkingrecipe2.data_struct.sampleUser
+import com.dd2d.talkingrecipe2.ui.TestingValue.TestingUser
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -24,7 +24,7 @@ class UserViewModel(
     private val userId: String
 ): ViewModel() {
     private lateinit var database: SupabaseClient
-    private var _user by mutableStateOf<User>(sampleUser)
+    private var _user by mutableStateOf<User>(TestingUser)
     val user: User
         get() = _user
 

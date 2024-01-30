@@ -3,18 +3,19 @@ package com.dd2d.talkingrecipe2.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.dd2d.talkingrecipe2.logging
+import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.Friend
+import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.MyPost
+import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.SavePost
 import com.dd2d.talkingrecipe2.view.sub_screen.SubScreen
 
 fun NavGraphBuilder.subScreenGraph(
     navController: NavController,
 ){
     composable(route = "${Screen.Sub.route}/{destination}"){ backStack->
-        backStack.arguments?.getString("destination")?.let { destination->
-            SubScreen(
-                destination = destination
-            )
-        }
+        val destination = backStack.arguments?.getString("destination")?: SubScreenDestination.MyPost.route
+        SubScreen(
+            destination = destination
+        )
     }
 }
 

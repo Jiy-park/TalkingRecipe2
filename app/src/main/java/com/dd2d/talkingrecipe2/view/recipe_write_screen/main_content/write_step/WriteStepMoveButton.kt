@@ -11,8 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
-import com.dd2d.talkingrecipe2.data_struct.recipe_create.CreateStep
-import com.dd2d.talkingrecipe2.data_struct.recipe_create.WriteStep
+import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
 import com.dd2d.talkingrecipe2.ui.CommonValue.BottomButtonHeight
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 import com.dd2d.talkingrecipe2.ui.theme.kotex
@@ -23,7 +22,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 @Composable
 fun WriteStepMoveButton(
     modifier: Modifier = Modifier,
-    writeStep: WriteStep,
+    writeStep: RecipeWriteStep,
     onClickNextStep: ()->Unit,
     onClickPrevStep: ()->Unit,
 ){
@@ -32,7 +31,7 @@ fun WriteStepMoveButton(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.height(BottomButtonHeight)
     ) {
-        if(writeStep.step > CreateStep.values().first().step){
+        if(writeStep.step > RecipeWriteStep.values().first().step){
             Button(
                 onClick = { onClickPrevStep() },
                 shape = RectangleShape,
@@ -48,7 +47,7 @@ fun WriteStepMoveButton(
                 )
             }
         }
-        if(writeStep.step < CreateStep.values().last().step){
+        if(writeStep.step < RecipeWriteStep.values().last().step){
             Button(
                 onClick = { onClickNextStep() },
                 shape = RectangleShape,
@@ -58,7 +57,7 @@ fun WriteStepMoveButton(
                     .weight(1F)
             ) {
                 kotex(
-                    text = if(writeStep.step == CreateStep.values().lastIndex-1) "완료" else "다음",
+                    text = if(writeStep.step == RecipeWriteStep.values().lastIndex-1) "완료" else "다음",
                     color = Color.White,
                     weight = FontWeight.Bold
                 )

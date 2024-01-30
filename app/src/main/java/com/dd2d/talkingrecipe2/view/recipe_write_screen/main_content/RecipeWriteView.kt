@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.dd2d.talkingrecipe2.data_struct.Recipe
-import com.dd2d.talkingrecipe2.data_struct.recipe_create.WriteStep
-import com.dd2d.talkingrecipe2.navigation.CreateScreenMode
+import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteMode
+import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.RecipeWriteScreenCenterView
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.RecipeWriteScreenTopView
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteStepMoveButton
@@ -16,8 +16,8 @@ import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.
 fun RecipeWriteView(
     modifier: Modifier = Modifier,
     recipe: Recipe,
-    writeStep: WriteStep,
-    writeMode: CreateScreenMode,
+    writeStep: RecipeWriteStep,
+    writeMode: RecipeWriteMode,
     onChangeRecipe: (Recipe)->Unit,
     onClickBack: () -> Unit,
     onClickNextStep: ()->Unit,

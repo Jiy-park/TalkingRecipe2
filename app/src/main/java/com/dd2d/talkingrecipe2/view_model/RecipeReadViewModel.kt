@@ -9,7 +9,6 @@ import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -35,11 +34,11 @@ sealed class RecipeState{
     }
 }
 
-/** 앱 내에서 하나의 레시피를 다룰 때 사용함.
+/** 레시피를 읽을 때 사용.
  * 뷰모델 내의 [RecipeState]의 값이 [RecipeState.Stable]일 경우에만 레시피의 정보를 가져올 수 있음.
  * @see [Screen.RecipeRead]
  * @see [Screen.RecipeWrite]*/
-class RecipeViewModel(
+class RecipeReadViewModel(
     private val recipeRepo: RecipeFetchRepository,
     private val recipeId: String?,
 ): ViewModel() {
@@ -73,7 +72,7 @@ class RecipeViewModel(
                         }
                     )
 
-//                    TODO("테스트용임. 테스트 끝나면 위 주석 해제하고 하래 한 줄 지우면 됨.")
+//                    TODO("테스트용임. 테스트 끝나면 위 주석 해제하고 하래 한 줄 지우면 됨. >>했음.")
 //                    val recipe = flowOf(TestingRecipe)
 
                     _recipeState.value = RecipeState.Stable

@@ -17,7 +17,7 @@ import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
 import com.dd2d.talkingrecipe2.view.recipe_read_screen.RecipeReadScreen
 import com.dd2d.talkingrecipe2.view.recipe_read_screen.talking_recipe.TalkingRecipe
-import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
+import com.dd2d.talkingrecipe2.view_model.RecipeReadViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.recipeReadScreenGraph(
@@ -26,7 +26,7 @@ fun NavGraphBuilder.recipeReadScreenGraph(
     composable(route = "${Screen.RecipeRead.route}/{recipeId}"){ backStack->
         val recipeId = backStack.arguments?.getString("recipeId")
         val recipeRepository = RecipeFetchRepository()
-        val recipeViewModel = RecipeViewModel(recipeRepo = recipeRepository, recipeId = recipeId)
+        val recipeViewModel = RecipeReadViewModel(recipeRepo = recipeRepository, recipeId = recipeId)
 
         var recipeReadMode by remember { mutableStateOf<RecipeReadMode>(RecipeReadMode.Normal) }
 

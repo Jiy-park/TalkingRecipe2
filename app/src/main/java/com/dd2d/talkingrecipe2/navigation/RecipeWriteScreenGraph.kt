@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteMode
 import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
 import com.dd2d.talkingrecipe2.model.RecipeUploadRepository
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingUserId
@@ -22,22 +23,8 @@ fun NavGraphBuilder.recipeWriteScreenGraph(
 //            else CreateScreenMode.Modify(recipeId)
 //        }?: CreateScreenMode.Create
 
-        val mode = CreateScreenMode.Modify("TalkingRecipe_240124_1526")
-
-//        val application = LocalContext.current.applicationContext as Application
-//        val createViewModel: CreateViewModel = viewModel {
-//            CreateViewModel(userId = TestingUserId, createScreenMode = mode, application = application)
-//        }
-//        RecipeWriteScreen(
-//            createViewModel = createViewModel,
-//            onClickBack = { navController.navigateUp() },
-//            onClickMoveToMain = { navController.navigateUp() },
-//            onClickMoveToRecipe = {
-//                val recipeId = createViewModel.recipeBasicInfo.recipeId
-//                navController.navigate(route = "${Screen.RecipeRead.route}/$recipeId")
-//            }
-//        )
-
+//        TODO("아래 한 줄은 테스트용. 위의 주석을 해제 후 아래 한 줄 지우면 됨.")
+        val mode = RecipeWriteMode.Modify("TalkingRecipe_240124_1526")
 
         val context = LocalContext.current
         val recipeFetchRepo = RecipeFetchRepository()
@@ -55,9 +42,4 @@ fun NavGraphBuilder.recipeWriteScreenGraph(
             }
         )
     }
-}
-
-sealed class CreateScreenMode{
-    object Create: CreateScreenMode()
-    class Modify(val recipeId: String): CreateScreenMode()
 }

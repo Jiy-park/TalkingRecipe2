@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.dp
 import com.dd2d.talkingrecipe2.R
 import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
 import com.dd2d.talkingrecipe2.data_struct.Recipe
+import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.Level
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
@@ -44,6 +45,13 @@ object TestingValue{
     const val TestingUserId = "TalkingRecipe"
     const val TestingUserName = "toxi"
     val TestingUserProfileImageUri = R.drawable.main_screen_toxi.toUriWithDrawable()
+
+    val TestingUser = User(
+        userId = TestingUserId,
+        name = TestingUserName,
+        profileImageUri = R.drawable.complete_upload_recipe.toUriWithDrawable(),
+        backgroundImageUri = R.drawable.temp.toUriWithDrawable(),
+    )
 
 
     val TestingBasicInfo = RecipeBasicInfo(

@@ -23,9 +23,9 @@ fun AppNavigation(
         composable(route = Screen.Main.route){
             MainScreen(
                 onClickSearchTrigger = { navController.navigate(route = Screen.RecipeSearch.route) },
-                onClickSavePost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.SavePost}") },
+                onClickSavePost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.SavePost.route}") },
                 onClickCreate = { navController.navigate(route = "${Screen.RecipeWrite.route}/${CreateScreenValue.CreateMode}") },
-                onClickMyPost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.MyPost}") },
+                onClickMyPost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.MyPost.route}") },
                 onClickSetting = {
                      /*TODO("다이얼로그로 ")*/
                     navController.navigate(route = "${Screen.RecipeRead.route}/$TestingRecipeId")

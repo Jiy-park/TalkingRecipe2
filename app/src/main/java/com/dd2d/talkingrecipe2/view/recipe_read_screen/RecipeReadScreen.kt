@@ -17,13 +17,13 @@ import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
 import com.dd2d.talkingrecipe2.view.recipe_read_screen.main_content.RecipeReadView
 import com.dd2d.talkingrecipe2.view_model.RecipeState
-import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
+import com.dd2d.talkingrecipe2.view_model.RecipeReadViewModel
 
 @Composable
 @Preview(showSystemUi = true)
 fun RecipeReadScreen(
     modifier: Modifier = Modifier,
-    recipeViewModel: RecipeViewModel = viewModel { RecipeViewModel(RecipeFetchRepository(), TestingRecipeId) },
+    recipeViewModel: RecipeReadViewModel = viewModel { RecipeReadViewModel(RecipeFetchRepository(), TestingRecipeId) },
     onClickBack: ()->Unit = llog("click back"),
     onClickAuthorProfileImage: () -> Unit = llog("click author profile image"),
     onClickFavorite: () -> Unit = llog("click favorite"),
