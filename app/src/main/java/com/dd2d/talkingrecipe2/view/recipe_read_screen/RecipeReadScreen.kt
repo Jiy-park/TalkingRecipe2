@@ -16,21 +16,21 @@ import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
 import com.dd2d.talkingrecipe2.view.recipe_read_screen.main_content.RecipeReadView
-import com.dd2d.talkingrecipe2.view_model.RecipeState
 import com.dd2d.talkingrecipe2.view_model.RecipeReadViewModel
+import com.dd2d.talkingrecipe2.view_model.RecipeState
 
 @Composable
 @Preview(showSystemUi = true)
 fun RecipeReadScreen(
     modifier: Modifier = Modifier,
     recipeViewModel: RecipeReadViewModel = viewModel { RecipeReadViewModel(RecipeFetchRepository(), TestingRecipeId) },
-    onClickBack: ()->Unit = llog("click back"),
+    onClickBack: () -> Unit = llog("click back"),
     onClickAuthorProfileImage: () -> Unit = llog("click author profile image"),
     onClickFavorite: () -> Unit = llog("click favorite"),
     onClickShare: () -> Unit = llog("click share"),
     onClickSave: () -> Unit = llog("click save"),
     onClickModify: () -> Unit = llog("click modify"),
-    onClickTalkingRecipe: (AuthorInfo, Recipe)->Unit = { _,_ -> logging("click talking recipe") },
+    onClickTalkingRecipe: (AuthorInfo, Recipe) -> Unit = { _,_ -> logging("click talking recipe") },
 ){
     val recipeState by recipeViewModel.recipeState.collectAsState()
 

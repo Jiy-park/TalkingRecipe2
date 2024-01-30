@@ -69,7 +69,7 @@ val MapleFontFamily = FontFamily(
 fun kotex(
     modifier: Modifier = Modifier,
     text: String = "",
-    weight: FontWeight = FontWeight.Light,
+    weight: FontWeight = FontWeight.Medium,
     color: Color = MainText,
     size: TextUnit = 15.sp,
     maxLine: Int = 1,

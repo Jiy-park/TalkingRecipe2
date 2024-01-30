@@ -12,9 +12,15 @@ fun NavGraphBuilder.subScreenGraph(
     navController: NavController,
 ){
     composable(route = "${Screen.Sub.route}/{destination}"){ backStack->
-        val destination = backStack.arguments?.getString("destination")?: SubScreenDestination.MyPost.route
+        val destinationRoute = backStack.arguments?.getString("destination")?: SubScreenDestination.MyPost.route
+        val selectedTab = when(destinationRoute){
+            SubScreenDestination.MyPost.route -> { SubScreenDestination.MyPost }
+            SubScreenDestination.Friend.route -> { SubScreenDestination.Friend }
+            SubScreenDestination.SavePost.route -> { SubScreenDestination.SavePost }
+            else -> { SubScreenDestination.MyPost }
+        }
         SubScreen(
-            destination = destination
+            destination = selectedTab
         )
     }
 }
@@ -24,5 +30,7 @@ fun NavGraphBuilder.subScreenGraph(
  * @property SavePost 보관함. 저장한 레시피
  * @property Friend 친구 목록*/
 enum class SubScreenDestination(val route: String, val description: String){
-    MyPost("my post","작성글"), SavePost("save post", "보관함"), Friend("friend", "친구")
+    MyPost("my post","작성글"),
+    Friend("friend", "친구"),
+    SavePost("save post", "보관함"),
 }
