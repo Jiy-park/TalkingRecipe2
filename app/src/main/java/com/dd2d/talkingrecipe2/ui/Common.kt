@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -22,13 +23,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.dd2d.talkingrecipe2.data_struct.RecipePost
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGray
+import com.dd2d.talkingrecipe2.ui.theme.HintText
 import com.dd2d.talkingrecipe2.ui.theme.MainText
 import com.dd2d.talkingrecipe2.ui.theme.kopupFontFamily
 import com.dd2d.talkingrecipe2.ui.theme.kotex
@@ -38,7 +43,7 @@ fun RecipeViewer(
     modifier: Modifier = Modifier,
     recipeBasicInfo: RecipeBasicInfo,
     recipeAuthor: String,
-    recipeThumbnail: Uri,
+    recipeThumbnailUri: Uri,
     onClick: (recipeId: String) -> Unit,
 ){
     val innerModifier = Modifier
@@ -50,7 +55,7 @@ fun RecipeViewer(
     ) {
         Surface(shape = RoundedCornerShape(15.dp)) {
             AsyncImage(
-                model = recipeThumbnail,
+                model = recipeThumbnailUri,
                 contentDescription = "recent recipe thumbnail image"
             )
         }
@@ -86,6 +91,68 @@ fun RecipeViewer(
 }
 
 @Composable
+fun PostViewer(
+    modifier: Modifier = Modifier,
+    post: RecipePost = TestingValue.TestingPostList[0],
+    onClickPost: (RecipePost) -> Unit = {}
+){
+    with(post) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
+            modifier = modifier
+                .wrapContentHeight()
+                .clickableWithoutRipple { onClickPost(post) }
+        ) {
+            val innerModifier = Modifier
+            AsyncImage(
+                model = thumbnailImageUri,
+                contentDescription = "recipe thumbnail image",
+                contentScale = ContentScale.Crop,
+                modifier = innerModifier
+                    .weight(0.5F)
+                    .aspectRatio(CommonValue.RecipeThumbnailImageRatio)
+                    .graphicsLayer {
+                        clip = true
+                        shape = RoundedCornerShape(15.dp)
+                    }
+            )
+
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center,
+                modifier = innerModifier
+                    .weight(0.5F)
+                    .padding(start = 10.dp)
+            ){
+                kotex(text = recipeBasicInfo.title, weight = FontWeight.Bold, size = 18.sp)
+                kotex(text = author, color = HintText)
+                kotex(text = recipeBasicInfo.description, color = HintText)
+                PostTagView(modifier = innerModifier, recipeBasicInfo = recipeBasicInfo)
+            }
+        }
+    }
+}
+
+@Composable
+fun PostTagView(
+    modifier: Modifier = Modifier,
+    recipeBasicInfo: RecipeBasicInfo
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .horizontalScroll(state = rememberScrollState())
+    ) {
+        TagView(text = recipeBasicInfo.time + "분")
+        TagView(text = recipeBasicInfo.amount + "인분")
+        TagView(text = recipeBasicInfo.calorie + "kcal")
+        TagView(text = recipeBasicInfo.level.description)
+    }
+}
+
+@Composable
 fun TagView(
     modifier: Modifier = Modifier,
     text: String
@@ -101,7 +168,7 @@ fun TagView(
             color = Color.White,
             size = 12.sp,
             modifier = modifier
-                .padding(horizontal = 5.dp)
+                .padding(horizontal = 5.dp, vertical = 2.dp)
         )
     }
 }

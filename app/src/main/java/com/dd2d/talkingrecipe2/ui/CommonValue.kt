@@ -3,7 +3,9 @@ package com.dd2d.talkingrecipe2.ui
 import androidx.compose.ui.unit.dp
 import com.dd2d.talkingrecipe2.R
 import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
+import com.dd2d.talkingrecipe2.data_struct.FriendInfo
 import com.dd2d.talkingrecipe2.data_struct.Recipe
+import com.dd2d.talkingrecipe2.data_struct.RecipePost
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.Level
@@ -38,6 +40,12 @@ object CommonValue {
 
     /** 레시피의 각 단계에서 보여주는 이미지의 높이. 140.dp*/
     val StepInfoViewHeight = 140.dp
+
+    /** 레시피의 썸네일 이미지 비율. 1.6 : 1.0*/
+    const val RecipeThumbnailImageRatio = 1.64F/1.0F
+
+    /** 친구 목록에서 보여지는 프로필이미지의 높이*/
+    val FriendViewerHeight = 50.dp
 }
 
 object TestingValue{
@@ -52,7 +60,11 @@ object TestingValue{
         profileImageUri = R.drawable.complete_upload_recipe.toUriWithDrawable(),
         backgroundImageUri = R.drawable.temp.toUriWithDrawable(),
     )
-
+    val TestingAuthor = AuthorInfo(
+        authorId = TestingUserId,
+        name = TestingUserName,
+        profileImageUri = TestingUserProfileImageUri
+    )
 
     val TestingBasicInfo = RecipeBasicInfo(
         recipeId = TestingRecipeId,
@@ -60,9 +72,9 @@ object TestingValue{
         title = "으앙",
         description = "설명??",
         level = Level.Easy,
-        time = "140분",
-        amount = "3인분",
-        calorie = "111kcal",
+        time = "140",
+        amount = "3",
+        calorie = "111",
         shareOption = ShareOption.All
     )
     val TestingIngredientList = mutableListOf(
@@ -94,9 +106,39 @@ object TestingValue{
         thumbnailUri = R.drawable.default_image_background.toUriWithDrawable()
     )
 
-    val TestingAuthor = AuthorInfo(
-        authorId = TestingUserId,
-        name = TestingUserName,
-        profileImageUri = TestingUserProfileImageUri
+    val TestingPostList = listOf<RecipePost>(
+        RecipePost(
+            recipeBasicInfo = TestingBasicInfo.copy(recipeId = "1"),
+            thumbnailImageUri = R.drawable.default_image_background.toUriWithDrawable(),
+            author = "$TestingUserName @$TestingUserId"
+        ),
+        RecipePost(
+            recipeBasicInfo = TestingBasicInfo.copy(recipeId = "2"),
+            thumbnailImageUri = R.drawable.temp.toUriWithDrawable(),
+            author = "$TestingUserName @$TestingUserId"
+        ),
+        RecipePost(
+            recipeBasicInfo = TestingBasicInfo.copy(recipeId = "3"),
+            thumbnailImageUri = R.drawable.temp.toUriWithDrawable(),
+            author = "$TestingUserName @$TestingUserId"
+        ),
+        RecipePost(
+            recipeBasicInfo = TestingBasicInfo.copy(recipeId = "4"),
+            thumbnailImageUri = R.drawable.temp.toUriWithDrawable(),
+            author = "$TestingUserName @$TestingUserId"
+        ),
+        RecipePost(
+            recipeBasicInfo = TestingBasicInfo.copy(recipeId = "5"),
+            thumbnailImageUri = R.drawable.temp.toUriWithDrawable(),
+            author = "$TestingUserName @$TestingUserId"
+        ),
+    )
+
+    val TestingFriendList = listOf(
+        FriendInfo("1asdasd", "1eqweqe", R.drawable.level_hard.toUriWithDrawable()),
+        FriendInfo("2vvvv", "2vfdfv", R.drawable.level_easy.toUriWithDrawable()),
+        FriendInfo("3ddd", "3sfsdv", R.drawable.default_image_background.toUriWithDrawable()),
+        FriendInfo("4vbfg", "4bgs", R.drawable.level_normal.toUriWithDrawable()),
+        FriendInfo("5123", "5333", R.drawable.main_screen_toxi.toUriWithDrawable()),
     )
 }

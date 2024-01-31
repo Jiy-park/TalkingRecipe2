@@ -107,7 +107,7 @@ fun RecentRecipe(
         RecipeViewer(
             recipeBasicInfo = recipeBasicInfo,
             recipeAuthor = recipeAuthor,
-            recipeThumbnail = recipeThumbnail,
+            recipeThumbnailUri = recipeThumbnail,
             onClick = { recipeId-> onClick(recipeId) },
             modifier = Modifier.fillMaxWidth()
         )
