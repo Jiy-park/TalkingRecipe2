@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -59,8 +60,6 @@ fun UserInfoView(
         }
 
         /** 배경 이미지*/
-
-        /** 배경 이미지*/
         AsyncImage(
             model = userInfo.backgroundImageUri,
             contentDescription = "user background image",
@@ -69,8 +68,6 @@ fun UserInfoView(
                 .fillMaxSize()
                 .zIndex(-1F)
         )
-
-        /** 프로필 이미지*/
 
         /** 프로필 이미지*/
         Surface(

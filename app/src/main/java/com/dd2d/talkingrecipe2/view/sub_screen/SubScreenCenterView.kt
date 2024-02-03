@@ -24,8 +24,6 @@ fun SubScreenCenterView(
     onTabChange: (tabIndex: Int)->Unit,
     mainContent: @Composable ()->Unit,
 ){
-    val viewList = SubScreenDestination.values()
-
     TabRow(
         selectedTabIndex = currentTab,
         containerColor = Color.White,
@@ -40,7 +38,7 @@ fun SubScreenCenterView(
         },
         divider = { TabRowDefaults.Indicator(height = 2.dp, color = SubColor) },
     ) {
-        viewList.forEachIndexed { index, destination->
+        SubScreenDestination.values().forEachIndexed { index, destination->
             Tab(
                 selected = currentTab == index,
                 onClick = { onTabChange(index) },

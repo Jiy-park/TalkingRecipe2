@@ -1,7 +1,7 @@
 package com.dd2d.talkingrecipe2.navigation
 
 /** 앱 내의 화면. navigation을 통해 각 화면을 이동한다.
- * @property SignIn
+ * @property Login
  * @property Main
  * @property Sub
  * @property RecipeWrite
@@ -9,7 +9,7 @@ package com.dd2d.talkingrecipe2.navigation
  * @property RecipeRead*/
 enum class Screen(val route: String){
     /** 로그인 화면. 유저는 해당 화면에서 회원가입을 진행할 수 있음.*/
-    SignIn("sign in screen"),
+    Login("log in screen"),
 
     /** 로그인 후 유저가 볼 첫 화면. 해당 화면으로부터 각 화면으로 이동 가능.*/
     Main("main screen"),

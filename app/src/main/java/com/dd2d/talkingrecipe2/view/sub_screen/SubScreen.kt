@@ -37,7 +37,6 @@ fun SubScreen(
     val postList by remember { mutableStateOf(TestingPostList) }
     val friendList by remember { mutableStateOf(TestingFriendList) }
 
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,

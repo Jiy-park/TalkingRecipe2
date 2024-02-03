@@ -10,4 +10,5 @@
 
     <color name="main_color">#FFFF6D89</color>
     <color name="main_text">#FF818181</color>
+    <color name="hint_color">#FFDADADA</color>
 </resources>

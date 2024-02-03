@@ -125,6 +125,7 @@ fun kofield(
     value: String,
     onValueChange: (String)->Unit,
     maxLength: Int = 10,
+    isError: Boolean = false,
     placeholder: @Composable (()->Unit)? = null,
     leadingIcon: @Composable (()->Unit)? = null,
     trailingIcon: @Composable (()->Unit)? = null,
@@ -155,6 +156,7 @@ fun kofield(
         TextFieldDefaults.DecorationBox(
             value = value,
             innerTextField = { innerTextField() },
+            isError = isError,
             placeholder = { placeholder?.let { it() } },
             leadingIcon = { leadingIcon?.let { it() } },
             trailingIcon = { trailingIcon?.let { it() } },

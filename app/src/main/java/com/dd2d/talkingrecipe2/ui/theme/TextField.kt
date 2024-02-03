@@ -18,7 +18,10 @@ fun textFieldColor(
         focusedIndicatorColor = if(removeIndicator) Color.Transparent else MainColor,
         unfocusedIndicatorColor = if(removeIndicator) Color.Transparent else MainText,
         disabledIndicatorColor = if(removeIndicator) Color.Transparent else HintText,
-        errorIndicatorColor = Color.Transparent,
+
+        errorIndicatorColor = if(removeIndicator) Color.Transparent else MainColor,
+        errorContainerColor = backgroundColor,
+
 
         focusedContainerColor = backgroundColor,
         unfocusedContainerColor = backgroundColor,

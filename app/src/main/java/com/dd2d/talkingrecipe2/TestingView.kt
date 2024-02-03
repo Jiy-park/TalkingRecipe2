@@ -5,22 +5,37 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,9 +44,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
@@ -41,6 +58,8 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfoDTO
 import com.dd2d.talkingrecipe2.model.RecipeDBValue.Field.BasicInfoField
 import com.dd2d.talkingrecipe2.model.RecipeDBValue.Filter.RecipeIdEqualTo
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
+import com.dd2d.talkingrecipe2.ui.theme.MainColor
+import com.dd2d.talkingrecipe2.ui.theme.kotex
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
@@ -67,6 +86,221 @@ private val supabase = createSupabaseClient(
 ) {
     install(Postgrest)
     install(Storage)
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+@Preview(showSystemUi = true)
+fun MSS(modifier: Modifier = Modifier){
+    val speed = 100.dp.value
+    var locationX by remember { mutableFloatStateOf(0F) }
+    var clickR by remember { mutableStateOf(false) }
+    var locationY by remember { mutableFloatStateOf(0F) }
+    val interaction = remember { MutableInteractionSource() }
+    val isPress by interaction.collectIsPressedAsState()
+
+    while(isPress){
+        logging("sad")
+    }
+
+
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ){
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .weight(1F)
+                .graphicsLayer {
+                    translationX = locationX
+                }
+        ){
+            Box(
+                modifier = modifier
+                    .size(200.dp)
+                    .background(color = MainColor)
+            )
+
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .fillMaxWidth()
+                .weight(0.3F)
+                .background(color = Color.Yellow)
+                .padding(horizontal = 100.dp)
+        ){
+            IconButton(
+                onClick = { locationX += speed },
+                modifier = modifier
+                    .align(Alignment.CenterEnd)
+                    .size(50.dp)
+            ) {
+                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "")
+            }
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "",
+                modifier = modifier
+                    .align(Alignment.CenterStart)
+                    .size(50.dp)
+                    .clickable(
+                        indication = rememberRipple(),
+                        interactionSource = interaction
+                    ){
+
+                    }
+            )
+        }
+    }
+}
+
+
+@Composable
+@Preview(showSystemUi = true)
+fun RT(modifier: Modifier = Modifier){
+
+    var trigger by remember { mutableStateOf(false) }
+    val y = remember { Animatable(0F) }
+    LaunchedEffect(key1 = trigger){
+        y.animateTo(
+            if(trigger)100F else 0F
+        )
+    }
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color.LightGray)
+    ){
+        Box(
+            modifier = modifier
+                .size(200.dp)
+                .background(color = Color.White)
+                .graphicsLayer {
+                    rotationY = y.value
+                }
+        ){
+            Box(
+                modifier = modifier
+                    .size(100.dp)
+                    .background(color = MainColor)
+                    .align(Alignment.TopEnd)
+                    .clickable {
+                        trigger = !trigger
+                    }
+                    .zIndex(1F)
+            )
+        }
+    }
+}
+
+@Composable
+@Preview(showSystemUi = true)
+fun AniTestingView(modifier: Modifier = Modifier){
+
+    val x = remember { Animatable(0F) }
+    var r by remember { mutableStateOf(false) }
+    var l by remember { mutableStateOf(false) }
+
+    val scale = remember { Animatable(0F) }
+
+    val roY = remember { Animatable(0F) }
+    var ro by remember { mutableStateOf(false) }
+
+    val interactionSource by remember { mutableStateOf(MutableInteractionSource()) }
+    val isPress by interactionSource.collectIsPressedAsState()
+    LaunchedEffect(key1 = isPress){
+        scale.animateTo(
+            if(isPress) 1.3F else 1F
+        )
+        x.animateTo(x.value + 30F)
+
+    }
+
+
+
+    LaunchedEffect(key1 = r){
+        x.animateTo(x.value + 30F)
+    }
+    LaunchedEffect(key1 = l){
+        x.animateTo(x.value - 30F)
+    }
+    LaunchedEffect(key1 = ro){
+        roY.animateTo(roY.value + 30F)
+    }
+
+    isPress.alog("prees")
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxSize()
+    ){
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .weight(1F)
+                .graphicsLayer {
+                    rotationY = roY.value
+                    translationX = x.value
+                    scaleX = scale.value
+                    scaleY = scale.value
+                }
+        ){
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = modifier
+                    .size(200.dp)
+                    .background(color = MainColor)
+            ){
+                kotex(text = "123", color = Color.White)
+            }
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .fillMaxWidth()
+                .weight(1F)
+                .background(color = Color.LightGray)
+                .padding(15.dp)
+        ){
+            IconButton(
+                onClick = { l = !l },
+                modifier = modifier
+                    .align(Alignment.CenterStart)
+            ) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
+            }
+            IconButton(
+                onClick = { ro = !ro },
+                modifier = modifier
+                    .align(Alignment.Center)
+            ) {
+                Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
+            }
+            IconButton(
+                onClick = { r = !r },
+                interactionSource = interactionSource,
+                modifier = modifier
+                    .align(Alignment.CenterEnd)
+            ) {
+                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "")
+            }
+            IconButton(
+                onClick = {  },
+                interactionSource = interactionSource,
+                modifier = modifier
+                    .align(Alignment.TopCenter)
+            ) {
+                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "")
+            }
+        }
+    }
 }
 
 @Composable

@@ -23,7 +23,7 @@ fun SubScreenTopView(
 ){
     var onEdit by remember { mutableStateOf(false) }
     AnimatedContent(
-        targetState = onEdit,
+        targetState = onEdit, label = "",
         transitionSpec = {
             if(onEdit){
                 slideInHorizontally { it*2 } + fadeIn() togetherWith
@@ -35,7 +35,6 @@ fun SubScreenTopView(
                         slideOutHorizontally { -it*2 } + fadeOut()
             }
         },
-        label = "",
     ) {isEdit->
         if(isEdit){
             EditUserInfoView(

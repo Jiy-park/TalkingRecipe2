@@ -24,7 +24,7 @@ val BackgroundGradient = Brush
         start = Offset.Zero,
         end = Offset.Infinite
     )
-
+val PassColor = Color(0xFF218334)
 
 
 //<color name="main_text">#818181</color>

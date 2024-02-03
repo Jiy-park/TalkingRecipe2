@@ -58,7 +58,9 @@ fun EditUserInfoView(
     onEndEdit: (update: User)->Unit,
 ){
     var updatedUserInfo by remember { mutableStateOf(userInfo) }
+    /** 변경할 사진이 프로필 이미지임. 프로필 이미지를 클릭 시 해당 값이 true로 변경됨. [ActivityResultContracts.GetContent]로 받아온 결과값(=[Uri]?)을 프로필 이미지에 적용. 적용 후엔 다시 false.*/
     var onEditProfile by remember { mutableStateOf(false) }
+    /** 변경할 사진이 배경 이미지임. 배경 이미지를 클릭 시 해당 값이 true로 변경됨. [ActivityResultContracts.GetContent]로 받아온 결과값(=[Uri]?)을 배경 이미지에 적용. 적용 후엔 다시 false.*/
     var onEditBackground by remember { mutableStateOf(false) }
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
