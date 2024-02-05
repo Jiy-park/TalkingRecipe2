@@ -81,17 +81,16 @@ object TestingValue{
         shareOption = ShareOption.All
     )
     val TestingIngredientList = mutableListOf(
-        Ingredient(version = 0, name = "재료0", amount = "양0"),
-        Ingredient(version = 1, name = "재료1", amount = "양1"),
-        Ingredient(version = 2, name = "재료2", amount = "양2"),
-        Ingredient(version = 3, name = "재료3", amount = "양3"),
-        Ingredient(version = 4, name = "재료4", amount = "양4"),
-        Ingredient(version = 5, name = "재료5", amount = "양5"),
-        Ingredient(version = 5, name = "재료5", amount = "양5"),
-        Ingredient(version = 5, name = "재료5", amount = "양5"),
-        Ingredient(version = 5, name = "재료5", amount = "양5"),
-        Ingredient(version = 5, name = "재료5", amount = "양5"),
-        Ingredient(version = 5, name = "재료5", amount = "양5"),
+        Ingredient(version = 1, name = "재료1", amount = "양1", no = 1),
+        Ingredient(version = 2, name = "재료2", amount = "양2", no = 2),
+        Ingredient(version = 3, name = "재료3", amount = "양3", no = 3),
+        Ingredient(version = 4, name = "재료4", amount = "양4", no = 4),
+        Ingredient(version = 5, name = "재료5", amount = "양5", no = 5),
+        Ingredient(version = 5, name = "재료5", amount = "양5", no = 5),
+        Ingredient(version = 5, name = "재료5", amount = "양5", no = 5),
+        Ingredient(version = 5, name = "재료5", amount = "양5", no = 5),
+        Ingredient(version = 5, name = "재료5", amount = "양5", no = 5),
+        Ingredient(version = 5, name = "재료5", amount = "양5", no = 5),
     )
 
     val TestingStepInfoList = mutableListOf(

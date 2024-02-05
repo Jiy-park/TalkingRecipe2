@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

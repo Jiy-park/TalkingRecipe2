@@ -94,6 +94,56 @@ sealed class T{
     object B: T()
 }
 
+@Composable
+@Preview(showSystemUi = true)
+fun UploadImageTest(modifier: Modifier = Modifier) {
+    var image by remember { mutableStateOf(Uri.EMPTY) }
+    val gallery = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){
+        it?.let { uri ->
+            image = uri
+        }
+    }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val bucket = supabase.storage.from("users_image/Toxi")
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier.fillMaxSize()
+    ){
+        AsyncImage(model = image, contentDescription = "", modifier = modifier.clickable { gallery.launch("image/*") })
+        TextButton(
+            onClick = {
+                scope.launch {
+//                    uploadImage(
+//                        bucketApi = bucket,
+//                        imageUri = image,
+//                        uploadPath = image.toImagePath(path = "test", context = context),
+//                        onTask = {
+//                            it.alog("task")
+//                        }
+//                    )
+                }
+            },
+            modifier = modifier.fillMaxWidth()
+        ) {
+            kotex(text = "upload")
+        }
+        TextButton(
+            onClick = {
+                scope.launch {
+                    image = supabase.storage.from("users_image")
+                        .createSignedUrl(path = "1.jpeg", 30.minutes)
+                        .toSupabaseUrl()
+                        .toUri()
+                }
+            },
+            modifier = modifier.fillMaxWidth()
+        ) {
+            kotex(text = "fetch")
+        }
+    }
+}
 
 
 @OptIn(ExperimentalFoundationApi::class)

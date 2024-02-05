@@ -1,6 +1,8 @@
 package com.dd2d.talkingrecipe2.data_struct
 
 import android.net.Uri
+import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.toUriWithDrawable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -60,4 +62,14 @@ data class User(
         profileImagePath = profileImagePath,
         backgroundImagePath = backgroundImagePath
     )
+    companion object{
+        val Empty = User(
+            userId = "",
+            name = "",
+            createdAt = 0L,
+            recentRecipeId = "",
+            profileImageUri = R.drawable.default_image.toUriWithDrawable(),
+            backgroundImageUri = R.drawable.default_image.toUriWithDrawable(),
+        )
+    }
 }

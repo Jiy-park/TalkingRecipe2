@@ -46,6 +46,7 @@ fun Uri.toImagePath(path: String, context: Context): String{
  * 2. 갤러리로부터 받은 이미지의 경우 false 반납*/
 fun Uri.isFromServer() = this.toString().startsWith("http")
 
+/** [Uri]를 [ByteArray]로 변환해준다. */
 suspend fun Uri.toByteArray() = withContext(Dispatchers.IO) {
     HttpClient().get(urlString = this@toByteArray.toString()).readBytes()
 }
@@ -60,3 +61,4 @@ fun List<Ingredient>.removeEmptyIngredient() = this.filterNot { ingredient-> ing
 /** 리스트의 내용물 중 빈 내용물을 필터링 함.
  * @return 이름 또는 양 중 하나라도 공백인 요소를 제외한 모든 아이템.*/
 fun List<StepInfo>.removeEmptyStepInfo() = this.filterNot { stepInfo-> stepInfo.isEmpty() }
+

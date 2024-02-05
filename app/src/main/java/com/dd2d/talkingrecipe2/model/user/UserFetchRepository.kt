@@ -8,8 +8,8 @@ import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.UserDTO
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.Expire.In1Hours
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.Field.UserFetchColumns
-import com.dd2d.talkingrecipe2.model.user.UserDBValue.Filter.UserId
-import com.dd2d.talkingrecipe2.model.user.UserDBValue.Filter.UserPassword
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Filter.UserIdEqualTo
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Filter.UserPasswordEqualTo
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserImageTable
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserLoginTable
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserTable
@@ -65,9 +65,9 @@ class UserFetchRepositoryImpl: UserFetchRepository {
     suspend fun isExistId(userId: String): Boolean{
         try {
             val res = database.from(UserLoginTable)
-                .select(columns = Columns.list(UserId)) {
+                .select(columns = Columns.list(UserIdEqualTo)) {
                     filter {
-                        eq(UserId, userId)
+                        eq(UserIdEqualTo, userId)
                     }
                 }
                 .data
@@ -87,9 +87,9 @@ class UserFetchRepositoryImpl: UserFetchRepository {
     suspend fun validateUser(userId: String, userPassword: String): Boolean{
         try {
             val res = database.from(UserLoginTable)
-                .select(columns = Columns.list(UserPassword)){
+                .select(columns = Columns.list(UserPasswordEqualTo)){
                     filter {
-                        eq(UserId, userId)
+                        eq(UserIdEqualTo, userId)
                     }
                 }
                 .data                           // res = [{"user_password":"value"}]
@@ -111,7 +111,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
 
             withContext(Dispatchers.IO){
                 val userProfileImageUri = async { fetchUserProfileImageUriById(userId, userDTO.profileImagePath) }.await()
-                val userBackgroundImageUri = async { fetchUserBackgroundImageUriById(userId, userDTO.profileImagePath) }.await()
+                val userBackgroundImageUri = async { fetchUserBackgroundImageUriById(userId, userDTO.backgroundImagePath) }.await()
 
                 User(
                     createdAt = userDTO.createdAt,
@@ -133,7 +133,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             database.from(UserTable)
                 .select(columns = Columns.list(UserFetchColumns)) {
                     filter {
-                        eq(UserId, userId)
+                        eq(UserIdEqualTo, userId)
                     }
                 }
                 .decodeSingle<UserDTO>()
@@ -144,11 +144,11 @@ class UserFetchRepositoryImpl: UserFetchRepository {
     }
 
     override suspend fun fetchUserProfileImageUriById(userId: String, imagePath: String): Uri {
-        imagePath.ifBlank { return Uri.EMPTY }
+        imagePath.ifBlank { return R.drawable.default_image.toUriWithDrawable() }
 
         return try {
             val res = database.storage
-                .from(UserImageTable)
+                .from("$UserImageTable/$userId")
                 .createSignedUrl(
                     path = imagePath,
                     expiresIn = In1Hours,
@@ -163,11 +163,11 @@ class UserFetchRepositoryImpl: UserFetchRepository {
     }
 
     override suspend fun fetchUserBackgroundImageUriById(userId: String, imagePath: String): Uri {
-        imagePath.ifBlank { return Uri.EMPTY }
+        imagePath.ifBlank { return R.drawable.default_image.toUriWithDrawable() }
 
         return try {
             val res = database.storage
-                .from(UserImageTable)
+                .from("$UserImageTable/$userId")
                 .createSignedUrl(
                     path = imagePath,
                     expiresIn = In1Hours,

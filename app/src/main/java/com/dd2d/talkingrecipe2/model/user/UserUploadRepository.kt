@@ -4,28 +4,40 @@ import android.net.Uri
 import com.dd2d.talkingrecipe2.BuildConfig
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.UserDTO
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Columns.RecentRecipeId
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Columns.UserBackgroundPath
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Columns.UserName
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Columns.UserProfilePath
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.Field.UserUpsertField
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Filter.UserIdEqualTo
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserImageTable
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserLoginTable
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserTable
+import com.dd2d.talkingrecipe2.uploadImage
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.io.IOException
 
 /** 유저의 정보를 데이터베이스에 업로드함.
  *- [uploadUser]
- *- [uploadUserProfileImage]
- *- [uploadUserBackgroundImage]*/
+ *- [updateUserProfileImage]
+ *- [updateUserBackgroundImage]*/
 interface UserUploadRepository {
     /** 유저의 정보를 데이터베이스에 업로드함. */
     suspend fun uploadUser(user: User)
-    /** 유저의 프로필 이미지를 업로드함. */
-    suspend fun uploadUserProfileImage(image: Uri)
-    /** 유저의 배경 이미지를 업로드함.*/
-    suspend fun uploadUserBackgroundImage(image: Uri)
+    /** 유저의 이름을 업데이트함.*/
+    suspend fun updateUserName(userId: String, name: String)
+    /** 유저가 최근에 본 레시피 정보를 업데이트함.*/
+    suspend fun updateUserRecentRecipe(userId: String, recipeId: String)
+    /** 유저의 프로필 이미지를 업데이트함. 해당 과정은 스토리지와 데이터베이스 모두 업데이트 함.*/
+    suspend fun updateUserProfileImage(userId: String, image: Uri, onTask: (msg: String) -> Unit)
+    /** 유저의 배경 이미지를 업데이트함. 해당 과정은 스토리지와 데이터베이스 모두 업데이트 함.*/
+    suspend fun updateUserBackgroundImage(userId: String, image: Uri, onTask: (msg: String) -> Unit)
 }
 
 /** 유저가 로그인 하기 위해 필요한 데이터를 통신하기 위한 DTO.
@@ -68,22 +80,89 @@ class UserUploadRepositoryImpl: UserUploadRepository{
         }
     }
 
-    override suspend fun uploadUserProfileImage(image: Uri) {
-        try {
-
-        }
-        catch (e :Exception){
-            throw IOException("IOException in uploadUserProfileImage.\nimage : $image.\nerror : $e")
-        }
+    override suspend fun updateUserName(userId: String, name: String) {
+        database.from(UserTable).update(
+            update = {
+                set(UserName, name)
+            },
+            request = {
+                filter {
+                    eq(UserIdEqualTo, userId)
+                }
+            }
+        )
     }
 
-    override suspend fun uploadUserBackgroundImage(image: Uri) {
-        try {
+    override suspend fun updateUserRecentRecipe(userId: String, recipeId: String) {
+        database.from(UserTable).update(
+            update = {
+                set(RecentRecipeId, recipeId)
+            },
+            request = {
+                filter {
+                    eq(UserIdEqualTo, userId)
+                }
+            }
+        )
+    }
 
-        }
-        catch (e :Exception){
-            throw IOException("IOException in uploadUserBackgroundImage.\nimage : $image.\nerror : $e")
-        }
+    override suspend fun updateUserProfileImage(
+        userId: String,
+        image: Uri,
+        onTask: (msg: String) -> Unit
+    ) {
+        val bucketApi = database.storage.from("$UserImageTable/$userId")
+        val uploadPath = "profile.jpeg"
+
+        onTask("updateUserProfileImage()::start update user profile path")
+        database.from(UserTable).update(
+            update = {
+                set(UserProfilePath, uploadPath)
+            },
+            request = {
+                filter {
+                    eq(UserIdEqualTo, userId)
+                }
+            }
+        )
+        onTask("updateUserProfileImage()::finished update user profile path")
+        uploadImage(
+            bucketApi = bucketApi,
+            uploadPath = "profile.jpeg",
+            imageUri = image,
+            callFrom = "uploadUserProfileImage",
+            onTask = { msg-> onTask(msg) }
+        )
+    }
+
+    override suspend fun updateUserBackgroundImage(
+        userId: String,
+        image: Uri,
+        onTask: (msg: String) -> Unit
+    ) {
+        val bucketApi = database.storage.from("$UserImageTable/$userId")
+        val uploadPath = "background.jpeg"
+
+        onTask("updateUserProfileImage()::start update user profile path")
+        database.from(UserTable).update(
+            update = {
+                set(UserBackgroundPath, uploadPath)
+            },
+            request = {
+                filter {
+                    eq(UserIdEqualTo, userId)
+                }
+            }
+        )
+        onTask("updateUserProfileImage()::finished update user profile path")
+
+        uploadImage(
+            bucketApi = bucketApi,
+            uploadPath = uploadPath,
+            imageUri = image,
+            callFrom = "uploadUserBackgroundImage",
+            onTask = { msg-> onTask(msg) }
+        )
     }
 
     /** 새로운 유저 등록. 해당 함수는 [UserLoginTable], [UserTable]에 새로운 유저를 추가하는 과정이 포함돼 있음.
@@ -103,13 +182,10 @@ class UserUploadRepositoryImpl: UserUploadRepository{
         onTaskState("joinNewUser()::start insert new user to user table.")
         insertNewUserToUserTable(createdAt, userId, userName)
 
-        return User(
+        return User.Empty.copy(
             userId = userId,
             name = userName,
             createdAt = createdAt,
-            recentRecipeId = "",
-            profileImageUri = Uri.EMPTY,
-            backgroundImageUri = Uri.EMPTY
         )
     }
 

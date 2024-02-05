@@ -31,10 +31,12 @@ fun AppNavigation(
     val navController = rememberNavController()
     val userState by userViewModel.userState.collectAsState()
 
+//    TODO("아래에서 두번째에 있는 startDestination -> 테스트용임. 첫번째 주석 해제. 두번째 지우기.")
     NavHost(
         modifier = modifier.fillMaxSize(),
         navController = navController,
         startDestination = if(userState is UserState.OnLogin) Screen.Main.route else Screen.Login.route,
+//        startDestination = Screen.Main.route,
     ){
         composable(route = Screen.Login.route){
             LoginScreen(
@@ -65,7 +67,7 @@ fun AppNavigation(
                 onClickRecentRecipe = { recipeId-> navController.navigate(route = "${Screen.RecipeRead.route}/$recipeId") },
             )
         }
-        subScreenGraph(navController = navController)
+        subScreenGraph(navController = navController, userViewModel = userViewModel)
         recipeWriteScreenGraph(navController = navController)
         recipeSearchScreenGraph(navController = navController)
         recipeReadScreenGraph(navController = navController)

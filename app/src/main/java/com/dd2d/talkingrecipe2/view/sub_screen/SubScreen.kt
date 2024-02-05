@@ -10,30 +10,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.dd2d.talkingrecipe2.data_struct.FriendInfo
 import com.dd2d.talkingrecipe2.data_struct.RecipePost
-import com.dd2d.talkingrecipe2.llog
-import com.dd2d.talkingrecipe2.logging
+import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.navigation.SubScreenDestination
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingFriendList
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingPostList
-import com.dd2d.talkingrecipe2.ui.TestingValue.TestingUser
 
 /**@param destination 서브 메인의 시작점. 참고 : [SubScreenDestination] */
 @Composable
-@Preview(showSystemUi = true)
 fun SubScreen(
     modifier: Modifier = Modifier,
-    destination: SubScreenDestination = SubScreenDestination.MyPost,
-    onClickPost: (RecipePost) -> Unit = { logging("click post") },
-    onClickFriend: (FriendInfo) -> Unit = { logging("click friend") },
-    onClickBack: () -> Unit = llog("click back"),
+    user: User,
+    onUpdateUser: (update: User)->Unit,
+    destination: SubScreenDestination,
+    onClickPost: (RecipePost) -> Unit,
+    onClickFriend: (FriendInfo) -> Unit,
+    onClickBack: () -> Unit,
 ){
     var currentTab by remember { mutableStateOf<SubScreenDestination>(destination) }
 //    TODO("아래 세 줄은 테스트용 나중에 지우면 됨. user 정보는 뷰모델에서 가져올 것.")
-    var user by remember { mutableStateOf(TestingUser) }
     val postList by remember { mutableStateOf(TestingPostList) }
     val friendList by remember { mutableStateOf(TestingFriendList) }
 
@@ -45,7 +42,7 @@ fun SubScreen(
     ){
         SubScreenTopView(
             userInfo = user,
-            onEditUserInfo = { update-> user = update },
+            onEditUserInfo = { update-> onUpdateUser(update) },
             onClickBack = { onClickBack() }
         )
         SubScreenCenterView(

@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -31,7 +31,7 @@ fun WriteStepMoveButton(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.height(BottomButtonHeight)
     ) {
-        if(writeStep.step > RecipeWriteStep.values().first().step){
+        if(writeStep != RecipeWriteStep.values().first()){
             Button(
                 onClick = { onClickPrevStep() },
                 shape = RectangleShape,
@@ -47,21 +47,19 @@ fun WriteStepMoveButton(
                 )
             }
         }
-        if(writeStep.step < RecipeWriteStep.values().last().step){
-            Button(
-                onClick = { onClickNextStep() },
-                shape = RectangleShape,
-                colors = buttonColor(),
-                modifier = innerModifier
-                    .background(brush = BackgroundGradient)
-                    .weight(1F)
-            ) {
-                kotex(
-                    text = if(writeStep.step == RecipeWriteStep.values().lastIndex-1) "완료" else "다음",
-                    color = Color.White,
-                    weight = FontWeight.Bold
-                )
-            }
+        Button(
+            onClick = { onClickNextStep() },
+            shape = RectangleShape,
+            colors = buttonColor(),
+            modifier = innerModifier
+                .background(brush = BackgroundGradient)
+                .weight(1F)
+        ) {
+            kotex(
+                text = if(writeStep.ordinal == RecipeWriteStep.values().lastIndex) "완료" else "다음",
+                color = Color.White,
+                weight = FontWeight.Bold
+            )
         }
     }
 }

@@ -9,8 +9,8 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.toDTO
 import com.dd2d.talkingrecipe2.isFromServer
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.BasicInfoUpsertField
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.IngredientUpsertField
-import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.RecipeBasicInfoUpsertField
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.StepInfoUpsertField
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.IngredientTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeImageTable
@@ -89,7 +89,7 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
                 .from(RecipeTable)
                 .upsert(
                     value = basicInfo.toDTO(),
-                    onConflict = RecipeBasicInfoUpsertField
+                    onConflict = BasicInfoUpsertField
                 )
         }
         catch (e: Exception){

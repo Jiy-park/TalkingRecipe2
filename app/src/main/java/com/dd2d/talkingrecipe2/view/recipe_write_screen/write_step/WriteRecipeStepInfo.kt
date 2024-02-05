@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step
 
 import android.content.Context
 import android.net.Uri
@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,6 +41,7 @@ import com.dd2d.talkingrecipe2.R
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.ui.CommonValue.StepInfoViewHeight
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
+import com.dd2d.talkingrecipe2.ui.theme.BackgroundGray
 import com.dd2d.talkingrecipe2.ui.theme.HintText
 import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.textFieldColor
@@ -84,7 +86,24 @@ fun WriteRecipeStepInfo(
             .reorderable(state)
             .detectReorderAfterLongPress(state)
     ){
-        itemsIndexed(items = stepInfoList, key = { _, info -> info.version }){ index, info ->
+        if(stepInfoList.isEmpty()){
+            item {
+                TextButton(
+                    onClick = {
+                        val updateList = stepInfoList.toMutableList()
+                        updateList.add(StepInfo(version = 0, order = stepInfoList.size+1, explanation = "", imageUri = Uri.EMPTY))
+                        onChangeStepInfoList(updateList)
+                    },
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .background(color = BackgroundGray)
+
+                ) {
+                    kotex(text = "단계 추가하기")
+                }
+            }
+        }
+        itemsIndexed(items = stepInfoList, key = { _, info -> info.order }){ index, info ->
             ReorderableItem(reorderableState = state, key = info) { _ ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,

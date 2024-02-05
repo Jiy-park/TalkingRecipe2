@@ -9,9 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
-import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeBasicInfo
-import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeStepInfo
-import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.WriteRecipeThumbnail
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step.WriteRecipeBasicInfo
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step.WriteRecipeStepInfo
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step.WriteRecipeThumbnail
 
 
 @Composable

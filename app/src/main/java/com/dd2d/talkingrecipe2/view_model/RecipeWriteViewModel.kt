@@ -124,13 +124,13 @@ class RecipeWriteViewModel(
     }
 
     fun moveToNextStep(){
-        val currentStep = _writeStep.value.step
-        if(currentStep >= RecipeWriteStep.values().last().step) return
+        val currentStep = _writeStep.value.ordinal
+        if(currentStep >= RecipeWriteStep.values().last().ordinal) return
         _writeStep.value = RecipeWriteStep.values()[currentStep+1]
     }
 
     fun moveToPrevStep(){
-        val currentStep = _writeStep.value.step
+        val currentStep = _writeStep.value.ordinal
         if(currentStep <= 0) return
         _writeStep.value = RecipeWriteStep.values()[currentStep-1]
     }

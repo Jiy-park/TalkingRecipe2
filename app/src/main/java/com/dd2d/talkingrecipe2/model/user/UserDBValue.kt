@@ -6,11 +6,18 @@ object UserDBValue{
     const val UserTable = "user"
     const val UserImageTable = "users_image"
     const val UserLoginTable = "user_login"
+    object Columns{
+        const val UserProfilePath = "profile_image_path"
+        const val UserBackgroundPath = "background_image_path"
+        const val RecentRecipeId = "recent_recipe_id"
+        const val UserName = "user_name"
+
+
+    }
+
     object Filter{
-        const val UserId = "user_id"
-        const val UserPassword = "user_password"
-
-
+        const val UserIdEqualTo = "user_id"
+        const val UserPasswordEqualTo = "user_password"
     }
     object Expire{
         val In1Hours = 1.hours

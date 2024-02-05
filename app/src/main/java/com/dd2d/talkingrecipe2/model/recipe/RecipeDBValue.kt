@@ -15,6 +15,7 @@ object RecipeDBValue{
         const val StepInfoImageTable = "step_info"
     }
 
+
     object Filter{
         const val RecipeIdEqualTo = "recipe_id"
     }
@@ -24,9 +25,20 @@ object RecipeDBValue{
     }
 
     object Field{
-        val BasicInfoField = listOf("recipe_id", "author_id", "title", "description", "level", "time", "amount", "share_option", "calorie")
-        const val RecipeBasicInfoUpsertField = "recipe_id"
+        const val BasicInfoUpsertField = "recipe_id"
         const val IngredientUpsertField = "no,recipe_id"
-        const val StepInfoUpsertField = "no,recipe_id"
+        const val StepInfoUpsertField = "order,recipe_id"
+        val BasicInfoField = listOf(
+            "version",
+            "recipe_id",
+            "author_id",
+            "title",
+            "description",
+            "level",
+            "time",
+            "amount",
+            "share_option",
+            "calorie"
+        )
     }
 }

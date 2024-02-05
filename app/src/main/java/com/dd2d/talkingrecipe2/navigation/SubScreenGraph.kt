@@ -1,5 +1,7 @@
 package com.dd2d.talkingrecipe2.navigation
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -7,24 +9,7 @@ import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.Friend
 import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.MyPost
 import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.SavePost
 import com.dd2d.talkingrecipe2.view.sub_screen.SubScreen
-
-fun NavGraphBuilder.subScreenGraph(
-    navController: NavController,
-){
-    composable(route = "${Screen.Sub.route}/{destination}"){ backStack->
-        @Suppress("MoveVariableDeclarationIntoWhen")
-        val destinationRoute = backStack.arguments?.getString("destination")?: SubScreenDestination.MyPost.route
-        val selectedTab = when(destinationRoute){
-            SubScreenDestination.MyPost.route -> { SubScreenDestination.MyPost }
-            SubScreenDestination.Friend.route -> { SubScreenDestination.Friend }
-            SubScreenDestination.SavePost.route -> { SubScreenDestination.SavePost }
-            else -> { SubScreenDestination.MyPost }
-        }
-        SubScreen(
-            destination = selectedTab
-        )
-    }
-}
+import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
 /** [Screen.Sub]의 세부 종착점.
  * @property MyPost 작성글
@@ -34,4 +19,37 @@ enum class SubScreenDestination(val route: String, val description: String){
     MyPost("my post","작성글"),
     Friend("friend", "친구"),
     SavePost("save post", "보관함"),
+}
+
+fun NavGraphBuilder.subScreenGraph(
+    navController: NavController,
+    userViewModel: UserViewModel,
+){
+
+    composable(route = "${Screen.Sub.route}/{destination}"){ backStack->
+        val user by userViewModel.user.collectAsState()
+
+        @Suppress("MoveVariableDeclarationIntoWhen")
+        val destinationRoute = backStack.arguments?.getString("destination")?: MyPost.route
+        val selectedTab = when(destinationRoute){
+            MyPost.route -> { MyPost }
+            Friend.route -> { Friend }
+            SavePost.route -> { SavePost }
+            else -> { MyPost }
+        }
+        SubScreen(
+            user = user,
+            onUpdateUser = { update ->
+                userViewModel.updateUser(update)
+            },
+            destination = selectedTab,
+            onClickBack = { navController.navigateUp() },
+            onClickPost = {
+
+            },
+            onClickFriend = {
+
+            }
+        )
+    }
 }

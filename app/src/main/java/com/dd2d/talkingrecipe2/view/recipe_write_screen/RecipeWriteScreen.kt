@@ -7,8 +7,7 @@ import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteState
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
-import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.RecipeWriteView
-import com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step.EndWrite
+import com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step.EndWrite
 import com.dd2d.talkingrecipe2.view_model.RecipeWriteViewModel
 
 @Composable

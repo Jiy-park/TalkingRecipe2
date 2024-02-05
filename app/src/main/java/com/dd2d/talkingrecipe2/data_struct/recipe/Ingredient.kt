@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 /** @param version 레시피의 버전. 레시피의 버전에 맞는 [Ingredient]만 사용함.*/
 data class Ingredient(
     val version: Int,
+    val no: Int,
     val name: String = "",
     val amount: String = "",
 ){
@@ -15,6 +16,7 @@ data class Ingredient(
 
     fun toDTO(recipeId: String) = IngredientDTO(
         version = this.version,
+        no = this.no,
         recipeId = recipeId,
         name = this.name,
         amount = this.amount
@@ -25,6 +27,8 @@ data class Ingredient(
 data class IngredientDTO(
     @SerialName("version")
     val version: Int,
+    @SerialName("no")
+    val no: Int,
     @SerialName("recipe_id")
     val recipeId: String,
     @SerialName("name")
@@ -34,6 +38,7 @@ data class IngredientDTO(
 ){
     fun toIngredient() = Ingredient(
         version = this.version,
+        no = this.no,
         name = this.name,
         amount = this.amount
     )

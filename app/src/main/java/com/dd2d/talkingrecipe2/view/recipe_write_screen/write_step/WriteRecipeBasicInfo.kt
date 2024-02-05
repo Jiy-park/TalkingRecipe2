@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.view.recipe_write_screen.main_content.write_step
+package com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -111,7 +111,7 @@ fun WriteRecipeBasicInfo(
             },
             onCLickAdd = {
                 val updatedList = ingredientList.toMutableList()
-                updatedList.add(Ingredient(version = ingredientList.size+1))
+                updatedList.add(Ingredient(no = ingredientList.size+1, version = 0))
                 onChangeIngredientList(updatedList)
             },
             onClickRemove = { index->
