@@ -10,7 +10,7 @@ import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.llog
 import com.dd2d.talkingrecipe2.logging
-import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
+import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingAuthor
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import com.dd2d.talkingrecipe2.view.ErrorView
@@ -23,7 +23,7 @@ import com.dd2d.talkingrecipe2.view_model.RecipeState
 @Preview(showSystemUi = true)
 fun RecipeReadScreen(
     modifier: Modifier = Modifier,
-    recipeViewModel: RecipeReadViewModel = viewModel { RecipeReadViewModel(RecipeFetchRepository(), TestingRecipeId) },
+    recipeViewModel: RecipeReadViewModel = viewModel { RecipeReadViewModel(RecipeFetchRepositoryImpl(), TestingRecipeId) },
     onClickBack: () -> Unit = llog("click back"),
     onClickAuthorProfileImage: () -> Unit = llog("click author profile image"),
     onClickFavorite: () -> Unit = llog("click favorite"),

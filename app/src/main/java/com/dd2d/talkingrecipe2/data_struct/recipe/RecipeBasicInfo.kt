@@ -8,26 +8,29 @@ import kotlinx.serialization.Serializable
 /** 데이터베이스와의 통신을 위한 DTO*/
 @Serializable
 data class RecipeBasicInfoDTO(
+    @SerialName("version")
+    val version: Int,
     @SerialName("recipe_id")
-    var recipeId: String,
+    val recipeId: String,
     @SerialName("author_id")
     val authorId: String,
     @SerialName("title")
-    var title: String,
+    val title: String,
     @SerialName("description")
-    var description: String,
+    val description: String,
     @SerialName("level")
-    var level: Int,
+    val level: Int,
     @SerialName("time")
-    var time: String,
+    val time: String,
     @SerialName("amount")
-    var amount: String,
+    val amount: String,
     @SerialName("calorie")
-    var calorie: String,
+    val calorie: String,
     @SerialName("share_option")
-    var shareOption: Int
+    val shareOption: Int
 ){
     fun toRecipeBasicInfo() = RecipeBasicInfo(
+        version = this.version,
         recipeId = this.recipeId,
         authorId = this.authorId,
         title = this.title,
@@ -40,18 +43,21 @@ data class RecipeBasicInfoDTO(
     )
 }
 
+/** @param version 레시피의 버전.*/
 data class RecipeBasicInfo(
-    var recipeId: String = "",
-    var authorId: String = "",
-    var title: String = "",
-    var description: String = "",
-    var level: Level = Level.Normal,
-    var time: String = "",
-    var amount: String = "",
-    var calorie: String = "",
-    var shareOption: ShareOption = ShareOption.All
+    val version: Int = 0,
+    val recipeId: String = "",
+    val authorId: String = "",
+    val title: String = "",
+    val description: String = "",
+    val level: Level = Level.Normal,
+    val time: String = "",
+    val amount: String = "",
+    val calorie: String = "",
+    val shareOption: ShareOption = ShareOption.All
 ){
     fun toDTO() = RecipeBasicInfoDTO(
+        version = this.version,
         recipeId = this.recipeId,
         authorId = this.authorId,
         title = this.title,

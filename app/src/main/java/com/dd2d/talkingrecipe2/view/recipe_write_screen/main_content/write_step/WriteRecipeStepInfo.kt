@@ -84,7 +84,7 @@ fun WriteRecipeStepInfo(
             .reorderable(state)
             .detectReorderAfterLongPress(state)
     ){
-        itemsIndexed(items = stepInfoList, key = { _, info -> info.no }){ index, info ->
+        itemsIndexed(items = stepInfoList, key = { _, info -> info.version }){ index, info ->
             ReorderableItem(reorderableState = state, key = info) { _ ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -108,7 +108,7 @@ fun WriteRecipeStepInfo(
                         },
                         onClickAdd = {
                             val updateList = stepInfoList.toMutableList()
-                            updateList.add(index+1, StepInfo(order = stepInfoList.size+1))
+                            updateList.add(index+1, StepInfo(version = 0, order = stepInfoList.size+1, explanation = "", imageUri = Uri.EMPTY))
                             onChangeStepInfoList(updateList)
                         },
                         onClickRemove = {

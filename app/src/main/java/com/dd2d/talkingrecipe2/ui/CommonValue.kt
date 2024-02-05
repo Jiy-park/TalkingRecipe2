@@ -55,8 +55,10 @@ object TestingValue{
     val TestingUserProfileImageUri = R.drawable.main_screen_toxi.toUriWithDrawable()
 
     val TestingUser = User(
+        createdAt = 1,
         userId = TestingUserId,
         name = TestingUserName,
+        recentRecipeId = TestingRecipeId,
         profileImageUri = R.drawable.complete_upload_recipe.toUriWithDrawable(),
         backgroundImageUri = R.drawable.temp.toUriWithDrawable(),
     )
@@ -67,6 +69,7 @@ object TestingValue{
     )
 
     val TestingBasicInfo = RecipeBasicInfo(
+        version = 0,
         recipeId = TestingRecipeId,
         authorId = TestingUserId,
         title = "으앙",
@@ -78,25 +81,25 @@ object TestingValue{
         shareOption = ShareOption.All
     )
     val TestingIngredientList = mutableListOf(
-        Ingredient(no = 0, name = "재료0", amount = "양0"),
-        Ingredient(no = 1, name = "재료1", amount = "양1"),
-        Ingredient(no = 2, name = "재료2", amount = "양2"),
-        Ingredient(no = 3, name = "재료3", amount = "양3"),
-        Ingredient(no = 4, name = "재료4", amount = "양4"),
-        Ingredient(no = 5, name = "재료5", amount = "양5"),
-        Ingredient(no = 5, name = "재료5", amount = "양5"),
-        Ingredient(no = 5, name = "재료5", amount = "양5"),
-        Ingredient(no = 5, name = "재료5", amount = "양5"),
-        Ingredient(no = 5, name = "재료5", amount = "양5"),
-        Ingredient(no = 5, name = "재료5", amount = "양5"),
+        Ingredient(version = 0, name = "재료0", amount = "양0"),
+        Ingredient(version = 1, name = "재료1", amount = "양1"),
+        Ingredient(version = 2, name = "재료2", amount = "양2"),
+        Ingredient(version = 3, name = "재료3", amount = "양3"),
+        Ingredient(version = 4, name = "재료4", amount = "양4"),
+        Ingredient(version = 5, name = "재료5", amount = "양5"),
+        Ingredient(version = 5, name = "재료5", amount = "양5"),
+        Ingredient(version = 5, name = "재료5", amount = "양5"),
+        Ingredient(version = 5, name = "재료5", amount = "양5"),
+        Ingredient(version = 5, name = "재료5", amount = "양5"),
+        Ingredient(version = 5, name = "재료5", amount = "양5"),
     )
 
     val TestingStepInfoList = mutableListOf(
-        StepInfo(no = 0L, order = 0, explanation = "설명0", imageUri = R.drawable.level_hard.toUriWithDrawable()),
-        StepInfo(no = 1L, order = 1, explanation = "설명1", imageUri = R.drawable.main_screen_toxi.toUriWithDrawable()),
-        StepInfo(no = 2L, order = 2, explanation = "설명2", imageUri = R.drawable.ic_setting.toUriWithDrawable()),
-        StepInfo(no = 3L, order = 3, explanation = "설명3", imageUri = R.drawable.main_screen_search.toUriWithDrawable()),
-        StepInfo(no = 4L, order = 4, explanation = "설명4", imageUri = R.drawable.temp.toUriWithDrawable()),
+        StepInfo(version = 0, order = 0, explanation = "설명0", imageUri = R.drawable.level_hard.toUriWithDrawable()),
+        StepInfo(version = 1, order = 1, explanation = "설명1", imageUri = R.drawable.main_screen_toxi.toUriWithDrawable()),
+        StepInfo(version = 2, order = 2, explanation = "설명2", imageUri = R.drawable.ic_setting.toUriWithDrawable()),
+        StepInfo(version = 3, order = 3, explanation = "설명3", imageUri = R.drawable.main_screen_search.toUriWithDrawable()),
+        StepInfo(version = 4, order = 4, explanation = "설명4", imageUri = R.drawable.temp.toUriWithDrawable()),
     )
 
     val TestingRecipe = Recipe(

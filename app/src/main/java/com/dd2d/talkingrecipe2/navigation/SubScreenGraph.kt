@@ -12,6 +12,7 @@ fun NavGraphBuilder.subScreenGraph(
     navController: NavController,
 ){
     composable(route = "${Screen.Sub.route}/{destination}"){ backStack->
+        @Suppress("MoveVariableDeclarationIntoWhen")
         val destinationRoute = backStack.arguments?.getString("destination")?: SubScreenDestination.MyPost.route
         val selectedTab = when(destinationRoute){
             SubScreenDestination.MyPost.route -> { SubScreenDestination.MyPost }

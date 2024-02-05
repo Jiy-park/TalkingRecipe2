@@ -13,7 +13,6 @@ import com.dd2d.talkingrecipe2.ui.theme.TalkingRecipe2Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-//        val userViewModel = UserViewModel(supabase = supabase, userId = 1_000_001)
         super.onCreate(savedInstanceState)
         setContent {
             TalkingRecipe2Theme {

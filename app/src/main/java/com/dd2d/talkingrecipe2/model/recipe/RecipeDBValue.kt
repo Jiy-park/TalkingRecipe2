@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.model
+package com.dd2d.talkingrecipe2.model.recipe
 
 import kotlin.time.Duration.Companion.minutes
 
@@ -8,7 +8,7 @@ object RecipeDBValue{
     }
 
     object Table{
-        const val RecipeTable = "recipes"
+        const val RecipeTable = "recipe_basic_info"
         const val IngredientTable = "recipe_ingredient"
         const val StepInfoTable = "recipe_step_info"
         const val RecipeImageTable = "recipe_image"

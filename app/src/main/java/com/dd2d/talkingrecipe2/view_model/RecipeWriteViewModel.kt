@@ -7,10 +7,9 @@ import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteMode
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteState
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
-import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
-import com.dd2d.talkingrecipe2.model.RecipeUploadRepository
+import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
+import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,8 +26,8 @@ import java.time.format.DateTimeFormatter
 class RecipeWriteViewModel(
     private val userId: String,
     val writeScreenMode: RecipeWriteMode,
-    private val recipeUploadRepo: RecipeUploadRepository,
-    private val recipeFetchRepo: RecipeFetchRepository,
+    private val recipeUploadRepo: RecipeUploadRepositoryImpl,
+    private val recipeFetchRepo: RecipeFetchRepositoryImpl,
 ): ViewModel() {
     private var _writeState = MutableStateFlow<RecipeWriteState>(RecipeWriteState.Init)
     val writeState: StateFlow<RecipeWriteState> = _writeState.asStateFlow()
@@ -36,7 +35,7 @@ class RecipeWriteViewModel(
     private var _writeStep = MutableStateFlow<RecipeWriteStep>(RecipeWriteStep.RecipeBasicInfo)
     val writeStep: StateFlow<RecipeWriteStep> = _writeStep.asStateFlow()
 
-    private var _recipe = MutableStateFlow(Recipe())
+    private var _recipe = MutableStateFlow(Recipe.EmptyRecipe)
     val recipe: StateFlow<Recipe> = _recipe.asStateFlow()
 
     fun onChangeRecipe(recipe: Recipe){
@@ -47,7 +46,7 @@ class RecipeWriteViewModel(
         if(_writeState.value == RecipeWriteState.Init){
             when(writeScreenMode){
                 is RecipeWriteMode.Create -> {
-                    _recipe.value = Recipe()
+                    _recipe.value = Recipe.EmptyRecipe
                     _writeState.value = RecipeWriteState.Stable
                 }
                 is RecipeWriteMode.Modify -> {
@@ -67,9 +66,7 @@ class RecipeWriteViewModel(
         }
     }
 
-    /** 데이터베이스에서 [recipeId]에 맞는 레시피를 가져옴.
-     * 가져오는 동안 [RecipeWriteState.OnFetching] 상태이며 가져온 레시피는 [Flow]형태임.
-     * [writeState]의 값이 [RecipeWriteState.Stable]일 때 레시피에 접근 가능.*/
+    /** 데이터베이스에서 [recipeId]에 맞는 레시피를 가져옴.*/
     private fun fetchRecipe(recipeId: String){
         _writeState.value = RecipeWriteState.OnFetching("start fetch recipe. recipe id -> $recipeId")
         viewModelScope.launch(Dispatchers.IO) {
@@ -93,7 +90,7 @@ class RecipeWriteViewModel(
     private fun uploadRecipe() {
         viewModelScope.launch(Dispatchers.IO) {
             _writeState.value = RecipeWriteState.OnUploading("start upload recipe.")
-            if(writeScreenMode is RecipeWriteMode.Create){
+            if(writeScreenMode is RecipeWriteMode.Create){ /** 업로드할 레시피가 새로 만든 레시피인 경우 레시피 아이디를 할당해준다. [createRecipeId]사용.*/
                 val recipeId = createRecipeId()
                 val updateBasicInfo = _recipe.value.basicInfo.copy(recipeId = recipeId)
                 _recipe.value = _recipe.value.copy(basicInfo = updateBasicInfo)

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.data_struct.Recipe
-import com.dd2d.talkingrecipe2.model.RecipeFetchRepository
+import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
@@ -39,13 +39,13 @@ sealed class RecipeState{
  * @see [Screen.RecipeRead]
  * @see [Screen.RecipeWrite]*/
 class RecipeReadViewModel(
-    private val recipeRepo: RecipeFetchRepository,
+    private val recipeRepo: RecipeFetchRepositoryImpl,
     private val recipeId: String?,
 ): ViewModel() {
     private var _recipeState = MutableStateFlow<RecipeState>(RecipeState.Init)
     val recipeState = _recipeState.asStateFlow()
 
-    private var _recipe = MutableStateFlow<Recipe>(Recipe())
+    private var _recipe = MutableStateFlow<Recipe>(Recipe.EmptyRecipe)
     val recipe = _recipe.asStateFlow()
 
     /** 처음 초기화 됐을 경우에만 시행.

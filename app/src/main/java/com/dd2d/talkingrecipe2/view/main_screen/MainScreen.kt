@@ -8,14 +8,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.dd2d.talkingrecipe2.ui.TestingValue.TestingUserId
+import com.dd2d.talkingrecipe2.model.user.UserFetchRepositoryImpl
+import com.dd2d.talkingrecipe2.model.user.UserUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    userViewModel: UserViewModel = viewModel{ UserViewModel(TestingUserId) },
+    userViewModel: UserViewModel = viewModel{
+        UserViewModel(
+            userFetchRepo = UserFetchRepositoryImpl(),
+            userUploadRepo = UserUploadRepositoryImpl()
+        )
+    },
     onClickSearchTrigger: () -> Unit,
     onClickSavePost: ()->Unit,
     onClickCreate: ()->Unit,
@@ -40,11 +46,11 @@ fun MainScreen(
             onClickMyPost = { onClickMyPost() },
             onClickSetting = { onClickSetting() },
         )
-        RecentRecipe(
-            recipeBasicInfo = userViewModel.recentRecipeBasicInfo,
-            recipeAuthor = userViewModel.recentRecipeAuthor,
-            recipeThumbnail = userViewModel.recentRecipeThumbnail,
-            onClick = { onClickRecentRecipe(it) }
-        )
+//        RecentRecipe(
+//            recipeBasicInfo = userViewModel.recentRecipeBasicInfo,
+//            recipeAuthor = userViewModel.recentRecipeAuthor,
+//            recipeThumbnail = userViewModel.recentRecipeThumbnail,
+//            onClick = { onClickRecentRecipe(it) }
+//        )
     }
 }

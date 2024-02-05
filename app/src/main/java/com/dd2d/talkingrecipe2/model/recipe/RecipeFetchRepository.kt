@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.model
+package com.dd2d.talkingrecipe2.model.recipe
 
 import android.net.Uri
 import androidx.core.net.toUri
@@ -10,14 +10,14 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfoDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfoDTO
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Expires.In30M
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Field.BasicInfoField
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Filter.RecipeIdEqualTo
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.IngredientTable
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.RecipeImageTable
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.RecipeTable
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.StepInfoImageTable
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.StepInfoTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Expires.In30M
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.BasicInfoField
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.RecipeIdEqualTo
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.IngredientTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeImageTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoImageTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoTable
 import com.dd2d.talkingrecipe2.toSupabaseUrl
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -26,10 +26,19 @@ import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class RecipeFetchRepository: RecipeFetch{
+interface RecipeFetchRepository {
+    suspend fun fetRecipeById(recipeId: String, onChangeFetchingState: (msg: String) -> Unit): Recipe
+    suspend fun fetchRecipeBasicInfoById(recipeId: String): RecipeBasicInfo
+    suspend fun fetchRecipeIngredientListById(recipeId: String): List<Ingredient>
+    suspend fun fetchRecipeStepInfoListById(recipeId: String): List<StepInfo>
+    suspend fun fetchRecipeThumbnailUriById(recipeId: String): Uri
+}
+
+class RecipeFetchRepositoryImpl: RecipeFetchRepository {
     private val database = createSupabaseClient(
         supabaseUrl = BuildConfig.SUPABASE_URL,
         supabaseKey = BuildConfig.SUPABASE_KEY
@@ -45,16 +54,16 @@ class RecipeFetchRepository: RecipeFetch{
         try {
             return withContext(Dispatchers.IO){
                 onChangeFetchingState("start fetching recipe basic info")
-                val basicInfo = fetchRecipeBasicInfoById(recipeId)
+                val basicInfo = async { fetchRecipeBasicInfoById(recipeId) }.await()
 
                 onChangeFetchingState("start fetching recipe ingredient list")
-                val ingredientList = fetchRecipeIngredientListById(recipeId).toMutableList()
+                val ingredientList = async { fetchRecipeIngredientListById(recipeId).toMutableList() }.await()
 
                 onChangeFetchingState("start fetching recipe step info list")
-                val stepInfoList = fetchRecipeStepInfoListById(recipeId).toMutableList()
+                val stepInfoList = async { fetchRecipeStepInfoListById(recipeId).toMutableList() }.await()
 
                 onChangeFetchingState("start fetching recipe thumbnail image uri")
-                val thumbnailUri = fetchRecipeThumbnailUriById(recipeId)
+                val thumbnailUri = async { fetchRecipeThumbnailUriById(recipeId) }.await()
 
                 Recipe(
                     basicInfo = basicInfo,

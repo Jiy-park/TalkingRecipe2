@@ -55,8 +55,8 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.IngredientDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfoDTO
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Field.BasicInfoField
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Filter.RecipeIdEqualTo
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.BasicInfoField
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.RecipeIdEqualTo
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.kotex
@@ -87,6 +87,14 @@ private val supabase = createSupabaseClient(
     install(Postgrest)
     install(Storage)
 }
+
+sealed class T{
+    class A(val name: String): T(){
+    }
+    object B: T()
+}
+
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -149,7 +157,7 @@ fun MSS(modifier: Modifier = Modifier){
                     .clickable(
                         indication = rememberRipple(),
                         interactionSource = interaction
-                    ){
+                    ) {
 
                     }
             )

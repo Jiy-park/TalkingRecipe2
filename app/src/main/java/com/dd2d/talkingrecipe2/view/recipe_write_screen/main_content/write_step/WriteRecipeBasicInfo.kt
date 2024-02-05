@@ -111,7 +111,7 @@ fun WriteRecipeBasicInfo(
             },
             onCLickAdd = {
                 val updatedList = ingredientList.toMutableList()
-                updatedList.add(Ingredient(no = ingredientList.size+1))
+                updatedList.add(Ingredient(version = ingredientList.size+1))
                 onChangeIngredientList(updatedList)
             },
             onClickRemove = { index->

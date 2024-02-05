@@ -1,4 +1,4 @@
-package com.dd2d.talkingrecipe2.model
+package com.dd2d.talkingrecipe2.model.recipe
 
 import android.content.Context
 import android.net.Uri
@@ -9,14 +9,14 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.toDTO
 import com.dd2d.talkingrecipe2.isFromServer
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Field.IngredientUpsertField
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Field.RecipeBasicInfoUpsertField
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Field.StepInfoUpsertField
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.IngredientTable
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.RecipeImageTable
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.RecipeTable
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.StepInfoImageTable
-import com.dd2d.talkingrecipe2.model.RecipeDBValue.Table.StepInfoTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.IngredientUpsertField
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.RecipeBasicInfoUpsertField
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.StepInfoUpsertField
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.IngredientTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeImageTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoImageTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoTable
 import com.dd2d.talkingrecipe2.removeEmptyIngredient
 import com.dd2d.talkingrecipe2.removeEmptyStepInfo
 import com.dd2d.talkingrecipe2.toByteArray
@@ -31,8 +31,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
+interface RecipeUploadRepository {
+    suspend fun uploadRecipe(
+        recipe: Recipe,
+        onChangeUploadState: (msg: String) -> Unit,
+        onEndUpload: () -> Unit
+    )
+    suspend fun uploadRecipeBasicInfo(basicInfo: RecipeBasicInfo)
+    suspend fun uploadRecipeIngredientList(recipeId: String, ingredientList: List<Ingredient>)
+    suspend fun uploadRecipeStepInfoList(recipeId: String, stepInfoList: List<StepInfo>)
+    suspend fun uploadRecipeThumbnail(recipeId: String, thumbnailUri: Uri)
+}
+
 /** @param context 이미지의 확장자 ( JPEG, PNG, GIF 등 )을 파악하기 위해서만 사용할 것.*/
-class RecipeUploadRepository(private val context: Context): RecipeUpload {
+class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepository {
     private val database = createSupabaseClient(
         supabaseUrl = BuildConfig.SUPABASE_URL,
         supabaseKey = BuildConfig.SUPABASE_KEY

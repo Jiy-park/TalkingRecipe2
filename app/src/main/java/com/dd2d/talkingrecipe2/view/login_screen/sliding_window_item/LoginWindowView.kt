@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,22 +37,27 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 import com.dd2d.talkingrecipe2.ui.theme.HintText
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.kofield
 import com.dd2d.talkingrecipe2.ui.theme.kotex
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-/** @param onEndLogin 유저가 입력한 값이 맞는 값인지 검사함. 맞으면 true, 틀리면 false 반납 */
+/** @param tryLogin 유저가 입력한 값으로 로그인 시도. 로그인 성공 시 [Screen.Main]으로 이동. 실패 시 알림.  */
 @Composable
 fun LoginWindowView(
     modifier: Modifier,
     onClickJoin: ()->Unit,
-    onEndLogin: (userId: String, userPassword: String)->Boolean
+    tryLogin: suspend (userId: String, userPassword: String)->Boolean
 ) {
-    /** 유저가 로그인 버튼을 클릭 시 [onEndLogin] 함수 호출.
-     * [onEndLogin] 결과값이 false일 경우 해당 값이 true가 됨.*/
+    val scope = rememberCoroutineScope()
+
+    /** 유저가 로그인 버튼을 클릭 시 [tryLogin] 함수 호출.
+     * [tryLogin] 결과값이 false일 경우 [isFailLogin] 값이 true가 됨.*/
     var isFailLogin by remember { mutableStateOf(false) }
 
     var userId by remember { mutableStateOf("") }
@@ -121,7 +127,9 @@ fun LoginWindowView(
                     defaultElevation = 0.dp,
                     pressedElevation = 1.dp
                 ),
-                onClick = { isFailLogin = !onEndLogin(userId, userPassword) },
+                onClick = {
+                    scope.launch(Dispatchers.IO){ isFailLogin = !tryLogin(userId, userPassword) }
+                },
                 modifier = modifier
                     .fillMaxWidth(0.8F)
                     .background(brush = BackgroundGradient, shape = RoundedCornerShape(40.dp))

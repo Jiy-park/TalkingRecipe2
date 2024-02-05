@@ -3,8 +3,9 @@ package com.dd2d.talkingrecipe2.data_struct.recipe
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/** @param version 레시피의 버전. 레시피의 버전에 맞는 [Ingredient]만 사용함.*/
 data class Ingredient(
-    val no: Int,
+    val version: Int,
     val name: String = "",
     val amount: String = "",
 ){
@@ -13,7 +14,7 @@ data class Ingredient(
     fun isEmpty() = this.name.isBlank() || this.amount.isBlank()
 
     fun toDTO(recipeId: String) = IngredientDTO(
-        no = this.no,
+        version = this.version,
         recipeId = recipeId,
         name = this.name,
         amount = this.amount
@@ -22,8 +23,8 @@ data class Ingredient(
 
 @Serializable
 data class IngredientDTO(
-    @SerialName("no")
-    val no: Int,
+    @SerialName("version")
+    val version: Int,
     @SerialName("recipe_id")
     val recipeId: String,
     @SerialName("name")
@@ -32,7 +33,7 @@ data class IngredientDTO(
     val amount: String,
 ){
     fun toIngredient() = Ingredient(
-        no = this.no,
+        version = this.version,
         name = this.name,
         amount = this.amount
     )

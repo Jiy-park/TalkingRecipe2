@@ -6,17 +6,18 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 
 data class Recipe(
-    var basicInfo: RecipeBasicInfo = RecipeBasicInfo(),
-    var ingredientList: List<Ingredient> = mutableListOf(),
-    var stepInfoList: List<StepInfo> = mutableListOf(),
-    var thumbnailUri: Uri = Uri.EMPTY
+    var basicInfo: RecipeBasicInfo,
+    var ingredientList: List<Ingredient>,
+    var stepInfoList: List<StepInfo>,
+    var thumbnailUri: Uri
 ){
-    constructor(recipeId: String) : this() {
-        Recipe(
-            basicInfo = RecipeBasicInfo(recipeId = recipeId),
-            ingredientList = mutableListOf(),
-            stepInfoList = mutableListOf(),
-            thumbnailUri = Uri.EMPTY
+    companion object{
+        /** 어떠한 내용이 없는 레시피. */
+        val EmptyRecipe = Recipe(
+            basicInfo = RecipeBasicInfo(),
+            ingredientList = emptyList(),
+            stepInfoList = emptyList(),
+            thumbnailUri = Uri.EMPTY,
         )
     }
 }
