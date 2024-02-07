@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.data_struct.User
-import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserLoginTable
 import com.dd2d.talkingrecipe2.model.user.UserFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.user.UserUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.navigation.Screen
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 /** 앱 내에서 사용하는 유저의 상태.
@@ -116,94 +114,10 @@ class UserViewModel(
 
     /** 로그아웃. 기존에 접속 중이던 아이디는 제거됨.*/
     fun logout(){
-        _userState.value = UserState.OnLogout
+        _user.value = User.Empty
     }
 
-
-    /** [userId] + [userPassword]조합이 [UserLoginTable]에 존재하는 지 확인.
-     * @return 존재하는 값인 경우 true. 이후 로그인 과정 진행.
-     *
-     * 존재하지 않는 값인 경우 false
-     * @see login*/
-    suspend fun tryLogin(userId: String, userPassword: String): Boolean{
-        return withContext(Dispatchers.IO){
-            if(userFetchRepo.validateUser(userId, userPassword)){
-                login(userId)
-                true
-            }
-            else {
-                false
-            }
-        }
-    }
-
-
-    /** [userId]에 해당하는 유저의 정보를 가져옴.
-     * [tryLogin] 결과가 true일 때만 실행됨.
-     * @see tryLogin*/
-    private fun login(userId: String){
-        _userState.value = UserState.OnTask("login() : fetch user data for login. user id -> $userId")
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val user = userFetchRepo.fetchUserById(userId)
-                _userState.value = UserState.OnLogin
-                _user.value = user
-            }
-            catch (e: Exception){
-                _userState.value = UserState.OnError("login():: fail to login.\n" +
-                        "userId -> $userId\n" +
-                        "message -> $e")
-            }
-        }
-    }
-
-    /** 회원 가입에 입력된 값을 바탕으로 로그인.
-     * @param user 회원 가입 때 입력된 값.
-     * @see joinNewUserWithLogin*/
-    private fun login(user: User){
+    fun login(user: User){
         _user.value = user
-        _userState.value = UserState.OnLogin
-    }
-
-    /** 입력받은 값을 통해 새로운 유저 생성. 생성 후에는 로그인.
-     * @param userId 새로운 유저가 사용할 아이디. 해당 값은 데이터베이스에서 유일해야 함.
-     * @param userPassword 유저의 비밀번호.
-     * @param userName 유저의 이름. 해당 값은 조건 없이 변경가능함.*/
-    fun joinNewUserWithLogin(
-        userId: String,
-        userPassword: String,
-        userName: String
-    ){
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val user = userUploadRepo
-                    .joinNewUser(
-                        userId = userId,
-                        userPassword = userPassword,
-                        userName = userName
-                    ){ taskMessage->
-                        _userState.value = UserState.OnTask(taskMessage)
-                    }
-
-                login(user)
-            }
-            catch (e: Exception){
-                _userState.value = UserState.OnError("joinNewUser():: fail to insert new user.\n" +
-                        "userId -> $userId\n" +
-                        "userPassword -> $userPassword\n" +
-                        "userName -> $userName\n" +
-                        "message -> $e")
-            }
-        }
-    }
-
-    /** [userId]가 이미 회원가입된 아이디인지 확인함.
-     * @return 이미 존재하는 아이디인 경우 true
-     *
-     * 데이터베이스에 존재하지 않는 아이디인 경우 false*/
-    suspend fun checkDuplicateUserId(userId: String): Boolean{
-        return withContext(Dispatchers.IO){
-            userFetchRepo.isExistId(userId)
-        }
     }
 }

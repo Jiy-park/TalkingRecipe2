@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dd2d.talkingrecipe2.logging
 import com.dd2d.talkingrecipe2.model.user.UserFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.user.UserUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient

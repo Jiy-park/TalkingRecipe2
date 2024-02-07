@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,6 +31,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 fun LoginScreenSlidingWindow(
     modifier: Modifier = Modifier,
     windowTitle: String,
+    windowHeightRatio: Float,
     onClickClose: ()->Unit,
     content: @Composable (contentModifier: Modifier)->Unit,
 ) {
@@ -38,6 +40,7 @@ fun LoginScreenSlidingWindow(
         verticalArrangement = Arrangement.Top,
         modifier = modifier
             .fillMaxWidth()
+            .fillMaxHeight(windowHeightRatio)
     ){
         val innerModifier = Modifier
         Image(painter = painterResource(id = R.drawable.login), contentDescription = null)

@@ -19,15 +19,13 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 @Composable
 fun LoginScreenButton(
     modifier: Modifier = Modifier,
-    clickable: Boolean,
     onClickLogin: ()->Unit,
     onClickJoin: ()->Unit,
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ){
         val innerModifier = Modifier
         ElevatedButton(
@@ -41,12 +39,8 @@ fun LoginScreenButton(
                 pressedElevation = 5.dp
             ),
             shape = RoundedCornerShape(40.dp),
-            onClick = {
-                onClickLogin()
-            },
-            enabled = clickable,
-            modifier = innerModifier
-                .fillMaxWidth(0.8F)
+            onClick = { onClickLogin() },
+            modifier = innerModifier.fillMaxWidth(0.8F)
         ) {
             kotex(text = "로그인")
         }
@@ -55,9 +49,7 @@ fun LoginScreenButton(
             size = 13.sp,
             color = Color.White,
             modifier = innerModifier.clickableWithoutRipple {
-                if(clickable){
-                    onClickJoin()
-                }
+                onClickJoin()
             }
         )
     }

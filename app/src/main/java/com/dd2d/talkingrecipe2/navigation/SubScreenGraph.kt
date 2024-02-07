@@ -25,7 +25,6 @@ fun NavGraphBuilder.subScreenGraph(
     navController: NavController,
     userViewModel: UserViewModel,
 ){
-
     composable(route = "${Screen.Sub.route}/{destination}"){ backStack->
         val user by userViewModel.user.collectAsState()
 

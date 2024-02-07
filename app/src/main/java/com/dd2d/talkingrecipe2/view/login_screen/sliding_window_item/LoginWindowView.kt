@@ -128,7 +128,9 @@ fun LoginWindowView(
                     pressedElevation = 1.dp
                 ),
                 onClick = {
-                    scope.launch(Dispatchers.IO){ isFailLogin = !tryLogin(userId, userPassword) }
+                    scope.launch(Dispatchers.IO) {
+                        isFailLogin = !tryLogin(userId, userPassword)
+                    }
                 },
                 modifier = modifier
                     .fillMaxWidth(0.8F)

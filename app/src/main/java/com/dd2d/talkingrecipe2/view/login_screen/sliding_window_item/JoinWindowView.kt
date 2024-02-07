@@ -44,7 +44,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-/** @param checkDuplicateUserId 유저가 입력한 아이디가 중복된 값인지 확인. 중복된 값일 경우 true. 아닐 경우 false 반납. 판단 중일 경우 null.
+/** @param checkDuplicateUserId 유저가 입력한 아이디가 중복된 값인지 확인. 중복된 값일 경우 true. 아닐 경우 false 반납.
  * @param joinNewUser 유저가 입력한 값으로 새롭게 회원 가입. 해당 함수를 호출 전에 입력한 userId의 값이 사용가능한 값인지 확인 후, 해당 함수가 호출되어야 함.*/
 @Composable
 fun JoinWindowView(
