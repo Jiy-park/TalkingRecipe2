@@ -3,10 +3,9 @@ package com.dd2d.talkingrecipe2.view_model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dd2d.talkingrecipe2.data_struct.FriendInfo
 import com.dd2d.talkingrecipe2.data_struct.RecipePost
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.data_struct.User
-import com.dd2d.talkingrecipe2.logging
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.model.user.UserFetchRepositoryImpl
@@ -64,8 +63,8 @@ class UserViewModel(
     private var _user = MutableStateFlow<User>(User.Empty)
     val user: StateFlow<User> get() = _user.asStateFlow()
 
-    private var _friendList = MutableStateFlow<List<FriendInfo>>(emptyList())
-    val friendList: StateFlow<List<FriendInfo>> get() = _friendList.asStateFlow()
+    private var _friendList = MutableStateFlow<List<SimpleUserInfo>>(emptyList())
+    val friendList: StateFlow<List<SimpleUserInfo>> get() = _friendList.asStateFlow()
 
     private var _myPostList = MutableStateFlow<List<RecipePost>>(emptyList())
     val myPostList: StateFlow<List<RecipePost>> get() = _myPostList.asStateFlow()
@@ -118,10 +117,10 @@ class UserViewModel(
                         val profileImageUri = userFetchRepo.fetchUserProfileImageUriById(userId = friendId)
                         val friendName = userFetchRepo.fetchUserNameById(friendId)
                         _userState.value = UserState.OnTask("fetchFriend()::finished fetch [$index]. friend")
-                        FriendInfo(
-                            friendId = friendId,
-                            friendName = friendName,
-                            friendProfileImageUri = profileImageUri
+                        SimpleUserInfo(
+                            userId = friendId,
+                            userName = friendName,
+                            userProfileImageUri = profileImageUri
                         )
                     }
                 }.awaitAll()

@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.ui.CommonValue
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.HintText
@@ -37,7 +37,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 @Composable
 fun AuthorInfoView(
     modifier: Modifier = Modifier,
-    authorInfo: AuthorInfo,
+    authorInfo: SimpleUserInfo,
     recipeTitle: String,
     recipeDescription: String,
     onClickAuthor: ()->Unit,
@@ -62,7 +62,7 @@ fun AuthorInfoView(
                 .fillMaxHeight()
         ){
             kotex(text = recipeTitle, weight = FontWeight.Bold, size = 20.sp)
-            kotex(text = "${authorInfo.name} @${authorInfo.authorId}")
+            kotex(text = "${authorInfo.userName} @${authorInfo.userId}")
             kotex(text = recipeDescription)
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -85,7 +85,7 @@ fun AuthorInfoView(
             }
         }
         AsyncImage(
-            model = authorInfo.profileImageUri,
+            model = authorInfo.userProfileImageUri,
             contentDescription = "recipe author profile image",
             contentScale = ContentScale.Crop,
             modifier = modifier

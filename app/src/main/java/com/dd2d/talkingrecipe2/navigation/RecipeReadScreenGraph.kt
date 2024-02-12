@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.navigation.RecipeReadMode.Normal
@@ -92,5 +92,5 @@ sealed class RecipeReadMode{
     /** 레시피의 대부분의 정보를 볼 수 있음.*/
     object Normal: RecipeReadMode()
     /** 레시피를 음성으로 조작할 수 있음.*/
-    class TalkingRecipe(val recipe: Recipe, val authorInfo: AuthorInfo): RecipeReadMode()
+    class TalkingRecipe(val recipe: Recipe, val authorInfo: SimpleUserInfo): RecipeReadMode()
 }

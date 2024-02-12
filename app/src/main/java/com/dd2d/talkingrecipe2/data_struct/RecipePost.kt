@@ -11,11 +11,6 @@ data class RecipePost(
     val author: String
 )
 
-data class FriendInfo(
-    val friendId: String,
-    val friendName: String,
-    val friendProfileImageUri: Uri
-)
 
 @Serializable
 data class FriendInfoDTO(

@@ -2,10 +2,9 @@ package com.dd2d.talkingrecipe2.ui
 
 import androidx.compose.ui.unit.dp
 import com.dd2d.talkingrecipe2.R
-import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
-import com.dd2d.talkingrecipe2.data_struct.FriendInfo
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.RecipePost
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.Level
@@ -62,10 +61,10 @@ object TestingValue{
         profileImageUri = R.drawable.complete_upload_recipe.toUriWithDrawable(),
         backgroundImageUri = R.drawable.temp.toUriWithDrawable(),
     )
-    val TestingAuthor = AuthorInfo(
-        authorId = TestingUserId,
-        name = TestingUserName,
-        profileImageUri = TestingUserProfileImageUri
+    val TestingAuthor = SimpleUserInfo(
+        userId = TestingUserId,
+        userName = TestingUserName,
+        userProfileImageUri = TestingUserProfileImageUri
     )
 
     val TestingBasicInfo = RecipeBasicInfo(
@@ -137,10 +136,10 @@ object TestingValue{
     )
 
     val TestingFriendList = listOf(
-        FriendInfo("1asdasd", "1eqweqe", R.drawable.level_hard.toUriWithDrawable()),
-        FriendInfo("2vvvv", "2vfdfv", R.drawable.level_easy.toUriWithDrawable()),
-        FriendInfo("3ddd", "3sfsdv", R.drawable.default_image_background.toUriWithDrawable()),
-        FriendInfo("4vbfg", "4bgs", R.drawable.level_normal.toUriWithDrawable()),
-        FriendInfo("5123", "5333", R.drawable.main_screen_toxi.toUriWithDrawable()),
+        SimpleUserInfo("1asdasd", "1eqweqe", R.drawable.level_hard.toUriWithDrawable()),
+        SimpleUserInfo("2vvvv", "2vfdfv", R.drawable.level_easy.toUriWithDrawable()),
+        SimpleUserInfo("3ddd", "3sfsdv", R.drawable.default_image_background.toUriWithDrawable()),
+        SimpleUserInfo("4vbfg", "4bgs", R.drawable.level_normal.toUriWithDrawable()),
+        SimpleUserInfo("5123", "5333", R.drawable.main_screen_toxi.toUriWithDrawable()),
     )
 }

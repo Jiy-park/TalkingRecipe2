@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.logging
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingAuthor
@@ -25,7 +25,7 @@ fun RecipeReadScreen(
     isSavePost: Boolean,
     onClickSave: (recipeId: String) -> Unit,
     onClickModify: () -> Unit,
-    onClickTalkingRecipe: (AuthorInfo, Recipe) -> Unit = { _,_ -> logging("click talking recipe") },
+    onClickTalkingRecipe: (SimpleUserInfo, Recipe) -> Unit = { _, _ -> logging("click talking recipe") },
 ){
     val recipeState by recipeViewModel.recipeState.collectAsState()
 

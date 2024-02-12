@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.dd2d.talkingrecipe2.data_struct.AuthorInfo
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.ui.CommonValue.TalkingRecipeStepImageHeight
 import com.dd2d.talkingrecipe2.ui.fillWidthOfParent
@@ -25,7 +25,7 @@ import com.dd2d.talkingrecipe2.view.recipe_read_screen.RecipeReadScreenTopView
 @Composable
 fun TalkingRecipe(
     modifier: Modifier = Modifier,
-    authorInfo: AuthorInfo,
+    authorInfo: SimpleUserInfo,
     recipe: Recipe,
     onClickBack: ()->Unit,
     onClickAuthor: ()->Unit,

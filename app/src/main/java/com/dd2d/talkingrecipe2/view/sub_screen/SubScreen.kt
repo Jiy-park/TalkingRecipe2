@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.dd2d.talkingrecipe2.data_struct.FriendInfo
 import com.dd2d.talkingrecipe2.data_struct.RecipePost
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.navigation.SubScreenDestination
@@ -22,12 +22,12 @@ fun SubScreen(
     modifier: Modifier = Modifier,
     user: User,
     myPostList: List<RecipePost>,
-    friendList: List<FriendInfo>,
+    friendList: List<SimpleUserInfo>,
     savePostList: List<RecipePost>,
     onUpdateUser: (update: User)->Unit,
     destination: SubScreenDestination,
     onClickPost: (RecipePost) -> Unit,
-    onClickFriend: (FriendInfo) -> Unit,
+    onClickFriend: (SimpleUserInfo) -> Unit,
     onClickBack: () -> Unit,
 ){
     var currentTab by remember { mutableStateOf<SubScreenDestination>(destination) }

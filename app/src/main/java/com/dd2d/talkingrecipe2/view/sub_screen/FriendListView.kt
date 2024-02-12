@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.dd2d.talkingrecipe2.data_struct.FriendInfo
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.ui.CommonValue
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
@@ -27,8 +27,8 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 
 @Composable
 fun FriendListView(
-    friendList: List<FriendInfo>,
-    onCLickFriend: (friendInfo: FriendInfo) -> Unit,
+    friendList: List<SimpleUserInfo>,
+    onCLickFriend: (friendInfo: SimpleUserInfo) -> Unit,
     modifier: Modifier
 ) {
     LazyColumn(
@@ -39,7 +39,7 @@ fun FriendListView(
     ){
         items(
             items = friendList,
-            key = { friend-> friend.friendId }
+            key = { friend-> friend.userId }
         ){friend->
             FriendViewer(
                 friend = friend,
@@ -54,9 +54,9 @@ fun FriendListView(
 @Composable
 fun FriendViewer(
     modifier: Modifier = Modifier,
-    friend: FriendInfo,
+    friend: SimpleUserInfo,
     alsoMyFriend: Boolean = true,
-    onClickFriend: (friendInfo: FriendInfo) -> Unit
+    onClickFriend: (friendInfo: SimpleUserInfo) -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -67,7 +67,7 @@ fun FriendViewer(
     ) {
         val innerModifier = Modifier
         AsyncImage(
-            model = friend.friendProfileImageUri,
+            model = friend.userProfileImageUri,
             contentDescription = "friend user profile image",
             contentScale = ContentScale.Crop,
             modifier = innerModifier
@@ -79,7 +79,7 @@ fun FriendViewer(
                 }
         )
 
-        kotex(text = "${friend.friendName} @${friend.friendId}")
+        kotex(text = "${friend.userName} @${friend.userId}")
 
         if(alsoMyFriend){
             kotex(text = "친구", color = MainColor)
