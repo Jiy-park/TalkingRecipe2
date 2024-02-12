@@ -7,10 +7,11 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 
 
 data class Recipe(
-    var basicInfo: RecipeBasicInfo,
-    var ingredientList: List<Ingredient>,
-    var stepInfoList: List<StepInfo>,
-    var thumbnailUri: Uri
+    val basicInfo: RecipeBasicInfo,
+    val ingredientList: List<Ingredient>,
+    val stepInfoList: List<StepInfo>,
+    val thumbnailUri: Uri,
+    val authorInfo: SimpleUserInfo,
 ){
     companion object{
         /** 어떠한 내용이 없는 레시피. */
@@ -19,6 +20,7 @@ data class Recipe(
             ingredientList = emptyList(),
             stepInfoList = emptyList(),
             thumbnailUri = Uri.EMPTY,
+            authorInfo = SimpleUserInfo.Empty
         )
     }
 }

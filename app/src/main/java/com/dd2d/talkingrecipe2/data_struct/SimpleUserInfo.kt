@@ -15,7 +15,15 @@ data class SimpleUserInfo(
     val userId: String,
     val userName: String,
     val userProfileImageUri: Uri
-)
+){
+    companion object{
+        val Empty = SimpleUserInfo(
+            userId = "empty user id",
+            userName = "empty user name",
+            userProfileImageUri = Uri.EMPTY
+        )
+    }
+}
 
 /**@see SimpleUserInfo*/
 @Serializable

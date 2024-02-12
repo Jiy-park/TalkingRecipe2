@@ -29,6 +29,11 @@ object UserDBValue{
         const val UserId = "user_id"
         const val UserPassword = "user_password"
         const val UserName = "user_name"
+        val SimpleUserFetchColumn = listOf(
+            "user_id",
+            "user_name",
+            "profile_image_path"
+        )
         val FriendFetchColumn = listOf(
             "user_id",
             "friend_id"

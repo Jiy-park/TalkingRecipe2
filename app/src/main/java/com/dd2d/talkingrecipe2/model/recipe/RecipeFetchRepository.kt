@@ -3,8 +3,10 @@ package com.dd2d.talkingrecipe2.model.recipe
 import android.net.Uri
 import androidx.core.net.toUri
 import com.dd2d.talkingrecipe2.BuildConfig
-import com.dd2d.talkingrecipe2.data_struct.Recipe
+import com.dd2d.talkingrecipe2.R
 import com.dd2d.talkingrecipe2.data_struct.SavePostDTO
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfoDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.IngredientDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
@@ -23,7 +25,11 @@ import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.SavePostTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoImageTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoTable
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Field.SimpleUserFetchColumn
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserImageTable
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserTable
 import com.dd2d.talkingrecipe2.toSupabaseUrl
+import com.dd2d.talkingrecipe2.toUriWithDrawable
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
@@ -31,16 +37,28 @@ import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
+/** 레시피와 관련된 데이터를 받아온다.
+ * - [fetchRecipeBasicInfoById]
+ * - [fetchRecipeIngredientListById]
+ * - [fetchRecipeStepInfoListById]
+ * - [fetchRecipeThumbnailUriById]
+ * - [fetchRecipeAuthorInfo]*/
 interface RecipeFetchRepository {
-    suspend fun fetRecipeById(recipeId: String, onChangeFetchingState: (msg: String) -> Unit): Recipe
+    /** [recipeId]에 맞는 레시피의 [RecipeBasicInfo]를 받아옴.*/
     suspend fun fetchRecipeBasicInfoById(recipeId: String): RecipeBasicInfo
+    /** [recipeId]에 맞는 레시피의 [Ingredient] 리스트를 받아옴.*/
     suspend fun fetchRecipeIngredientListById(recipeId: String): List<Ingredient>
+    /** [recipeId]에 맞는 레시피의 [StepInfo] 리스트를 받아옴.
+     * [StepInfoTable]로부터 StepInfoDTO를 리스트 형태로 받은 후
+     * 리스트를 순회하며 dto에 저장된 imagePath 값을 이용해 [RecipeImageTable]로부터 맞는 이미지를 가져옴*/
     suspend fun fetchRecipeStepInfoListById(recipeId: String): List<StepInfo>
+    /** [recipeId]에 맞는 레시피의 썸네일 이미지를 [Uri]형태로 받아옴.*/
     suspend fun fetchRecipeThumbnailUriById(recipeId: String): Uri
+    /** [recipeId]에 맞는 레시피의 작성자 정보를 [SimpleUserInfo]형태로 받아옴.*/
+    suspend fun fetchRecipeAuthorInfo(recipeId: String): SimpleUserInfo
 }
 
 class RecipeFetchRepositoryImpl: RecipeFetchRepository {
@@ -88,39 +106,6 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
         }
     }
 
-    override suspend fun fetRecipeById(
-        recipeId: String,
-        onChangeFetchingState: (msg: String) -> Unit
-    ): Recipe {
-        try {
-            return withContext(Dispatchers.IO){
-                onChangeFetchingState("start fetching recipe basic info")
-                val basicInfo = async { fetchRecipeBasicInfoById(recipeId) }.await()
-
-                onChangeFetchingState("start fetching recipe ingredient list")
-                val ingredientList = async { fetchRecipeIngredientListById(recipeId).toMutableList() }.await()
-
-                onChangeFetchingState("start fetching recipe step info list")
-                val stepInfoList = async { fetchRecipeStepInfoListById(recipeId).toMutableList() }.await()
-
-                onChangeFetchingState("start fetching recipe thumbnail image uri")
-                val thumbnailUri = async { fetchRecipeThumbnailUriById(recipeId) }.await()
-
-                Recipe(
-                    basicInfo = basicInfo,
-                    ingredientList = ingredientList,
-                    stepInfoList = stepInfoList,
-                    thumbnailUri = thumbnailUri
-                )
-            }
-        }
-        catch (e: Exception){
-            throw IOException("IOException in fetRecipeById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
-        }
-    }
-
-    /** [recipeId]에 맞는 레시피의 [RecipeBasicInfo]를 받아옴.
-     * @throws IOException*/
     override suspend fun fetchRecipeBasicInfoById(recipeId: String): RecipeBasicInfo {
         return withContext(Dispatchers.IO){
             database.from(RecipeTable)
@@ -134,8 +119,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
         }
     }
 
-    /** [recipeId]에 맞는 레시피의 [Ingredient] 리스트를 받아옴.
-     * @throws IOException*/
+
     override suspend fun fetchRecipeIngredientListById(recipeId: String): List<Ingredient> {
         try {
             return withContext(Dispatchers.IO){
@@ -155,10 +139,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
             throw IOException("IOException in fetchRecipeIngredientListById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
         }
     }
-    /** [recipeId]에 맞는 레시피의 [StepInfo] 리스트를 받아옴.
-     * [StepInfoTable]로부터 StepInfoDTO를 리스트 형태로 받은 후
-     * 리스트를 순회하며 dto에 저장된 imagePath 값을 이용해 [RecipeImageTable]로부터 맞는 이미지를 가져옴
-     * @throws IOException*/
+
     override suspend fun fetchRecipeStepInfoListById(recipeId: String): List<StepInfo> {
         try {
             return withContext(Dispatchers.IO){
@@ -185,8 +166,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
         }
     }
 
-    /** [recipeId]에 맞는 레시피의 썸네일 이미지를 [Uri]형태로 받아옴.
-     * @throws IOException*/
+
     override suspend fun fetchRecipeThumbnailUriById(recipeId: String): Uri {
         try {
             return withContext(Dispatchers.IO){
@@ -199,6 +179,42 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
         }
         catch (e: Exception){
             throw IOException("IOException in fetchRecipeThumbnailUriById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
+        }
+    }
+
+    override suspend fun fetchRecipeAuthorInfo(recipeId: String): SimpleUserInfo {
+        return try {
+            /** 레시피의 아이디 형태 : {유저 아이디}_{만들어진 시간} */
+            val authorId = recipeId.split("_")[0]
+            val simpleUserInfoDTO = database
+                .from(UserTable)
+                .select(columns = Columns.list(SimpleUserFetchColumn)) {
+                    filter {
+                        eq(UserIdEqualTo, authorId)
+                    }
+                }
+                .decodeSingle<SimpleUserInfoDTO>()
+
+            val authorProfileImageUri =
+                if(simpleUserInfoDTO.userProfileImagePath.isNotBlank()){
+                    database.storage
+                        .from("$UserImageTable/$authorId")
+                        .createSignedUrl(path = simpleUserInfoDTO.userProfileImagePath, expiresIn = In30M)
+                        .toSupabaseUrl()
+                        .toUri()
+                }
+                else{
+                    R.drawable.default_image.toUriWithDrawable()
+                }
+
+            SimpleUserInfo(
+                userId = authorId,
+                userName = simpleUserInfoDTO.userName,
+                userProfileImageUri = authorProfileImageUri
+            )
+        }
+        catch (e: Exception){
+            throw IOException("IOException in fetchRecipeAuthorInfo().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
         }
     }
 }

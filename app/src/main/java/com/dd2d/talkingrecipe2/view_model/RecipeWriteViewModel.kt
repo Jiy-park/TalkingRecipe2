@@ -10,6 +10,7 @@ import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,14 +72,45 @@ class RecipeWriteViewModel(
         _writeState.value = RecipeWriteState.OnFetching("start fetch recipe. recipe id -> $recipeId")
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _recipe.value = recipeFetchRepo
-                    .fetRecipeById(
-                        recipeId = recipeId,
-                        onChangeFetchingState = { msg->
-                            _writeState.value = RecipeWriteState.OnFetching(msg)
-                        }
-                    )
+                with(recipeFetchRepo) {
+                    val basicInfo = async {
+                        _writeState.value =
+                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe basic info")
+                        fetchRecipeBasicInfoById(recipeId)
+                    }
 
+                    val ingredientList = async {
+                        _writeState.value =
+                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe ingredient list")
+                        fetchRecipeIngredientListById(recipeId)
+                    }
+
+                    val stepInfoList = async {
+                        _writeState.value =
+                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe step info list")
+                        fetchRecipeStepInfoListById(recipeId)
+                    }
+
+                    val thumbnailUri = async {
+                        _writeState.value =
+                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe thumbnail image uri")
+                        fetchRecipeThumbnailUriById(recipeId)
+                    }
+
+                    val authorInfo = async {
+                        _writeState.value =
+                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe author info")
+                        fetchRecipeAuthorInfo(recipeId)
+                    }
+
+                    _recipe.value = Recipe(
+                        basicInfo = basicInfo.await(),
+                        ingredientList = ingredientList.await(),
+                        stepInfoList = stepInfoList.await(),
+                        thumbnailUri = thumbnailUri.await(),
+                        authorInfo = authorInfo.await()
+                    )
+                }
                 _writeState.value = RecipeWriteState.Stable
             }
             catch (e: Exception){

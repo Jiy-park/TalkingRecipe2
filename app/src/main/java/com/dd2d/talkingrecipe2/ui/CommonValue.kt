@@ -48,7 +48,7 @@ object CommonValue {
 }
 
 object TestingValue{
-    const val TestingRecipeId = "TalkingRecipe_240115_0107"
+    const val TestingRecipeId = "TalkingRecipe_240208_0301"
     const val TestingUserId = "TalkingRecipe"
     const val TestingUserName = "toxi"
     val TestingUserProfileImageUri = R.drawable.main_screen_toxi.toUriWithDrawable()
@@ -104,7 +104,8 @@ object TestingValue{
         basicInfo = TestingBasicInfo,
         ingredientList = TestingIngredientList,
         stepInfoList = TestingStepInfoList,
-        thumbnailUri = R.drawable.default_image_background.toUriWithDrawable()
+        thumbnailUri = R.drawable.default_image_background.toUriWithDrawable(),
+        authorInfo = SimpleUserInfo.Empty
     )
 
     val TestingPostList = listOf<RecipePost>(

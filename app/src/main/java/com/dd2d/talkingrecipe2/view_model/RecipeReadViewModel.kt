@@ -4,15 +4,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.data_struct.Recipe
+import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepository
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 sealed class RecipeState{
@@ -60,19 +61,48 @@ class RecipeReadViewModel(
         }
     }
 
-    private fun fetchRecipe(recipeId: String){
-        _recipeState.value = RecipeState.OnLoading("start fetching recipe. recipe id -> $recipeId")
+    /** [recipeId]에 맞는 레시피를 [RecipeFetchRepository]로부터 [Recipe]형태로 받아온다.
+     * @see RecipeFetchRepository*/
+    fun fetchRecipe(recipeId: String){
+        _recipeState.value = RecipeState.OnLoading("fetchRecipe()::start fetching recipe. recipe id -> $recipeId")
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                withContext(Dispatchers.IO){
-                    _recipe.value = recipeRepo.fetRecipeById(
-                        recipeId = recipeId,
-                        onChangeFetchingState = { msg->
-                            _recipeState.value = RecipeState.OnLoading(msg)
-                        }
+                with(recipeRepo) {
+                    val basicInfo = async {
+                        _recipeState.value = RecipeState.OnLoading("fetchRecipe()::start fetching recipe basic info")
+                        fetchRecipeBasicInfoById(recipeId)
+                    }
+
+                    val ingredientList = async {
+                        _recipeState.value = RecipeState.OnLoading("fetchRecipe()::start fetching recipe ingredient list")
+                        fetchRecipeIngredientListById(recipeId)
+                    }
+
+                    val stepInfoList = async {
+                        _recipeState.value = RecipeState.OnLoading("fetchRecipe()::start fetching recipe step info list")
+                        fetchRecipeStepInfoListById(recipeId)
+                    }
+
+                    val thumbnailUri = async {
+                        _recipeState.value = RecipeState.OnLoading("fetchRecipe()::start fetching recipe thumbnail image uri")
+                        fetchRecipeThumbnailUriById(recipeId)
+                    }
+
+                    val authorInfo = async {
+                        _recipeState.value = RecipeState.OnLoading("fetchRecipe()::start fetching recipe author info")
+                        fetchRecipeAuthorInfo(recipeId)
+                    }
+
+                    _recipe.value =Recipe(
+                        basicInfo = basicInfo.await(),
+                        ingredientList = ingredientList.await(),
+                        stepInfoList = stepInfoList.await(),
+                        thumbnailUri = thumbnailUri.await(),
+                        authorInfo = authorInfo.await()
                     )
-                    _recipeState.value = RecipeState.Stable
+
                 }
+                _recipeState.value = RecipeState.Stable
             }
             catch (e: Exception){
                 _recipeState.value = RecipeState.OnError("fetchRecipe()::fail to fetch recipe\nrecipe id -> $recipeId.\nmessage -> $e")
