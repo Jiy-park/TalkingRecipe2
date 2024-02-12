@@ -55,7 +55,7 @@ fun StepInfoItemViewer(
             .fillMaxWidth()
     ) {
         kotex(
-            text = "${stepInfo.order}.${stepInfo.explanation}",
+            text = "${stepInfo.order}.${stepInfo.description}",
             maxLine = Int.MAX_VALUE,
             modifier = modifier
                 .weight(0.6F)

@@ -2,6 +2,7 @@ package com.dd2d.talkingrecipe2.model.recipe
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.dd2d.talkingrecipe2.BuildConfig
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
@@ -21,6 +22,7 @@ import com.dd2d.talkingrecipe2.removeEmptyIngredient
 import com.dd2d.talkingrecipe2.removeEmptyStepInfo
 import com.dd2d.talkingrecipe2.toByteArray
 import com.dd2d.talkingrecipe2.toImagePath
+import com.dd2d.talkingrecipe2.uploadImage
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
@@ -150,16 +152,17 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
 
     override suspend fun uploadRecipeThumbnail(recipeId: String, thumbnailUri: Uri) {
         try {
-            val imagePath = thumbnailUri
-                .toImagePath(path = "${recipeId}_thumbnail", context = context)
-            val bucket = database.storage.from("${RecipeImageTable}/$recipeId")
-
-            if(thumbnailUri.isFromServer()){
-                bucket.upload(data = thumbnailUri.toByteArray(), path = imagePath, upsert = true)
-            }
-            else{
-                bucket.upload(uri = thumbnailUri, path = imagePath, upsert = true)
-            }
+            val bucketApi = database.storage.from("$RecipeImageTable/$recipeId")
+            val imagePath = thumbnailUri.toImagePath(path = "${recipeId}_thumbnail", context = context)
+            uploadImage(
+                bucketApi = bucketApi,
+                imageUri = thumbnailUri,
+                uploadPath = imagePath,
+                callFrom = "uploadRecipeThumbnail()",
+                onTask = { task->
+                    Log.d("LOG_CHECK", "RecipeUploadRepositoryImpl :: uploadRecipeThumbnail() -> $task")
+                }
+            )
         }
         catch (e: Exception){
             throw IOException("IOException in uploadRecipeIngredientList.\nthumbnailUri -> $thumbnailUri\nmessage -> ${e.message}")

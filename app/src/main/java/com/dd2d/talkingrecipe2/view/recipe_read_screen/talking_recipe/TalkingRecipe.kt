@@ -61,7 +61,7 @@ fun TalkingRecipe(
         Spacer(modifier = modifier.height(15.dp))
 
         StepInfoExplanationView(
-            explanation = stepInfoList[currentStep].explanation,
+            explanation = stepInfoList[currentStep].description,
             modifier = modifier.weight(1F),
             onClickToxi = {  }
         )

@@ -43,6 +43,7 @@ fun AuthorInfoView(
     onClickAuthor: ()->Unit,
     onClickFavorite: ()->Unit,
     onClickShare: ()->Unit,
+    isSavePost: Boolean,
     onClickSave: ()->Unit,
     onClickModify: ()->Unit,
 ){
@@ -76,7 +77,7 @@ fun AuthorInfoView(
                     Icon(imageVector = Icons.Default.Share, tint = HintText, contentDescription = "favorite this recipe")
                 }
                 IconButton(onClick = { onClickSave() }) {
-                    Icon(imageVector = Icons.Default.Star, tint = HintText, contentDescription = "favorite this recipe")
+                    Icon(imageVector = Icons.Default.Star, tint = if(isSavePost) SubColor else HintText, contentDescription = "favorite this recipe")
                 }
                 IconButton(onClick = { onClickModify() }) {
                     Icon(imageVector = Icons.Default.Edit, tint = HintText, contentDescription = "favorite this recipe")

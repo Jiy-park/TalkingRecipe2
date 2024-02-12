@@ -2,17 +2,21 @@ package com.dd2d.talkingrecipe2.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dd2d.talkingrecipe2.alog
+import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
+import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.model.user.UserFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.user.UserUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.view.login_screen.LoginScreen
@@ -24,17 +28,22 @@ import com.dd2d.talkingrecipe2.view_model.UserViewModel
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
-    userViewModel: UserViewModel = viewModel {
+){
+    val context = LocalContext.current
+    val userViewModel: UserViewModel = viewModel {
         UserViewModel(
+            recipeFetchRepo = RecipeFetchRepositoryImpl(),
+            recipeUploadRepo = RecipeUploadRepositoryImpl(context),
             userFetchRepo = UserFetchRepositoryImpl(),
             userUploadRepo = UserUploadRepositoryImpl()
         )
     }
-){
-
     val navController = rememberNavController()
 //    TODO("일단 아래 한 줄은 테스트용임. ")
     var onLogin by remember { mutableStateOf(false) }
+
+
+
 
     NavHost(
         modifier = modifier.fillMaxSize(),
@@ -49,6 +58,14 @@ fun AppNavigation(
                 )
             }
             val loginState by loginViewModel.loginState.collectAsState()
+
+//            TODO("아래에 있는 LaunchedEffect 테스트용임.")
+            LaunchedEffect(key1 = Unit){
+                userViewModel.login(loginViewModel.fetchUserById("TalkingRecipe"))
+                onLogin = true
+            }
+
+
             LoginScreen(
                 loginState = loginState,
                 checkDuplicateUserId = { userId ->
@@ -90,6 +107,14 @@ fun AppNavigation(
         subScreenGraph(navController = navController, userViewModel = userViewModel)
         recipeWriteScreenGraph(navController = navController)
         recipeSearchScreenGraph(navController = navController)
-        recipeReadScreenGraph(navController = navController)
+        recipeReadScreenGraph(
+            navController = navController,
+            onClickSavePost = { recipeId ->
+//                userViewModel.s
+            },
+            updateUserRecentRecipe = { recipeId ->
+                
+            }
+        )
     }
 }

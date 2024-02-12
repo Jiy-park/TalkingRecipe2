@@ -92,7 +92,11 @@ class RecipeWriteViewModel(
             _writeState.value = RecipeWriteState.OnUploading("start upload recipe.")
             if(writeScreenMode is RecipeWriteMode.Create){ /** 업로드할 레시피가 새로 만든 레시피인 경우 레시피 아이디를 할당해준다. [createRecipeId]사용.*/
                 val recipeId = createRecipeId()
-                val updateBasicInfo = _recipe.value.basicInfo.copy(recipeId = recipeId)
+                val updateBasicInfo = _recipe.value.basicInfo
+                    .copy(
+                        recipeId = recipeId,
+                        authorId = userId
+                    )
                 _recipe.value = _recipe.value.copy(basicInfo = updateBasicInfo)
             }
 

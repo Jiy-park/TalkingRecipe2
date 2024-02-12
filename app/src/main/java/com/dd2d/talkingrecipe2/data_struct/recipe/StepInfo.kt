@@ -8,19 +8,19 @@ import kotlinx.serialization.Serializable
 data class StepInfo(
     val version: Int,
     val order: Int,
-    val explanation: String,
+    val description: String,
     val imageUri: Uri,
 ){
     /** [StepInfo]의 내용물이 비었는지 확인.
-     * @return [explanation] 또는 [imageUri] 중 하나라도 내용물이 비었다면 true 반납*/
-    fun isEmpty() = this.explanation.isBlank() || this.imageUri == Uri.EMPTY
+     * @return [description] 또는 [imageUri] 중 하나라도 내용물이 비었다면 true 반납*/
+    fun isEmpty() = this.description.isBlank() || this.imageUri == Uri.EMPTY
 
     fun toDTO(recipeId: String, order: Int, imagePath: String) = StepInfoDTO(
         version = this.version,
         recipeId = recipeId,
         order = order,
         imagePath = imagePath,
-        explanation = this.explanation,
+        description = this.description,
     )
 }
 
@@ -35,13 +35,13 @@ data class StepInfoDTO(
     val imagePath: String,
     @SerialName("order")
     val order: Int,
-    @SerialName("explanation")
-    val explanation: String = "",
+    @SerialName("description")
+    val description: String = "",
 ){
     fun toStepInfo(imageUri: Uri) = StepInfo(
         version = this.version,
         order = this.order,
-        explanation = this.explanation,
+        description = this.description,
         imageUri = imageUri
     )
 }

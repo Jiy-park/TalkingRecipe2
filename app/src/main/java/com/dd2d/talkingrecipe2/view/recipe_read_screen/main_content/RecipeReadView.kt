@@ -30,7 +30,8 @@ fun RecipeReadView(
     onClickAuthorProfileImage: () -> Unit,
     onClickFavorite: () -> Unit,
     onClickShare: () -> Unit,
-    onClickSave: () -> Unit,
+    isSavePost: Boolean,
+    onClickSave: (recipeId: String) -> Unit,
     onClickModify: () -> Unit,
     onClickTalkingRecipe: ()->Unit,
 ){
@@ -57,7 +58,8 @@ fun RecipeReadView(
                 onClickAuthor = { onClickAuthorProfileImage() },
                 onClickFavorite = { onClickFavorite() },
                 onClickShare = { onClickShare() },
-                onClickSave = { onClickSave() },
+                isSavePost = isSavePost,
+                onClickSave = { onClickSave(recipe.basicInfo.recipeId) },
                 onClickModify = { onClickModify() }
             )
             AsyncImage(

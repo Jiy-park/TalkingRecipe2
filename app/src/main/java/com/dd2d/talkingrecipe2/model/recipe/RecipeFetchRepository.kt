@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.dd2d.talkingrecipe2.BuildConfig
 import com.dd2d.talkingrecipe2.data_struct.Recipe
+import com.dd2d.talkingrecipe2.data_struct.SavePostDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.IngredientDTO
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
@@ -12,10 +13,14 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfoDTO
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Expires.In30M
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.BasicInfoField
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.SavePostField
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.AuthorIdEqualTo
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.RecipeIdEqualTo
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.UserIdEqualTo
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.IngredientTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeImageTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeTable
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.SavePostTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoImageTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoTable
 import com.dd2d.talkingrecipe2.toSupabaseUrl
@@ -45,6 +50,42 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
     ){
         install(Postgrest)
         install(Storage)
+    }
+
+    /** [userId]의 유저가 작성한 레시피의 [RecipeBasicInfo] 목록을 반환한다.
+     * @return [List] of [RecipeBasicInfo]*/
+    suspend fun fetchMyRecipeListByUserId(userId: String): List<RecipeBasicInfo>{
+        return try {
+            database.from(RecipeTable)
+                .select(columns = Columns.list(BasicInfoField)){
+                    filter {
+                        eq(AuthorIdEqualTo, userId)
+                    }
+                }
+                .decodeList<RecipeBasicInfoDTO>()
+                .map { it.toRecipeBasicInfo() }
+
+        }
+        catch (e: Exception){
+            throw IOException("IOException in fetchRecipeIdListByUserId().\nuser id -> $userId.\nmessage -> ${e.message}")
+        }
+    }
+
+    /** [userId]에 해당하는 유저가 저장한 레시피 게시글등을 [SavePostDTO] 형태의 리스트로 반환
+     * @return [List] of [SavePostDTO]*/
+    suspend fun fetchSavePostIdListByUserId(userId: String): List<SavePostDTO>{
+        return try {
+            database.from(SavePostTable)
+                .select(columns = Columns.list(SavePostField)){
+                    filter {
+                        eq(UserIdEqualTo, userId)
+                    }
+                }
+                .decodeList<SavePostDTO>()
+        }
+        catch (e: Exception){
+            throw IOException("IOException in fetchSavePostIdListByUserId().\nuser id -> $userId.\nmessage -> ${e.message}")
+        }
     }
 
     override suspend fun fetRecipeById(

@@ -7,22 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.dd2d.talkingrecipe2.logging
-import com.dd2d.talkingrecipe2.model.user.UserFetchRepositoryImpl
-import com.dd2d.talkingrecipe2.model.user.UserUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
-import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    userViewModel: UserViewModel = viewModel{
-        UserViewModel(
-            userFetchRepo = UserFetchRepositoryImpl(),
-            userUploadRepo = UserUploadRepositoryImpl()
-        )
-    },
     onClickSearchTrigger: () -> Unit,
     onClickSavePost: ()->Unit,
     onClickCreate: ()->Unit,

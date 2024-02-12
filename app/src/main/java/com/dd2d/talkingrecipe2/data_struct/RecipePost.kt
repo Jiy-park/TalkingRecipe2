@@ -2,6 +2,8 @@ package com.dd2d.talkingrecipe2.data_struct
 
 import android.net.Uri
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 data class RecipePost(
     val recipeBasicInfo: RecipeBasicInfo,
@@ -10,7 +12,23 @@ data class RecipePost(
 )
 
 data class FriendInfo(
+    val friendId: String,
+    val friendName: String,
+    val friendProfileImageUri: Uri
+)
+
+@Serializable
+data class FriendInfoDTO(
+    @SerialName("user_id")
     val userId: String,
-    val userName: String,
-    val userProfileImageUri: Uri
+    @SerialName("friend_id")
+    val friendId: String
+)
+
+@Serializable
+data class SavePostDTO(
+    @SerialName("user_id")
+    val userId: String,
+    @SerialName("recipe_id")
+    val recipeId: String,
 )

@@ -39,7 +39,7 @@ fun FriendListView(
     ){
         items(
             items = friendList,
-            key = { friend-> friend.userId }
+            key = { friend-> friend.friendId }
         ){friend->
             FriendViewer(
                 friend = friend,
@@ -67,7 +67,7 @@ fun FriendViewer(
     ) {
         val innerModifier = Modifier
         AsyncImage(
-            model = friend.userProfileImageUri,
+            model = friend.friendProfileImageUri,
             contentDescription = "friend user profile image",
             contentScale = ContentScale.Crop,
             modifier = innerModifier
@@ -79,7 +79,7 @@ fun FriendViewer(
                 }
         )
 
-        kotex(text = "${friend.userName} @${friend.userId}")
+        kotex(text = "${friend.friendName} @${friend.friendId}")
 
         if(alsoMyFriend){
             kotex(text = "친구", color = MainColor)

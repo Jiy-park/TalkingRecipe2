@@ -6,14 +6,15 @@ object UserDBValue{
     const val UserTable = "user"
     const val UserImageTable = "users_image"
     const val UserLoginTable = "user_login"
+    const val FriendTable = "friend"
+
     object Columns{
         const val UserProfilePath = "profile_image_path"
         const val UserBackgroundPath = "background_image_path"
         const val RecentRecipeId = "recent_recipe_id"
         const val UserName = "user_name"
-
-
     }
+
 
     object Filter{
         const val UserIdEqualTo = "user_id"
@@ -25,6 +26,13 @@ object UserDBValue{
 
     object Field{
         const val UserUpsertField = "user_id"
+        const val UserId = "user_id"
+        const val UserPassword = "user_password"
+        const val UserName = "user_name"
+        val FriendFetchColumn = listOf(
+            "user_id",
+            "friend_id"
+        )
         val UserFetchColumns = listOf(
             "user_id",
             "user_name",

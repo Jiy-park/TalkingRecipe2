@@ -94,11 +94,11 @@ object TestingValue{
     )
 
     val TestingStepInfoList = mutableListOf(
-        StepInfo(version = 0, order = 0, explanation = "설명0", imageUri = R.drawable.level_hard.toUriWithDrawable()),
-        StepInfo(version = 1, order = 1, explanation = "설명1", imageUri = R.drawable.main_screen_toxi.toUriWithDrawable()),
-        StepInfo(version = 2, order = 2, explanation = "설명2", imageUri = R.drawable.ic_setting.toUriWithDrawable()),
-        StepInfo(version = 3, order = 3, explanation = "설명3", imageUri = R.drawable.main_screen_search.toUriWithDrawable()),
-        StepInfo(version = 4, order = 4, explanation = "설명4", imageUri = R.drawable.temp.toUriWithDrawable()),
+        StepInfo(version = 0, order = 0, description = "설명0", imageUri = R.drawable.level_hard.toUriWithDrawable()),
+        StepInfo(version = 1, order = 1, description = "설명1", imageUri = R.drawable.main_screen_toxi.toUriWithDrawable()),
+        StepInfo(version = 2, order = 2, description = "설명2", imageUri = R.drawable.ic_setting.toUriWithDrawable()),
+        StepInfo(version = 3, order = 3, description = "설명3", imageUri = R.drawable.main_screen_search.toUriWithDrawable()),
+        StepInfo(version = 4, order = 4, description = "설명4", imageUri = R.drawable.temp.toUriWithDrawable()),
     )
 
     val TestingRecipe = Recipe(

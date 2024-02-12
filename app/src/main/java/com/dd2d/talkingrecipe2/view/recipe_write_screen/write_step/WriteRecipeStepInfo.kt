@@ -91,7 +91,7 @@ fun WriteRecipeStepInfo(
                 TextButton(
                     onClick = {
                         val updateList = stepInfoList.toMutableList()
-                        updateList.add(StepInfo(version = 0, order = stepInfoList.size+1, explanation = "", imageUri = Uri.EMPTY))
+                        updateList.add(StepInfo(version = 0, order = stepInfoList.size+1, description = "", imageUri = Uri.EMPTY))
                         onChangeStepInfoList(updateList)
                     },
                     modifier = modifier
@@ -114,11 +114,11 @@ fun WriteRecipeStepInfo(
                 ){
                     StepInfoView(
                         context = context,
-                        stepExplanation = info.explanation,
+                        stepExplanation = info.description,
                         stepImageUri = info.imageUri,
                         onChangeExplanation = { update->
                             val updateList = stepInfoList.toMutableList()
-                            updateList[index] = stepInfoList[index].copy(explanation = update)
+                            updateList[index] = stepInfoList[index].copy(description = update)
                             onChangeStepInfoList(updateList)
                         },
                         onClickImage = {
@@ -127,7 +127,7 @@ fun WriteRecipeStepInfo(
                         },
                         onClickAdd = {
                             val updateList = stepInfoList.toMutableList()
-                            updateList.add(index+1, StepInfo(version = 0, order = stepInfoList.size+1, explanation = "", imageUri = Uri.EMPTY))
+                            updateList.add(index+1, StepInfo(version = 0, order = stepInfoList.size+1, description = "", imageUri = Uri.EMPTY))
                             onChangeStepInfoList(updateList)
                         },
                         onClickRemove = {

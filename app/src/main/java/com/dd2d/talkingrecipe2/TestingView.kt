@@ -57,6 +57,7 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfoDTO
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.BasicInfoField
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.RecipeIdEqualTo
+import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.kotex
@@ -87,6 +88,18 @@ private val supabase = createSupabaseClient(
     install(Postgrest)
     install(Storage)
 }
+
+private const val testId = "TalkingRecipe"
+
+@Composable
+@Preview
+fun AAA() {
+    val rf = RecipeFetchRepositoryImpl()
+    LaunchedEffect(key1 = true){
+        rf.fetchSavePostIdListByUserId(testId)
+    }
+}
+
 
 sealed class T{
     class A(val name: String): T(){

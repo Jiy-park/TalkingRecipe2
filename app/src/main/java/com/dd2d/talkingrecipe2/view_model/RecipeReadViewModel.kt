@@ -71,10 +71,6 @@ class RecipeReadViewModel(
                             _recipeState.value = RecipeState.OnLoading(msg)
                         }
                     )
-
-//                    TODO("테스트용임. 테스트 끝나면 위 주석 해제하고 하래 한 줄 지우면 됨. >>했음.")
-//                    val recipe = flowOf(TestingRecipe)
-
                     _recipeState.value = RecipeState.Stable
                 }
             }

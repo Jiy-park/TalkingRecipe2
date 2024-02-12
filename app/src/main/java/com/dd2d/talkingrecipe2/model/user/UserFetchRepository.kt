@@ -4,12 +4,19 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.dd2d.talkingrecipe2.BuildConfig
 import com.dd2d.talkingrecipe2.R
+import com.dd2d.talkingrecipe2.alog
+import com.dd2d.talkingrecipe2.data_struct.FriendInfoDTO
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.UserDTO
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Columns.UserProfilePath
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.Expire.In1Hours
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Field.FriendFetchColumn
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.Field.UserFetchColumns
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Field.UserId
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Field.UserName
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.Field.UserPassword
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.Filter.UserIdEqualTo
-import com.dd2d.talkingrecipe2.model.user.UserDBValue.Filter.UserPasswordEqualTo
+import com.dd2d.talkingrecipe2.model.user.UserDBValue.FriendTable
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserImageTable
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserLoginTable
 import com.dd2d.talkingrecipe2.model.user.UserDBValue.UserTable
@@ -19,6 +26,7 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +73,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
     suspend fun isExistId(userId: String): Boolean{
         try {
             val res = database.from(UserLoginTable)
-                .select(columns = Columns.list(UserIdEqualTo)) {
+                .select(columns = Columns.list(UserId)) {
                     filter {
                         eq(UserIdEqualTo, userId)
                     }
@@ -80,6 +88,22 @@ class UserFetchRepositoryImpl: UserFetchRepository {
         }
     }
 
+    suspend fun fetchUserNameById(userId: String): String{
+        return try {
+            database.from(UserTable)
+                .select(columns = Columns.list(UserName)) {
+                    filter {
+                        eq(UserIdEqualTo, userId)
+                    }
+                }
+                .decodeString()
+        }
+        catch (e: Exception){
+            throw IOException("IOException in fetchUserNameById().\nuser id -> $userId.\nmessage -> ${e.message}")
+        }
+    }
+
+
     /** 유저가 입력한 [userId]의 값과 [userPassword]의 조합이 [UserLoginTable]에 존쟈하는 지 판별.
      * @return 존재하는 조합인 경우 true
      *
@@ -87,23 +111,18 @@ class UserFetchRepositoryImpl: UserFetchRepository {
     suspend fun validateUser(userId: String, userPassword: String): Boolean{
         try {
             val res = database.from(UserLoginTable)
-                .select(columns = Columns.list(UserPasswordEqualTo)){
+                .select(columns = Columns.list(UserPassword)){
                     filter {
                         eq(UserIdEqualTo, userId)
                     }
                 }
-                .data                           // res = [{"user_password":"value"}]
-                .split(":\"")[1]     // res =  value"}]
-                .dropLast(3)                 // res = value
+                .decodeString()
             return res == userPassword
         }
         catch (e: Exception){
             throw IOException("IOException in validateUser().\nuser id -> $userId.\nuser password -> $userPassword.\nmessage -> ${e.message}")
         }
     }
-
-//    private fun getUserProfileImagePath(userId: String) = "${userId}_profile.jpeg"
-//    private fun getUserBackgroundImagePath(userId: String) = "${userId}_background.jpeg"
 
     override suspend fun fetchUserById(userId: String): User {
         return try {
@@ -128,6 +147,24 @@ class UserFetchRepositoryImpl: UserFetchRepository {
         }
     }
 
+    /** [userId]의 친구 목록을 [FriendInfoDTO] 형태로 불러온다.*/
+    suspend fun fetchFriendListByUserId(userId: String): List<FriendInfoDTO>{
+        return try {
+            withContext(Dispatchers.IO){
+                database.from(FriendTable)
+                    .select(columns = Columns.list(FriendFetchColumn)) {
+                        filter {
+                            eq(UserIdEqualTo, userId)
+                        }
+                    }
+                    .decodeList<FriendInfoDTO>()
+            }
+        }
+        catch (e: Exception){
+            throw IOException("IOException in fetchFriendListByUserId().\nuser id -> $userId.\nmessage -> ${e.message}")
+        }
+    }
+
     override suspend fun fetchUserDTOById(userId: String): UserDTO {
         return try {
             database.from(UserTable)
@@ -143,19 +180,42 @@ class UserFetchRepositoryImpl: UserFetchRepository {
         }
     }
 
+    suspend fun fetchUserProfileImageUriById(userId: String): Uri{
+        return try {
+            val imagePath = database.from(UserTable)
+                .select(columns = Columns.list(UserProfilePath)) {
+                    filter {
+                        eq(UserIdEqualTo, userId)
+                    }
+                }
+                .decodeString()
+
+            if(imagePath.isBlank()) {
+                R.drawable.default_image.toUriWithDrawable()
+            }
+            else {
+                database.storage.from("$UserImageTable/$userId")
+                    .createSignedUrl(path = imagePath, expiresIn = In1Hours)// 이미지 얻음.
+                    .toSupabaseUrl()
+                    .toUri()
+            }
+        }
+        catch (e: Exception){
+            throw IOException("IOException in fetchUserProfileImageUriById().\nuser id -> $userId.\nmessage -> ${e.message}")
+        }
+    }
+
     override suspend fun fetchUserProfileImageUriById(userId: String, imagePath: String): Uri {
         imagePath.ifBlank { return R.drawable.default_image.toUriWithDrawable() }
-
         return try {
-            val res = database.storage
+            database.storage
                 .from("$UserImageTable/$userId")
                 .createSignedUrl(
                     path = imagePath,
                     expiresIn = In1Hours,
                 )
-
-            if(res.isBlank()) { R.drawable.default_image.toUriWithDrawable() }
-            else { res.toSupabaseUrl().toUri() }
+                .toSupabaseUrl()
+                .toUri()
         }
         catch (e: Exception){
             throw IOException("IOException in fetchUserProfileImageUriById().\nuser id -> $userId.\nmessage -> ${e.message}")
@@ -180,4 +240,15 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             throw IOException("IOException in fetchUserBackgroundImageUriById().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
+
+    /** [PostgrestResult]의 필요 결과물이 [String]일 때 필요한 데이터만 추출함.
+     *- 과정
+     * 1. PostgrestResult.data
+     * 2. PostgrestResult.data.split(":"")
+     * 3. PostgrestResult.data.split(":"").drpoLast(3)*/
+    private fun PostgrestResult.decodeString() = this
+        .data                           // res = [{"user_password":"value"}]
+        .split(":\"")[1]     // res =  value"}]
+        .dropLast(3)                 // res = value
+
 }

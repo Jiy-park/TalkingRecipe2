@@ -124,7 +124,7 @@ fun kofield(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String)->Unit,
-    maxLength: Int = 10,
+    maxLength: Int = 15,
     isError: Boolean = false,
     placeholder: @Composable (()->Unit)? = null,
     leadingIcon: @Composable (()->Unit)? = null,

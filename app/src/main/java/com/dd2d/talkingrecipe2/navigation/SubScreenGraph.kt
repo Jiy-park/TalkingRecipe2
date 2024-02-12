@@ -27,6 +27,9 @@ fun NavGraphBuilder.subScreenGraph(
 ){
     composable(route = "${Screen.Sub.route}/{destination}"){ backStack->
         val user by userViewModel.user.collectAsState()
+        val friendList by userViewModel.friendList.collectAsState()
+        val myPostList by userViewModel.myPostList.collectAsState()
+        val savePostList by userViewModel.savePostList.collectAsState()
 
         @Suppress("MoveVariableDeclarationIntoWhen")
         val destinationRoute = backStack.arguments?.getString("destination")?: MyPost.route
@@ -38,13 +41,16 @@ fun NavGraphBuilder.subScreenGraph(
         }
         SubScreen(
             user = user,
+            myPostList = myPostList,
+            friendList = friendList,
+            savePostList = savePostList,
             onUpdateUser = { update ->
                 userViewModel.updateUser(update)
             },
             destination = selectedTab,
             onClickBack = { navController.navigateUp() },
-            onClickPost = {
-
+            onClickPost = { recipePost ->
+                navController.navigate(route = "${Screen.RecipeRead.route}/${recipePost.recipeBasicInfo.recipeId}")
             },
             onClickFriend = {
 

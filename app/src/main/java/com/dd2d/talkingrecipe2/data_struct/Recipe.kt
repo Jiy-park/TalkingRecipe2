@@ -5,6 +5,7 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 
+
 data class Recipe(
     var basicInfo: RecipeBasicInfo,
     var ingredientList: List<Ingredient>,

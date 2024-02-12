@@ -13,7 +13,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /** Supabase Storage로부터 받은 결과물을 사용가능한 url로 변환.*/
-fun String.toSupabaseUrl() = "${BuildConfig.SUPABASE_URL}/storage/v1/$this"
+fun String.toSupabaseUrl(): String{
+    if(this.isBlank())  throw IllegalAccessException("object is blank")
+    else return "${BuildConfig.SUPABASE_URL}/storage/v1/$this"
+}
 
 /** 이미지 업로드 시 사용. [Uri]를 imagePath로 바꿈. 이떄 imagePath는 path.tpye 형태.
  * 1. 다운 받은 이미지인지 판단 -> startWith("http").

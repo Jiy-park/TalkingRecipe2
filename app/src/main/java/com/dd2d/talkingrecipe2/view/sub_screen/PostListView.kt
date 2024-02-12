@@ -1,7 +1,6 @@
 package com.dd2d.talkingrecipe2.view.sub_screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,32 +17,36 @@ import com.dd2d.talkingrecipe2.data_struct.RecipePost
 import com.dd2d.talkingrecipe2.ui.PostViewer
 import com.dd2d.talkingrecipe2.ui.fillWidthOfParent
 import com.dd2d.talkingrecipe2.ui.theme.HintText
+import com.dd2d.talkingrecipe2.ui.theme.kotex
 
+/** @param emptyComment [postList]가 비어있을 경우 유저에게 보여질 문장.*/
 @Composable
 fun PostListView(
     modifier: Modifier = Modifier,
+    emptyComment: String,
     postList: List<RecipePost>,
     onClickPost: (post: RecipePost)->Unit,
 ){
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxSize()
+    LazyColumn(
+        state = rememberLazyListState(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = PaddingValues(15.dp),
+        modifier = modifier.fillMaxSize()
     ){
-        LazyColumn(
-            state = rememberLazyListState(),
-            verticalArrangement = Arrangement.Top,
-            contentPadding = PaddingValues(15.dp)
-        ){
-            items(
-                items = postList,
-                key = { post -> post.recipeBasicInfo.recipeId }
-            ){ post->
-                PostViewer(post = post) { clicked-> onClickPost(clicked) }
-                Spacer(modifier = modifier.height(15.dp))
-                Divider(modifier = modifier.fillWidthOfParent(15.dp), color = HintText)
-                Spacer(modifier = modifier.height(15.dp))
+        if(postList.isEmpty()){
+            item {
+                kotex(text = emptyComment)
             }
+        }
+        items(
+            items = postList,
+            key = { post -> post.recipeBasicInfo.recipeId }
+        ){ post->
+            PostViewer(post = post) { clicked-> onClickPost(clicked) }
+            Spacer(modifier = modifier.height(15.dp))
+            Divider(modifier = modifier.fillWidthOfParent(15.dp), color = HintText)
+            Spacer(modifier = modifier.height(15.dp))
         }
     }
 }

@@ -13,11 +13,14 @@ object RecipeDBValue{
         const val StepInfoTable = "recipe_step_info"
         const val RecipeImageTable = "recipe_image"
         const val StepInfoImageTable = "step_info"
+        const val SavePostTable = "save_post"
     }
 
 
     object Filter{
         const val RecipeIdEqualTo = "recipe_id"
+        const val AuthorIdEqualTo = "author_id"
+        const val UserIdEqualTo = "user_id"
     }
 
     object Order{
@@ -28,6 +31,7 @@ object RecipeDBValue{
         const val BasicInfoUpsertField = "recipe_id"
         const val IngredientUpsertField = "no,recipe_id"
         const val StepInfoUpsertField = "order,recipe_id"
+        const val SavePostField = "recipe_id,user_id"
         val BasicInfoField = listOf(
             "version",
             "recipe_id",

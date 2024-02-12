@@ -15,14 +15,15 @@ import com.dd2d.talkingrecipe2.data_struct.RecipePost
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.navigation.Screen
 import com.dd2d.talkingrecipe2.navigation.SubScreenDestination
-import com.dd2d.talkingrecipe2.ui.TestingValue.TestingFriendList
-import com.dd2d.talkingrecipe2.ui.TestingValue.TestingPostList
 
 /**@param destination 서브 메인의 시작점. 참고 : [SubScreenDestination] */
 @Composable
 fun SubScreen(
     modifier: Modifier = Modifier,
     user: User,
+    myPostList: List<RecipePost>,
+    friendList: List<FriendInfo>,
+    savePostList: List<RecipePost>,
     onUpdateUser: (update: User)->Unit,
     destination: SubScreenDestination,
     onClickPost: (RecipePost) -> Unit,
@@ -30,9 +31,6 @@ fun SubScreen(
     onClickBack: () -> Unit,
 ){
     var currentTab by remember { mutableStateOf<SubScreenDestination>(destination) }
-//    TODO("아래 세 줄은 테스트용 나중에 지우면 됨. user 정보는 뷰모델에서 가져올 것.")
-    val postList by remember { mutableStateOf(TestingPostList) }
-    val friendList by remember { mutableStateOf(TestingFriendList) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -52,7 +50,8 @@ fun SubScreen(
             when(currentTab){
                 SubScreenDestination.MyPost -> {
                     PostListView(
-                        postList = postList,
+                        postList = myPostList,
+                        emptyComment = "작성한 레시피가 없어요.",
                         onClickPost = { post -> onClickPost(post) },
                         modifier = modifier
                     )
@@ -66,7 +65,8 @@ fun SubScreen(
                 }
                 SubScreenDestination.SavePost -> {
                     PostListView(
-                        postList = postList,
+                        postList = savePostList,
+                        emptyComment = "보관중인 레시피가 없어요.",
                         onClickPost = { post -> onClickPost(post) },
                         modifier = modifier
                     )

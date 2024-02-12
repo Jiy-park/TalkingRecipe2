@@ -29,7 +29,7 @@ data class RecipeBasicInfoDTO(
     @SerialName("share_option")
     val shareOption: Int
 ){
-    fun toRecipeBasicInfo() = RecipeBasicInfo(
+    fun     toRecipeBasicInfo() = RecipeBasicInfo(
         version = this.version,
         recipeId = this.recipeId,
         authorId = this.authorId,
