@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dd2d.talkingrecipe2.alog
+import com.dd2d.talkingrecipe2.data_struct.LocalUser
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.logging
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
@@ -37,6 +39,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.login_screen.LoginScreen
 import com.dd2d.talkingrecipe2.view.main_screen.MainScreen
+import com.dd2d.talkingrecipe2.view.recipe_read_screen.RecipeReadScreen
 import com.dd2d.talkingrecipe2.view_model.LoginViewModel
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode
@@ -45,7 +48,7 @@ import com.dd2d.talkingrecipe2.view_model.UserViewModel
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
-){
+) {
     val context = LocalContext.current
     val userViewModel = viewModel {
         UserViewModel(
@@ -55,63 +58,42 @@ fun AppNavigation(
             userUploadRepo = UserUploadRepositoryImpl()
         )
     }
-    val recipeViewModel = viewModel{
+    val recipeViewModel = viewModel {
         RecipeViewModel(
             recipeUploadRepo = RecipeUploadRepositoryImpl(context),
             recipeFetchRepo = RecipeFetchRepositoryImpl()
         )
     }
+
     val navController = rememberNavController()
 //    TODO("일단 아래 한 줄은 테스트용임. ")
     var onLogin by remember { mutableStateOf(true) }
-
-    NavHost(
-        modifier = modifier.fillMaxSize(),
-        navController = navController,
-        startDestination = if(onLogin) Screen.Main.route else Screen.Login.route,
-    ){
-        beforeLogin(
+    val loginUser by userViewModel.user.collectAsState()
+    CompositionLocalProvider(
+        LocalUser provides loginUser
+    ) {
+        NavHost(
+            modifier = modifier.fillMaxSize(),
             navController = navController,
-            onLogin = { loginUser ->
-                userViewModel.login(loginUser)
-                onLogin = true
-            }
-        )
+            startDestination = if (onLogin) Screen.Main.route else Screen.Login.route,
+        ) {
+            beforeLogin(
+                navController = navController,
+                onLogin = { loginUser ->
+                    userViewModel.login(loginUser)
+                    recipeViewModel.initUser(loginUser.toSimpleUserInfo())
+                    onLogin = true
+                }
+            )
 
-        afterLogin(
-            navController = navController,
-            userViewModel = userViewModel,
-            recipeViewModel = recipeViewModel,
-        )
+            afterLogin(
+                navController = navController,
+                userViewModel = userViewModel,
+                recipeViewModel = recipeViewModel,
+            )
+        }
     }
 }
-
-//fun NavGraphBuilder.test(navController: NavController){
-//
-//    val userInfo = SimpleUserInfo.Empty
-//
-//    composable(route = "test_recipe/{recipeViewModelMode}/{recipeId}"){ backStack->
-//        val context = LocalContext.current
-//        val modeArgument = backStack.arguments?.getString("recipeViewModelMode")?: "Error"
-//        val recipeIdArgument = backStack.arguments?.getString("recipeId")?: ""
-//
-//        var mode by remember { mutableStateOf(RecipeViewModelMode.nameOf(modeArgument)) }
-//        val recipeViewModel = viewModel{
-//            RecipeViewModel(
-//                recipeUploadRepo = RecipeUploadRepositoryImpl(context),
-//                recipeFetchRepo = RecipeFetchRepositoryImpl()
-//            )
-//        }
-//
-//        when(mode){
-//            is RecipeViewModelMode.ReadMode -> { logging("read") }
-//            is RecipeViewModelMode.ModifyMode -> { logging("modify") }
-//            is RecipeViewModelMode.WriteMode -> { logging("write") }
-//            is RecipeViewModelMode.OnModeError -> { logging("error") }
-//        }
-//
-//    }
-//}
 
 fun NavGraphBuilder.beforeLogin(
     navController: NavController,
@@ -156,9 +138,6 @@ fun NavGraphBuilder.afterLogin(
     recipeViewModel: RecipeViewModel
 ){
     composable(route = Screen.Main.route){
-        val loginUser by userViewModel.user.collectAsState()
-
-
         MainScreen(
             onClickSearchTrigger = { navController.navigate(route = Screen.Search.route) },
             onClickSavePost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.SavePost.route}") },
@@ -174,7 +153,7 @@ fun NavGraphBuilder.afterLogin(
 //                    userViewModel.logout()
                 val mode = RecipeViewModelMode.ReadMode
                 val recipeId = TestingRecipeId
-                navController.navigate(route = "test_recipe/${mode.name}")
+                navController.navigate(route = "${Screen.Recipe.route}/${mode.name}")
                 recipeViewModel.fetchRecipeById(recipeId)
             },
             onClickRecentRecipe = { recipeId-> navController.navigate(route = "${Screen.RecipeRead.route}/$recipeId") },
@@ -182,7 +161,11 @@ fun NavGraphBuilder.afterLogin(
     }
     subScreenGraph(navController = navController, userViewModel = userViewModel)
     recipeSearchScreenGraph(navController = navController)
-    recipeScreenGraph(navController = navController, recipeViewModel = recipeViewModel)
+    recipeScreenGraph(
+        navController = navController,
+        userViewModel = userViewModel,
+        recipeViewModel = recipeViewModel
+    )
 //            recipeWriteScreenGraph(navController = navController)
 //            recipeReadScreenGraph(
 //                navController = navController,
@@ -197,9 +180,10 @@ fun NavGraphBuilder.afterLogin(
 
 fun NavGraphBuilder.recipeScreenGraph(
     navController: NavController,
+    userViewModel: UserViewModel,
     recipeViewModel: RecipeViewModel
 ){
-    composable(route = "test_recipe/{recipeViewModelMode}"){ backStack->
+    composable(route = "${Screen.Recipe.route}/{recipeViewModelMode}"){ backStack->
         logging("sdf")
         val modeArgument = backStack.arguments?.getString("recipeViewModelMode")?: "Error"
         modeArgument.alog("mode")
@@ -207,7 +191,6 @@ fun NavGraphBuilder.recipeScreenGraph(
         recipeIdArgument.alog("id")
 
         var mode by remember { mutableStateOf(RecipeViewModelMode.nameOf(modeArgument)) }
-
 
         AnimatedContent(
             targetState = mode, label = "",
@@ -217,10 +200,10 @@ fun NavGraphBuilder.recipeScreenGraph(
         ) { modeState->
             when(modeState){
                 is RecipeViewModelMode.ReadMode -> {
-                    TempView(
-                        label = "read",
-                        color = Color.Cyan,
-                        onClick = { mode = it }
+                    RecipeReadScreen(
+                        navController = navController,
+                        userViewModel = userViewModel,
+                        recipeViewModel = recipeViewModel
                     )
                 }
                 is RecipeViewModelMode.ModifyMode -> {

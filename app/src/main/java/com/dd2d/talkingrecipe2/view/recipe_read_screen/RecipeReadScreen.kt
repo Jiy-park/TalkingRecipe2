@@ -1,56 +1,113 @@
 package com.dd2d.talkingrecipe2.view.recipe_read_screen
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
+import androidx.navigation.NavController
 import com.dd2d.talkingrecipe2.data_struct.Recipe
-import com.dd2d.talkingrecipe2.logging
-import com.dd2d.talkingrecipe2.ui.TestingValue.TestingAuthor
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
+import com.dd2d.talkingrecipe2.navigation.RecipeReadMode
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
 import com.dd2d.talkingrecipe2.view.recipe_read_screen.main_content.RecipeReadView
-import com.dd2d.talkingrecipe2.view_model.RecipeReadViewModel
-import com.dd2d.talkingrecipe2.view_model.RecipeState
+import com.dd2d.talkingrecipe2.view.recipe_read_screen.talking_recipe.TalkingRecipe
+import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
+import com.dd2d.talkingrecipe2.view_model.RecipeViewModelState
+import com.dd2d.talkingrecipe2.view_model.UserViewModel
+
 
 @Composable
 fun RecipeReadScreen(
-    modifier: Modifier = Modifier,
-    recipeViewModel: RecipeReadViewModel,
-    onClickBack: () -> Unit,
-    onClickAuthorProfileImage: () -> Unit,
-    onClickFavorite: () -> Unit,
-    onClickShare: () -> Unit,
-    isSavePost: Boolean,
-    onClickSave: (recipeId: String) -> Unit,
-    onClickModify: () -> Unit,
-    onClickTalkingRecipe: (SimpleUserInfo, Recipe) -> Unit = { _, _ -> logging("click talking recipe") },
+    navController: NavController,
+    userViewModel: UserViewModel,
+    recipeViewModel: RecipeViewModel
 ){
-    val recipeState by recipeViewModel.recipeState.collectAsState()
+    var isSavePost by remember { mutableStateOf(false) }
+    var isFavoritePost by remember { mutableStateOf(false) }
 
-    when(recipeState){
-        is RecipeState.Init -> { recipeViewModel.init() }
-        is RecipeState.OnLoading -> { LoadingView() }
-        is RecipeState.Stable -> {
-            val recipe by recipeViewModel.recipe.collectAsState()
-            val authorInfo = TestingAuthor
-            RecipeReadView(
+    val recipe by recipeViewModel.recipe.collectAsState()
+    val state by recipeViewModel.state.collectAsState()
+
+    when(state){
+        is RecipeViewModelState.OnInit -> {  }
+        is RecipeViewModelState.OnConnected -> { LoadingView() }
+        is RecipeViewModelState.OnStable -> {
+            StableView(
                 recipe = recipe,
-                authorInfo = authorInfo,
-                onClickBack = { onClickBack() },
-                onClickAuthorProfileImage = { onClickAuthorProfileImage() },
-                onClickFavorite = { onClickFavorite() },
-                onClickShare = { onClickShare() },
+                isFavoritePost = isFavoritePost,
                 isSavePost = isSavePost,
-                onClickSave = { recipeId-> onClickSave(recipeId) },
-                onClickModify = { onClickModify() },
-                onClickTalkingRecipe = { onClickTalkingRecipe(authorInfo, recipe) }
+                onClickFavorite = { update-> isFavoritePost = update},
+                onClickSave = { update-> isSavePost = update},
+                onClickBack = { navController.navigateUp() },
+                onClickAuthor = { author->  },
+                onClickShare = { /*TODO*/ },
+                onClickModify = { /*TODO*/ },
+                onClickToMain = { navController.navigateUp() }
             )
         }
-        is RecipeState.OnError -> {
-            val cause = (recipeState as RecipeState.OnError).cause
-            ErrorView(cause = cause) { onClickBack() }
+        is RecipeViewModelState.OnError -> {
+            ErrorView(
+                cause = (state as RecipeViewModelState.OnError).msg,
+                onClickBack = { navController.navigateUp() }
+            )
+        }
+    }
+
+
+}
+@Composable
+private fun StableView(
+    modifier: Modifier = Modifier,
+    recipe: Recipe,
+    isSavePost: Boolean,
+    isFavoritePost: Boolean,
+    onClickFavorite: (Boolean)->Unit,
+    onClickSave: (Boolean)->Unit,
+    onClickBack: () -> Unit,
+    onClickAuthor: (author: SimpleUserInfo)->Unit,
+    onClickShare: ()->Unit,
+    onClickModify: () -> Unit,
+    onClickToMain: ()->Unit,
+){
+    var recipeReadMode by remember { mutableStateOf<RecipeReadMode>(RecipeReadMode.Normal) }
+
+    AnimatedContent(
+        targetState = recipeReadMode, label = "",
+        transitionSpec = {
+            slideInVertically { it*2 } togetherWith slideOutVertically { it*2 }
+        }
+    ) {readMode->
+        when(readMode){
+            is RecipeReadMode.Normal -> {
+                RecipeReadView(
+                    recipe = recipe,
+                    isSavePost = isSavePost,
+                    isFavoritePost = isFavoritePost,
+                    onClickBack = { onClickBack() },
+                    onClickAuthorProfileImage = { author ->  onClickAuthor(author) },
+                    onClickFavorite = { update-> onClickFavorite(update) },
+                    onClickSave = { update-> onClickSave(update) },
+                    onClickShare = { onClickShare() },
+                    onClickModify = { onClickModify() },
+                    onClickTalkingRecipe = { recipeReadMode = RecipeReadMode.TalkingRecipe }
+                )
+            }
+            is RecipeReadMode.TalkingRecipe -> {
+                TalkingRecipe(
+                    recipe = recipe,
+                    onClickBack = { recipeReadMode = RecipeReadMode.Normal },
+                    onClickAuthor = { author-> onClickAuthor(author) },
+                    onClickToMain = { onClickToMain() }
+                )
+            }
         }
     }
 }

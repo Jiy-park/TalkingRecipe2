@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.dd2d.talkingrecipe2.data_struct.LocalUser
 import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.ui.CommonValue
 import com.dd2d.talkingrecipe2.ui.clickableWithoutRipple
@@ -40,13 +41,15 @@ fun AuthorInfoView(
     authorInfo: SimpleUserInfo,
     recipeTitle: String,
     recipeDescription: String,
-    onClickAuthor: ()->Unit,
-    onClickFavorite: ()->Unit,
-    onClickShare: ()->Unit,
     isSavePost: Boolean,
-    onClickSave: ()->Unit,
+    isFavoritePost: Boolean,
+    onClickAuthor: ()->Unit,
+    onClickFavorite: (Boolean)->Unit,
+    onClickShare: ()->Unit,
+    onClickSave: (Boolean)->Unit,
     onClickModify: ()->Unit,
 ){
+    val user = LocalUser.current
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
@@ -62,7 +65,7 @@ fun AuthorInfoView(
                 .fillMaxHeight()
         ){
             kotex(text = recipeTitle, weight = FontWeight.Bold, size = 20.sp)
-            kotex(text = "${authorInfo.userName} @${authorInfo.userId}")
+            kotex(text = authorInfo.fullName)
             kotex(text = recipeDescription)
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -70,17 +73,19 @@ fun AuthorInfoView(
                 modifier = modifier
                     .fillMaxWidth()
             ) {
-                IconButton(onClick = { onClickFavorite() }) {
-                    Icon(imageVector = Icons.Default.Favorite, tint = HintText, contentDescription = "favorite this recipe")
+                IconButton(onClick = { onClickFavorite(!isFavoritePost) }) {
+                    Icon(imageVector = Icons.Default.Favorite, tint = if(isFavoritePost) SubColor else HintText, contentDescription = "favorite this recipe")
                 }
                 IconButton(onClick = { onClickShare() }) {
-                    Icon(imageVector = Icons.Default.Share, tint = HintText, contentDescription = "favorite this recipe")
+                    Icon(imageVector = Icons.Default.Share, tint = HintText, contentDescription = "share this recipe")
                 }
-                IconButton(onClick = { onClickSave() }) {
-                    Icon(imageVector = Icons.Default.Star, tint = if(isSavePost) SubColor else HintText, contentDescription = "favorite this recipe")
+                IconButton(onClick = { onClickSave(!isSavePost) }) {
+                    Icon(imageVector = Icons.Default.Star, tint = if(isSavePost) SubColor else HintText, contentDescription = "save this recipe")
                 }
-                IconButton(onClick = { onClickModify() }) {
-                    Icon(imageVector = Icons.Default.Edit, tint = HintText, contentDescription = "favorite this recipe")
+                if(authorInfo.userId == user.userId){
+                    IconButton(onClick = { onClickModify() }) {
+                        Icon(imageVector = Icons.Default.Edit, tint = HintText, contentDescription = "modify this recipe")
+                    }
                 }
             }
         }

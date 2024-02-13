@@ -45,7 +45,8 @@ import java.io.IOException
  * - [fetchRecipeIngredientListById]
  * - [fetchRecipeStepInfoListById]
  * - [fetchRecipeThumbnailUriById]
- * - [fetchRecipeAuthorInfo]*/
+ * - [fetchRecipeAuthorInfo]
+ * */
 interface RecipeFetchRepository {
     /** [recipeId]에 맞는 레시피의 최근 버전을 받아옴.*/
     suspend fun checkRecipeVersion(recipeId: String): Long

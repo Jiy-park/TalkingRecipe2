@@ -31,6 +31,22 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
+/** 레시피에 대한 유저의 관심도를 나타내는 데이터의 집합체.
+ * 항목으로는 아래와 같다.
+ * * [isFavorite] 유저가 레시피의 좋아요(하트 버튼)을 눌렀는지에 대한 정보.
+ * * [isSaved] 유저가 레시피를 보관함에 추가했는지에 대한 정보.*/
+data class RecipeInterestInfo(
+    val isFavorite: Boolean,
+    val isSaved: Boolean,
+){
+    companion object{
+        val DefaultInterest = RecipeInterestInfo(
+            isFavorite = false,
+            isSaved = false
+        )
+    }
+}
+
 /** [RecipeViewModel]의 모드. 현재 레시피에 대해 어떠한 작업을 진행하는지 결정.
  * * [ReadMode]
  * * [WriteMode]
@@ -83,7 +99,7 @@ sealed class RecipeViewModelState{
     }
     /** 에러가 발생한 상태. 데이터를 다운 받는 중 에러가 발생한 상태이다.
      * @param msg 에러에 대한 정보를 받는다.*/
-    class OnError(msg: String): RecipeViewModelState(){
+    class OnError(val msg: String): RecipeViewModelState(){
         init { Log.d("LOG_CHECK", "RecipeViewModelState : OnError -> $msg") }
     }
 }
@@ -98,11 +114,18 @@ class RecipeViewModel(
     private var _recipe = MutableStateFlow<Recipe>(Recipe.EmptyRecipe)
     val recipe: StateFlow<Recipe> get() = _recipe.asStateFlow()
 
-    private lateinit var authorInfo: SimpleUserInfo
+    private var _recipeInterestInfo = MutableStateFlow<RecipeInterestInfo>(RecipeInterestInfo.DefaultInterest)
+    val recipeInterestInfo: StateFlow<RecipeInterestInfo> get() = _recipeInterestInfo.asStateFlow()
+
+    private lateinit var userInfo: SimpleUserInfo
 
     /** 레시피의 정보를 [recipe]로 업데이트한다..*/
     fun updateRecipe(recipe: Recipe){
         _recipe.value = recipe
+    }
+
+    fun initUser(user: SimpleUserInfo){
+        userInfo = user
     }
 
     init {
@@ -112,7 +135,7 @@ class RecipeViewModel(
     private fun createRecipeId(): String{
         val format = DateTimeFormatter.ofPattern("yyMMdd_HHmm")
         val createdAt = LocalDateTime.now().format(format)
-        val authorId = authorInfo.userId
+        val authorId = userInfo.userId
         val recipeId = "${authorId}_$createdAt"
         _state.value = OnStable("createRecipeId()::recipe id is created. author id -> $authorId. recipe id -> $recipeId")
         return recipeId
