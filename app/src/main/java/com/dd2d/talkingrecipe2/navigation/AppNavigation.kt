@@ -18,17 +18,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dd2d.talkingrecipe2.alog
 import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
+import com.dd2d.talkingrecipe2.data_struct.User
+import com.dd2d.talkingrecipe2.logging
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.model.user.UserFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.user.UserUploadRepositoryImpl
+import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import com.dd2d.talkingrecipe2.view.login_screen.LoginScreen
 import com.dd2d.talkingrecipe2.view.main_screen.MainScreen
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.CreateScreenValue
 import com.dd2d.talkingrecipe2.view_model.LoginViewModel
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode
-import com.dd2d.talkingrecipe2.view_model.RecipeViewModelState
 import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
 @Composable
@@ -36,7 +38,7 @@ fun AppNavigation(
     modifier: Modifier = Modifier,
 ){
     val context = LocalContext.current
-    val userViewModel: UserViewModel = viewModel {
+    val userViewModel = viewModel {
         UserViewModel(
             recipeFetchRepo = RecipeFetchRepositoryImpl(),
             recipeUploadRepo = RecipeUploadRepositoryImpl(context),
@@ -44,18 +46,23 @@ fun AppNavigation(
             userUploadRepo = UserUploadRepositoryImpl()
         )
     }
+    val recipeViewModel = viewModel{
+        RecipeViewModel(
+            recipeUploadRepo = RecipeUploadRepositoryImpl(context),
+            recipeFetchRepo = RecipeFetchRepositoryImpl()
+        )
+    }
+
     val navController = rememberNavController()
 //    TODO("일단 아래 한 줄은 테스트용임. ")
     var onLogin by remember { mutableStateOf(false) }
-
-
-
 
     NavHost(
         modifier = modifier.fillMaxSize(),
         navController = navController,
         startDestination = if(onLogin) Screen.Main.route else Screen.Login.route,
     ){
+
         composable(route = Screen.Login.route){
             val loginViewModel = viewModel{
                 LoginViewModel(
@@ -97,7 +104,7 @@ fun AppNavigation(
 
         composable(route = Screen.Main.route){
             MainScreen(
-                onClickSearchTrigger = { navController.navigate(route = Screen.RecipeSearch.route) },
+                onClickSearchTrigger = { navController.navigate(route = Screen.Search.route) },
                 onClickSavePost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.SavePost.route}") },
                 onClickCreate = { navController.navigate(route = "${Screen.RecipeWrite.route}/${CreateScreenValue.CreateMode}") },
                 onClickMyPost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.MyPost.route}") },
@@ -107,8 +114,8 @@ fun AppNavigation(
 //                    onLogin = false
 //                    userViewModel.logout()
                     val mode = RecipeViewModelMode.ReadMode
-                    val recipeId = ""
-                    navController.navigate(route = "test_recipe/${mode.name}")
+                    val recipeId = TestingRecipeId
+                    navController.navigate(route = "test_recipe/${mode.name}/$recipeId")
                 },
                 onClickRecentRecipe = { recipeId-> navController.navigate(route = "${Screen.RecipeRead.route}/$recipeId") },
             )
@@ -134,37 +141,62 @@ fun NavGraphBuilder.test(navController: NavController){
 
     val userInfo = SimpleUserInfo.Empty
 
-    composable(route = "test_recipe/{recipeViewModelMode}"){ backStack->
+    composable(route = "test_recipe/{recipeViewModelMode}/{recipeId}"){ backStack->
         val context = LocalContext.current
         val modeArgument = backStack.arguments?.getString("recipeViewModelMode")?: "Error"
         val recipeIdArgument = backStack.arguments?.getString("recipeId")?: ""
 
-        val mode = RecipeViewModelMode.nameOf(modeArgument)
-        val recipeViewModel = RecipeViewModel(
-            recipeUploadRepo = RecipeUploadRepositoryImpl(context),
-            recipeFetchRepo = RecipeFetchRepositoryImpl()
-        )
-
-        val recipeViewModelState by recipeViewModel.state.collectAsState()
-        recipeViewModelState::class.simpleName?.alog("name")
-        when(recipeViewModelState){
-            is RecipeViewModelState.OnInit -> {
-                "0".alog("0")
-                recipeViewModel.init(
-                    userInfo = userInfo,
-                    recipeId = recipeIdArgument,
-                    mode = mode
-                )
-            }
-            is RecipeViewModelState.OnStable -> {
-                "1".alog("1")
-            }
-            is RecipeViewModelState.OnConnected -> {
-                "2".alog("2")
-            }
-            is RecipeViewModelState.OnError -> {
-                "3".alog("3")
-            }
+        var mode by remember { mutableStateOf(RecipeViewModelMode.nameOf(modeArgument)) }
+        val recipeViewModel = viewModel{
+            RecipeViewModel(
+                recipeUploadRepo = RecipeUploadRepositoryImpl(context),
+                recipeFetchRepo = RecipeFetchRepositoryImpl()
+            )
         }
+
+        when(mode){
+            is RecipeViewModelMode.ReadMode -> { logging("read") }
+            is RecipeViewModelMode.ModifyMode -> { logging("modify") }
+            is RecipeViewModelMode.WriteMode -> { logging("write") }
+            is RecipeViewModelMode.OnModeError -> { logging("error") }
+        }
+
+    }
+}
+
+fun NavGraphBuilder.beforeLogin(
+    navController: NavController,
+    onLogin: (loginUser: User)->Unit,
+){
+    composable(route = Screen.Login.route){
+        val loginViewModel = viewModel{
+            LoginViewModel(
+                userUploadRepo = UserUploadRepositoryImpl(),
+                userFetchRepo = UserFetchRepositoryImpl()
+            )
+        }
+        val loginState by loginViewModel.loginState.collectAsState()
+
+        LoginScreen(
+            loginState = loginState,
+            checkDuplicateUserId = { userId ->
+                loginViewModel.checkDuplicateUserId(userId)
+            },
+            tryLogin = { userId, userPassword ->
+                if(loginViewModel.tryLogin(userId, userPassword)) {
+                    val loginUser = loginViewModel.fetchUserById(userId)
+                    onLogin(loginUser)
+                    true
+                }
+                else{
+                    false
+                }
+            },
+            joinNewUser = { userId, userPassword, userName ->
+                loginViewModel.joinNewUser(userId, userPassword, userName) { user->
+                    onLogin(user)
+                }
+            }
+        )
     }
 }

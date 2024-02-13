@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RecipeBasicInfoDTO(
     @SerialName("version")
-    val version: Int,
+    val version: Long,
     @SerialName("recipe_id")
     val recipeId: String,
     @SerialName("author_id")
@@ -45,7 +45,7 @@ data class RecipeBasicInfoDTO(
 
 /** @param version 레시피의 버전.*/
 data class RecipeBasicInfo(
-    val version: Int = 0,
+    val version: Long = 0L,
     val recipeId: String = "",
     val authorId: String = "",
     val title: String = "",

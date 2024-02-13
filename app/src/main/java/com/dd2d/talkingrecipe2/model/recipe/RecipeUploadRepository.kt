@@ -110,13 +110,14 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
     override suspend fun uploadRecipeIngredientList(recipeId: String, ingredientList: List<Ingredient>) {
         try {
             val upload = ingredientList.removeEmptyIngredient().toDTO(recipeId)
-
+            val version = 1
             database
                 .from(IngredientTable)
                 .upsert(
                     upload,
                     onConflict = IngredientUpsertField
                 )
+
         }
         catch (e: Exception){
             throw IOException("IOException in uploadRecipeIngredientList.\ningredientList -> $ingredientList\nmessage -> ${e.message}")

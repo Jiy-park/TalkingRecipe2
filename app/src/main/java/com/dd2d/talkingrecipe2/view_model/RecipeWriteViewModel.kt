@@ -99,12 +99,12 @@ class RecipeWriteViewModel(
 
                     val ingredientList = async {
                         _writeState.value = RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe ingredient list")
-                        fetchRecipeIngredientListById(recipeId)
+                        fetchRecipeIngredientListById(recipeId, 1L)
                     }
 
                     val stepInfoList = async {
                         _writeState.value = RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe step info list")
-                        fetchRecipeStepInfoListById(recipeId)
+                        fetchRecipeStepInfoListById(recipeId, 1L)
                     }
 
                     val thumbnailUri = async {

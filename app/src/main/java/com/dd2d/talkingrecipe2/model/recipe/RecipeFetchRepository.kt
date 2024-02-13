@@ -15,9 +15,11 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfoDTO
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Expires.In30M
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.BasicInfoField
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.RecipeVersion
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.SavePostField
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.AuthorIdEqualTo
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.RecipeIdEqualTo
+import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.RecipeVersionEqualTo
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.UserIdEqualTo
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.IngredientTable
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.RecipeImageTable
@@ -45,14 +47,16 @@ import java.io.IOException
  * - [fetchRecipeThumbnailUriById]
  * - [fetchRecipeAuthorInfo]*/
 interface RecipeFetchRepository {
+    /** [recipeId]에 맞는 레시피의 최근 버전을 받아옴.*/
+    suspend fun checkRecipeVersion(recipeId: String): Long
     /** [recipeId]에 맞는 레시피의 [RecipeBasicInfo]를 받아옴.*/
     suspend fun fetchRecipeBasicInfoById(recipeId: String): RecipeBasicInfo
-    /** [recipeId]에 맞는 레시피의 [Ingredient] 리스트를 받아옴.*/
-    suspend fun fetchRecipeIngredientListById(recipeId: String): List<Ingredient>
-    /** [recipeId]에 맞는 레시피의 [StepInfo] 리스트를 받아옴.
+    /** [recipeId]와 [version]의 값이 일치하는 레시피의 [Ingredient] 리스트를 받아옴.*/
+    suspend fun fetchRecipeIngredientListById(recipeId: String, version: Long): List<Ingredient>
+    /** [recipeId]와 [version]의 값이 일치하는  레시피의 [StepInfo] 리스트를 받아옴.
      * [StepInfoTable]로부터 StepInfoDTO를 리스트 형태로 받은 후
      * 리스트를 순회하며 dto에 저장된 imagePath 값을 이용해 [RecipeImageTable]로부터 맞는 이미지를 가져옴*/
-    suspend fun fetchRecipeStepInfoListById(recipeId: String): List<StepInfo>
+    suspend fun fetchRecipeStepInfoListById(recipeId: String, version: Long): List<StepInfo>
     /** [recipeId]에 맞는 레시피의 썸네일 이미지를 [Uri]형태로 받아옴.*/
     suspend fun fetchRecipeThumbnailUriById(recipeId: String): Uri
     /** [recipeId]에 맞는 레시피의 작성자 정보를 [SimpleUserInfo]형태로 받아옴.*/
@@ -66,6 +70,24 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
     ){
         install(Postgrest)
         install(Storage)
+    }
+
+    override suspend fun checkRecipeVersion(recipeId: String): Long {
+        return try {
+            database.from(RecipeTable)
+                .select(columns = Columns.list(RecipeVersion)) {
+                    filter {
+                        eq(RecipeIdEqualTo, recipeId)
+                    }
+                }
+                .data
+                .split(":")[1]
+                .dropLast(2)
+                .toLong()
+        }
+        catch (e: Exception){
+            throw IOException("IOException in checkRecipeVersion().\nrecipe id -> $recipeId    .\nmessage -> ${e.message}")
+        }
     }
 
     /** [userId]의 유저가 작성한 레시피의 [RecipeBasicInfo] 목록을 반환한다.
@@ -122,12 +144,15 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
     }
 
 
-    override suspend fun fetchRecipeIngredientListById(recipeId: String): List<Ingredient> {
+    override suspend fun fetchRecipeIngredientListById(recipeId: String, version: Long): List<Ingredient> {
         return try {
             database.from(IngredientTable)
                 .select {
                     filter {
-                        eq(RecipeIdEqualTo, recipeId)
+                        and {
+                            eq(RecipeIdEqualTo, recipeId)
+                            eq(RecipeVersionEqualTo, version)
+                        }
                     }
                 }
                 .decodeList<IngredientDTO>()
@@ -140,12 +165,15 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
         }
     }
 
-    override suspend fun fetchRecipeStepInfoListById(recipeId: String): List<StepInfo> {
+    override suspend fun fetchRecipeStepInfoListById(recipeId: String, version: Long): List<StepInfo> {
         return try {
             database.from(StepInfoTable)
                 .select {
                     filter {
-                        eq(RecipeIdEqualTo, recipeId)
+                        and {
+                            eq(RecipeIdEqualTo, recipeId)
+                            eq(RecipeVersionEqualTo, version)
+                        }
                     }
                 }
                 .decodeList<StepInfoDTO>()

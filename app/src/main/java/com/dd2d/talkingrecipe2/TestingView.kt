@@ -34,7 +34,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +46,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -59,12 +57,9 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfoDTO
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.BasicInfoField
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Filter.RecipeIdEqualTo
-import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
-import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.ui.TestingValue.TestingRecipeId
 import com.dd2d.talkingrecipe2.ui.theme.MainColor
 import com.dd2d.talkingrecipe2.ui.theme.kotex
-import com.dd2d.talkingrecipe2.view_model.RecipeReadViewModel
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
@@ -99,17 +94,7 @@ private const val testId = "TalkingRecipe"
 @Composable
 @Preview
 fun AAA() {
-    val context = LocalContext.current
-    val rf = RecipeFetchRepositoryImpl()
-    val ru = RecipeUploadRepositoryImpl(context)
-    val rv = RecipeReadViewModel(rf, TestingRecipeId)
-    val s by rv.recipeState.collectAsState()
-    val r = rv.recipe.collectAsState()
-    r.alog("recipe")
-    LaunchedEffect(key1 = true){
-        rv.fetchRecipe(TestingRecipeId)
-    }
-    kotex(text = r.toString(), maxLine = Int.MAX_VALUE, overflow = TextOverflow.Visible)
+
 }
 
 

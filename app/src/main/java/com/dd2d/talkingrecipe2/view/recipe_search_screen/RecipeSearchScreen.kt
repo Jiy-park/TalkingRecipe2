@@ -17,6 +17,6 @@ fun RecipeSearchScreen(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ){
-        kotex(text = Screen.RecipeSearch.route)
+        kotex(text = Screen.Search.route)
     }
 }

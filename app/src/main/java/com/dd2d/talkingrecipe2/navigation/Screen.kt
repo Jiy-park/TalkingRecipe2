@@ -5,7 +5,7 @@ package com.dd2d.talkingrecipe2.navigation
  * @property Main
  * @property Sub
  * @property RecipeWrite
- * @property RecipeSearch
+ * @property Search
  * @property RecipeRead*/
 enum class Screen(val route: String){
     /** 로그인 화면. 유저는 해당 화면에서 회원가입을 진행할 수 있음.*/
@@ -21,9 +21,10 @@ enum class Screen(val route: String){
     /** 레시피를 작성하는 화면. 해당 화면에서 레시피 작성 또는 수정이 가능함.*/
     RecipeWrite("recipe write screen"),
 
-    /** 레시피를 검색하는 화면. 추가적으로 유저도 검색 가능. */
-    RecipeSearch("recipe search screen"),
+    /** 레시피 또는 유저를 검색하는 화면. 추가적으로 유저도 검색 가능. */
+    Search("recipe search screen"),
 
     /** 레시피를 읽는 화면.*/
     RecipeRead("recipe read screen"),
 }
+

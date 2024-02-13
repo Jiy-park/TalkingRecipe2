@@ -62,6 +62,13 @@ data class User(
         profileImagePath = profileImagePath,
         backgroundImagePath = backgroundImagePath
     )
+
+    fun toSimpleUserInfo() = SimpleUserInfo(
+        userId = this.userId,
+        userName = this.name,
+        userProfileImageUri = this.profileImageUri
+    )
+
     companion object{
         val Empty = User(
             userId = "",

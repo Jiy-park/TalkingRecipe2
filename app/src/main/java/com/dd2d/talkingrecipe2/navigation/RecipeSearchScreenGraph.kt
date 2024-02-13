@@ -8,7 +8,7 @@ import com.dd2d.talkingrecipe2.view.recipe_search_screen.RecipeSearchScreen
 fun NavGraphBuilder.recipeSearchScreenGraph(
     navController: NavController
 ){
-    composable(route = Screen.RecipeSearch.route){
+    composable(route = Screen.Search.route){
         RecipeSearchScreen()
     }
 }

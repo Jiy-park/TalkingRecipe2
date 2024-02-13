@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 /** @param version 레시피의 버전. 레시피의 버전에 맞는 [StepInfo]만 사용함.*/
 data class StepInfo(
-    val version: Int,
+    val version: Long,
     val order: Int,
     val description: String,
     val imageUri: Uri,
@@ -28,7 +28,7 @@ data class StepInfo(
 @Serializable
 data class StepInfoDTO(
     @SerialName("version")
-    val version: Int,
+    val version: Long,
     @SerialName("recipe_id")
     val recipeId: String,
     @SerialName("image_path")

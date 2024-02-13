@@ -75,12 +75,12 @@ class RecipeReadViewModel(
 
                     val ingredientList = async {
                         _recipeState.value = RecipeState.OnLoading("fetchRecipe()::start fetching recipe ingredient list")
-                        fetchRecipeIngredientListById(recipeId)
+                        fetchRecipeIngredientListById(recipeId, 1L)
                     }
 
                     val stepInfoList = async {
                         _recipeState.value = RecipeState.OnLoading("fetchRecipe()::start fetching recipe step info list")
-                        fetchRecipeStepInfoListById(recipeId)
+                        fetchRecipeStepInfoListById(recipeId, 1L)
                     }
 
                     val thumbnailUri = async {
