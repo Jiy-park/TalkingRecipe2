@@ -15,7 +15,8 @@ data class SimpleUserInfo(
     val userId: String,
     val userName: String,
     val userProfileImageUri: Uri
-){
+) {
+    val fullName = "$userName @$userId"
     companion object{
         val Empty = SimpleUserInfo(
             userId = "empty user id",

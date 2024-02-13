@@ -9,7 +9,7 @@ data class Ingredient(
     val no: Int,
     val name: String = "",
     val amount: String = "",
-){
+) {
     /** [Ingredient]의 내용물이 비었는지 확인.
      * @return [name] 또는 [amount]이 비었을 경우 true 반납.*/
     fun isEmpty() = this.name.isBlank() || this.amount.isBlank()

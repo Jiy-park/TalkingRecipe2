@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteMode
-import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteState
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
@@ -18,6 +17,26 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+sealed class RecipeWriteState{
+    object Init: RecipeWriteState(){
+        init { Log.d("LOG_CHECK", "Write State : Init -> initial view model") }
+    }
+    class OnFetching(msg: String): RecipeWriteState(){
+        init { Log.d("LOG_CHECK", "Write State : OnFetching -> $msg") }
+    }
+    class OnUploading(msg: String): RecipeWriteState(){
+        init { Log.d("LOG_CHECK", "Create State : OnUploading -> $msg") }
+    }
+    object Stable: RecipeWriteState(){
+        init { Log.d("LOG_CHECK", "Recipe State : Stable") }
+    }
+    object OnEndUploading: RecipeWriteState(){
+        init { Log.d("LOG_CHECK", "Recipe State : OnEndUploading -> upload recipe is finished.") }
+    }
+    class OnError(val cause: String): RecipeWriteState(){
+        init { Log.e("LOG_CHECK", "Write State : OnError -> $cause") }
+    }
+}
 
 /** 레시피에 대한 읽기, 쓰기 작업을 할 때 사용됨.
  * @param userId 레시피를 작성 (또는 수정)을 하는 주체의 아이디.
@@ -74,32 +93,27 @@ class RecipeWriteViewModel(
             try {
                 with(recipeFetchRepo) {
                     val basicInfo = async {
-                        _writeState.value =
-                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe basic info")
+                        _writeState.value = RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe basic info")
                         fetchRecipeBasicInfoById(recipeId)
                     }
 
                     val ingredientList = async {
-                        _writeState.value =
-                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe ingredient list")
+                        _writeState.value = RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe ingredient list")
                         fetchRecipeIngredientListById(recipeId)
                     }
 
                     val stepInfoList = async {
-                        _writeState.value =
-                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe step info list")
+                        _writeState.value = RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe step info list")
                         fetchRecipeStepInfoListById(recipeId)
                     }
 
                     val thumbnailUri = async {
-                        _writeState.value =
-                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe thumbnail image uri")
+                        _writeState.value = RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe thumbnail image uri")
                         fetchRecipeThumbnailUriById(recipeId)
                     }
 
                     val authorInfo = async {
-                        _writeState.value =
-                            RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe author info")
+                        _writeState.value = RecipeWriteState.OnFetching("fetchRecipe()::start fetching recipe author info")
                         fetchRecipeAuthorInfo(recipeId)
                     }
 

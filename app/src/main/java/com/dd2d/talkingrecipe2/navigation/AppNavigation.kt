@@ -11,10 +11,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dd2d.talkingrecipe2.alog
+import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.model.user.UserFetchRepositoryImpl
@@ -23,6 +26,9 @@ import com.dd2d.talkingrecipe2.view.login_screen.LoginScreen
 import com.dd2d.talkingrecipe2.view.main_screen.MainScreen
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.CreateScreenValue
 import com.dd2d.talkingrecipe2.view_model.LoginViewModel
+import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
+import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode
+import com.dd2d.talkingrecipe2.view_model.RecipeViewModelState
 import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
 @Composable
@@ -61,7 +67,7 @@ fun AppNavigation(
 
 //            TODO("아래에 있는 LaunchedEffect 테스트용임.")
             LaunchedEffect(key1 = Unit){
-                userViewModel.login(loginViewModel.fetchUserById("TalkingRecipe"))
+//                userViewModel.login(loginViewModel.fetchUserById("TalkingRecipe"))
                 onLogin = true
             }
 
@@ -98,8 +104,11 @@ fun AppNavigation(
                 onClickSetting = {
                      /*TODO("다이얼로그로 ")*/
 //                    navController.navigate(route = "${Screen.RecipeRead.route}/$TestingRecipeId")
-                    onLogin = false
-                    userViewModel.logout()
+//                    onLogin = false
+//                    userViewModel.logout()
+                    val mode = RecipeViewModelMode.ReadMode
+                    val recipeId = ""
+                    navController.navigate(route = "test_recipe/${mode.name}")
                 },
                 onClickRecentRecipe = { recipeId-> navController.navigate(route = "${Screen.RecipeRead.route}/$recipeId") },
             )
@@ -116,6 +125,46 @@ fun AppNavigation(
                 
             }
         )
+
+        test(navController)
     }
 }
 
+fun NavGraphBuilder.test(navController: NavController){
+
+    val userInfo = SimpleUserInfo.Empty
+
+    composable(route = "test_recipe/{recipeViewModelMode}"){ backStack->
+        val context = LocalContext.current
+        val modeArgument = backStack.arguments?.getString("recipeViewModelMode")?: "Error"
+        val recipeIdArgument = backStack.arguments?.getString("recipeId")?: ""
+
+        val mode = RecipeViewModelMode.nameOf(modeArgument)
+        val recipeViewModel = RecipeViewModel(
+            recipeUploadRepo = RecipeUploadRepositoryImpl(context),
+            recipeFetchRepo = RecipeFetchRepositoryImpl()
+        )
+
+        val recipeViewModelState by recipeViewModel.state.collectAsState()
+        recipeViewModelState::class.simpleName?.alog("name")
+        when(recipeViewModelState){
+            is RecipeViewModelState.OnInit -> {
+                "0".alog("0")
+                recipeViewModel.init(
+                    userInfo = userInfo,
+                    recipeId = recipeIdArgument,
+                    mode = mode
+                )
+            }
+            is RecipeViewModelState.OnStable -> {
+                "1".alog("1")
+            }
+            is RecipeViewModelState.OnConnected -> {
+                "2".alog("2")
+            }
+            is RecipeViewModelState.OnError -> {
+                "3".alog("3")
+            }
+        }
+    }
+}

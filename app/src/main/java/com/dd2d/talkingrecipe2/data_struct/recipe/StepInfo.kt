@@ -10,7 +10,7 @@ data class StepInfo(
     val order: Int,
     val description: String,
     val imageUri: Uri,
-){
+) {
     /** [StepInfo]의 내용물이 비었는지 확인.
      * @return [description] 또는 [imageUri] 중 하나라도 내용물이 비었다면 true 반납*/
     fun isEmpty() = this.description.isBlank() || this.imageUri == Uri.EMPTY

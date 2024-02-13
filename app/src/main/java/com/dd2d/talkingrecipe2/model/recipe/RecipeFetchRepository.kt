@@ -36,8 +36,6 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.IOException
 
 /** 레시피와 관련된 데이터를 받아온다.
@@ -107,7 +105,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
     }
 
     override suspend fun fetchRecipeBasicInfoById(recipeId: String): RecipeBasicInfo {
-        return withContext(Dispatchers.IO){
+        return try {
             database.from(RecipeTable)
                 .select(columns = Columns.list(BasicInfoField)) {
                     filter {
@@ -116,24 +114,26 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
                 }
                 .decodeSingle<RecipeBasicInfoDTO>()
                 .toRecipeBasicInfo()
+
+        }
+        catch (e: Exception){
+            throw IOException("IOException in fetchRecipeBasicInfoById().\nrecipe id -> $recipeId    .\nmessage -> ${e.message}")
         }
     }
 
 
     override suspend fun fetchRecipeIngredientListById(recipeId: String): List<Ingredient> {
-        try {
-            return withContext(Dispatchers.IO){
-                database.from(IngredientTable)
-                    .select {
-                        filter {
-                            eq(RecipeIdEqualTo, recipeId)
-                        }
+        return try {
+            database.from(IngredientTable)
+                .select {
+                    filter {
+                        eq(RecipeIdEqualTo, recipeId)
                     }
-                    .decodeList<IngredientDTO>()
-                    .map{ dto->
-                        dto.toIngredient()
-                    }
-            }
+                }
+                .decodeList<IngredientDTO>()
+                .map{ dto->
+                    dto.toIngredient()
+                }
         }
         catch (e: Exception){
             throw IOException("IOException in fetchRecipeIngredientListById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
@@ -141,25 +141,23 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
     }
 
     override suspend fun fetchRecipeStepInfoListById(recipeId: String): List<StepInfo> {
-        try {
-            return withContext(Dispatchers.IO){
-                database.from(StepInfoTable)
-                    .select {
-                        filter {
-                            eq(RecipeIdEqualTo, recipeId)
-                        }
+        return try {
+            database.from(StepInfoTable)
+                .select {
+                    filter {
+                        eq(RecipeIdEqualTo, recipeId)
                     }
-                    .decodeList<StepInfoDTO>()
-                    .map { dto->
-                        val imageUri = database
-                            .storage
-                            .from("${RecipeImageTable}/$recipeId/${StepInfoImageTable}")
-                            .createSignedUrl(path = dto.imagePath, expiresIn = In30M)
-                            .toSupabaseUrl()
-                            .toUri()
-                        dto.toStepInfo(imageUri = imageUri)
-                    }
-            }
+                }
+                .decodeList<StepInfoDTO>()
+                .map { dto->
+                    val imageUri = database
+                        .storage
+                        .from("${RecipeImageTable}/$recipeId/${StepInfoImageTable}")
+                        .createSignedUrl(path = dto.imagePath, expiresIn = In30M)
+                        .toSupabaseUrl()
+                        .toUri()
+                    dto.toStepInfo(imageUri = imageUri)
+                }
         }
         catch (e: Exception){
             throw IOException("IOException in fetchRecipeStepInfoListById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
@@ -168,14 +166,12 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
 
 
     override suspend fun fetchRecipeThumbnailUriById(recipeId: String): Uri {
-        try {
-            return withContext(Dispatchers.IO){
-                database.storage
-                    .from("${RecipeImageTable}/$recipeId")
-                    .createSignedUrl(path = "${recipeId}_thumbnail.jpeg", In30M)
-                    .toSupabaseUrl()
-                    .toUri()
-            }
+        return try {
+            database.storage
+                .from("${RecipeImageTable}/$recipeId")
+                .createSignedUrl(path = "${recipeId}_thumbnail.jpeg", In30M)
+                .toSupabaseUrl()
+                .toUri()
         }
         catch (e: Exception){
             throw IOException("IOException in fetchRecipeThumbnailUriById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")

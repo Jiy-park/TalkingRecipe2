@@ -3,11 +3,11 @@ package com.dd2d.talkingrecipe2.view.recipe_write_screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteState
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step.EndWrite
+import com.dd2d.talkingrecipe2.view_model.RecipeWriteState
 import com.dd2d.talkingrecipe2.view_model.RecipeWriteViewModel
 
 @Composable

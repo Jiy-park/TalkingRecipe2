@@ -26,6 +26,7 @@ fun String.toSupabaseUrl(): String{
  * @param path 이미지의 path. 확장자 전에 붙을 경로. -> [path].확장자
  * @param context 이미지의 mime type 추정에 사용*/
 fun Uri.toImagePath(path: String, context: Context): String{
+    if(this == Uri.EMPTY) { return "" }
     val type = if(this.toString().startsWith("http")){ // 다운 받은 이미지임.
         MimeTypeMap
             .getFileExtensionFromUrl(this.toString())?.let { extension->

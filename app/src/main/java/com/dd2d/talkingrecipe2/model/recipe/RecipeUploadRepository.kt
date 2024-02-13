@@ -9,7 +9,6 @@ import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.toDTO
-import com.dd2d.talkingrecipe2.isFromServer
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.BasicInfoUpsertField
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.IngredientUpsertField
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Field.StepInfoUpsertField
@@ -20,7 +19,6 @@ import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoImageTab
 import com.dd2d.talkingrecipe2.model.recipe.RecipeDBValue.Table.StepInfoTable
 import com.dd2d.talkingrecipe2.removeEmptyIngredient
 import com.dd2d.talkingrecipe2.removeEmptyStepInfo
-import com.dd2d.talkingrecipe2.toByteArray
 import com.dd2d.talkingrecipe2.toImagePath
 import com.dd2d.talkingrecipe2.uploadImage
 import io.github.jan.supabase.createSupabaseClient
@@ -28,20 +26,30 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
-import io.github.jan.supabase.storage.upload
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
+/** 데이터베이스에 레시피를 업로드한다.
+ * * [uploadRecipeBasicInfo]
+ * * [uploadRecipeIngredientList]
+ * * [uploadRecipeStepInfoList]
+ * * [uploadRecipeThumbnail]*/
 interface RecipeUploadRepository {
     suspend fun uploadRecipe(
         recipe: Recipe,
         onChangeUploadState: (msg: String) -> Unit,
         onEndUpload: () -> Unit
     )
+    /** 레시피의 기본적인 정보를 업로드한다. [RecipeBasicInfo]*/
     suspend fun uploadRecipeBasicInfo(basicInfo: RecipeBasicInfo)
+    /** 레시피의 재료 정보를 업로드한다. [Ingredient]*/
     suspend fun uploadRecipeIngredientList(recipeId: String, ingredientList: List<Ingredient>)
+    /** 레시피의 단계 정보를 업로드한다. [StepInfo]*/
     suspend fun uploadRecipeStepInfoList(recipeId: String, stepInfoList: List<StepInfo>)
+    /** 레시피의 썸네일을 업로드한다. [Uri]*/
     suspend fun uploadRecipeThumbnail(recipeId: String, thumbnailUri: Uri)
 }
 
@@ -105,7 +113,10 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
 
             database
                 .from(IngredientTable)
-                .upsert(upload, onConflict = IngredientUpsertField)
+                .upsert(
+                    upload,
+                    onConflict = IngredientUpsertField
+                )
         }
         catch (e: Exception){
             throw IOException("IOException in uploadRecipeIngredientList.\ningredientList -> $ingredientList\nmessage -> ${e.message}")
@@ -113,37 +124,34 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
     }
 
     override suspend fun uploadRecipeStepInfoList(recipeId: String, stepInfoList: List<StepInfo>) {
-        val bucket = database
+        val bucketApi = database
             .storage
             .from("${RecipeImageTable}/$recipeId/${StepInfoImageTable}")
 
-        val upload = stepInfoList
-            .removeEmptyStepInfo()
-            .mapIndexed { order, stepInfo ->
-                var imagePath = ""
-                if (stepInfo.imageUri != Uri.EMPTY) {
-                    imagePath = stepInfo.imageUri.toImagePath(
-                        path = "$order",
-                        context = context
-                    )
-                    try {
-                        if(stepInfo.imageUri.isFromServer()){ /** 서버에서 받은 이미지를 재업로드*/
-                            bucket.upload(data = stepInfo.imageUri.toByteArray(), path = imagePath, upsert = true)
-                        }
-                        else{ /** 갤러리에서 받은 이미지를 업로드*/
-                            bucket.upload(uri = stepInfo.imageUri, path = imagePath, upsert = true)
-                        }
-
-                    } catch (e: Exception) {
-                        throw IOException("IOException in uploadRecipeStepInfoList. - step info image\nstep info -> $stepInfo\nmessage -> ${e.message}")
-                    }
-                }
-                stepInfo.toDTO(recipeId = recipeId, order = order, imagePath = imagePath)
-            }
         try {
-            database
-                .from(StepInfoTable)
-                .upsert(upload, onConflict = StepInfoUpsertField)
+            withContext(Dispatchers.IO){
+                val upload = stepInfoList
+                    .removeEmptyStepInfo()
+                    .mapIndexed { order, stepInfo ->
+                        async{
+                            val imagePath = stepInfo.imageUri.toImagePath(path = "$order", context = context)
+
+                            uploadImage(
+                                bucketApi = bucketApi,
+                                imageUri = stepInfo.imageUri,
+                                uploadPath = imagePath,
+                                callFrom = "uploadRecipeStepInfoList() - $order",
+                                onTask = { task-> Log.d("LOG_CHECK", task) }
+                            )
+                            stepInfo.toDTO(recipeId = recipeId, order = order, imagePath = imagePath)
+
+                        }
+                    }.awaitAll()
+
+                database
+                    .from(StepInfoTable)
+                    .upsert(upload, onConflict = StepInfoUpsertField)
+            }
         }
         catch (e: Exception){
             throw IOException("IOException in uploadRecipeStepInfoList.\nstepInfoList -> $stepInfoList\nmessage -> ${e.message}")
@@ -159,9 +167,7 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
                 imageUri = thumbnailUri,
                 uploadPath = imagePath,
                 callFrom = "uploadRecipeThumbnail()",
-                onTask = { task->
-                    Log.d("LOG_CHECK", "RecipeUploadRepositoryImpl :: uploadRecipeThumbnail() -> $task")
-                }
+                onTask = { task-> Log.d("LOG_CHECK", task) }
             )
         }
         catch (e: Exception){
