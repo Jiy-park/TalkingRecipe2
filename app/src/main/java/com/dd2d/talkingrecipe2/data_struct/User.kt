@@ -1,6 +1,7 @@
 package com.dd2d.talkingrecipe2.data_struct
 
 import android.net.Uri
+import androidx.compose.runtime.compositionLocalOf
 import com.dd2d.talkingrecipe2.R
 import com.dd2d.talkingrecipe2.toUriWithDrawable
 import kotlinx.serialization.SerialName
@@ -80,3 +81,5 @@ data class User(
         )
     }
 }
+
+val LocalUser = compositionLocalOf { User.Empty }

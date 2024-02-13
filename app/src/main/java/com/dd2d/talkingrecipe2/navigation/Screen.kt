@@ -26,5 +26,8 @@ enum class Screen(val route: String){
 
     /** 레시피를 읽는 화면.*/
     RecipeRead("recipe read screen"),
+
+    /** TODO("asdasd")*/
+    Recipe("recipe screen"),
 }
 
