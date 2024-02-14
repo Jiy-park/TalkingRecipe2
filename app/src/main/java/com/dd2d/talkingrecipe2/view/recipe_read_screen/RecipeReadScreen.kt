@@ -10,13 +10,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
-import com.dd2d.talkingrecipe2.navigation.RecipeReadMode
 import com.dd2d.talkingrecipe2.view.ErrorView
 import com.dd2d.talkingrecipe2.view.LoadingView
+import com.dd2d.talkingrecipe2.view.recipe_read_screen.RecipeReadMode.Normal
+import com.dd2d.talkingrecipe2.view.recipe_read_screen.RecipeReadMode.TalkingRecipe
 import com.dd2d.talkingrecipe2.view.recipe_read_screen.main_content.RecipeReadView
 import com.dd2d.talkingrecipe2.view.recipe_read_screen.talking_recipe.TalkingRecipe
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
@@ -28,7 +28,8 @@ import com.dd2d.talkingrecipe2.view_model.UserViewModel
 fun RecipeReadScreen(
     navController: NavController,
     userViewModel: UserViewModel,
-    recipeViewModel: RecipeViewModel
+    recipeViewModel: RecipeViewModel,
+    onClickModify: () -> Unit
 ){
     var isSavePost by remember { mutableStateOf(false) }
     var isFavoritePost by remember { mutableStateOf(false) }
@@ -37,7 +38,6 @@ fun RecipeReadScreen(
     val state by recipeViewModel.state.collectAsState()
 
     when(state){
-        is RecipeViewModelState.OnInit -> {  }
         is RecipeViewModelState.OnConnected -> { LoadingView() }
         is RecipeViewModelState.OnStable -> {
             StableView(
@@ -49,7 +49,7 @@ fun RecipeReadScreen(
                 onClickBack = { navController.navigateUp() },
                 onClickAuthor = { author->  },
                 onClickShare = { /*TODO*/ },
-                onClickModify = { /*TODO*/ },
+                onClickModify = { onClickModify() },
                 onClickToMain = { navController.navigateUp() }
             )
         }
@@ -65,7 +65,6 @@ fun RecipeReadScreen(
 }
 @Composable
 private fun StableView(
-    modifier: Modifier = Modifier,
     recipe: Recipe,
     isSavePost: Boolean,
     isFavoritePost: Boolean,
@@ -77,7 +76,7 @@ private fun StableView(
     onClickModify: () -> Unit,
     onClickToMain: ()->Unit,
 ){
-    var recipeReadMode by remember { mutableStateOf<RecipeReadMode>(RecipeReadMode.Normal) }
+    var recipeReadMode by remember { mutableStateOf<RecipeReadMode>(Normal) }
 
     AnimatedContent(
         targetState = recipeReadMode, label = "",
@@ -86,7 +85,7 @@ private fun StableView(
         }
     ) {readMode->
         when(readMode){
-            is RecipeReadMode.Normal -> {
+            is Normal -> {
                 RecipeReadView(
                     recipe = recipe,
                     isSavePost = isSavePost,
@@ -97,17 +96,27 @@ private fun StableView(
                     onClickSave = { update-> onClickSave(update) },
                     onClickShare = { onClickShare() },
                     onClickModify = { onClickModify() },
-                    onClickTalkingRecipe = { recipeReadMode = RecipeReadMode.TalkingRecipe }
+                    onClickTalkingRecipe = { recipeReadMode = TalkingRecipe }
                 )
             }
-            is RecipeReadMode.TalkingRecipe -> {
+            is TalkingRecipe -> {
                 TalkingRecipe(
                     recipe = recipe,
-                    onClickBack = { recipeReadMode = RecipeReadMode.Normal },
+                    onClickBack = { recipeReadMode = Normal },
                     onClickAuthor = { author-> onClickAuthor(author) },
                     onClickToMain = { onClickToMain() }
                 )
             }
         }
     }
+}
+
+/** 레시피를 읽을 때의 모드.
+ *- [Normal]
+ *- [TalkingRecipe]*/
+private sealed class RecipeReadMode{
+    /** 레시피의 대부분의 정보를 볼 수 있음.*/
+    object Normal: RecipeReadMode()
+    /** 레시피를 음성으로 조작할 수 있음.*/
+    object TalkingRecipe: RecipeReadMode()
 }

@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.dd2d.talkingrecipe2.navigation.AppNavigation
 import com.dd2d.talkingrecipe2.ui.theme.TalkingRecipe2Theme
-import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +28,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun App(){
+private fun App(){
     AppNavigation()
 }

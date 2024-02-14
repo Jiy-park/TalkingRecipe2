@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.dd2d.talkingrecipe2.BuildConfig
-import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
@@ -38,11 +37,6 @@ import java.io.IOException
  * * [uploadRecipeStepInfoList]
  * * [uploadRecipeThumbnail]*/
 interface RecipeUploadRepository {
-    suspend fun uploadRecipe(
-        recipe: Recipe,
-        onChangeUploadState: (msg: String) -> Unit,
-        onEndUpload: () -> Unit
-    )
     /** 레시피의 기본적인 정보를 업로드한다. [RecipeBasicInfo]*/
     suspend fun uploadRecipeBasicInfo(basicInfo: RecipeBasicInfo)
     /** 레시피의 재료 정보를 업로드한다. [Ingredient]*/
@@ -62,37 +56,6 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
         install(Postgrest)
         install(Storage)
     }
-
-    override suspend fun uploadRecipe(
-        recipe: Recipe,
-        onChangeUploadState: (msg: String) -> Unit,
-        onEndUpload: ()->Unit
-    ) {
-        val (basicInfo, ingredientList, stepInfoList, thumbnailUri) = recipe
-        val recipeId = basicInfo.recipeId
-
-        withContext(Dispatchers.IO){
-            try {
-                onChangeUploadState("start uploading recipe basic info")
-                uploadRecipeBasicInfo(basicInfo)
-
-                onChangeUploadState("start uploading recipe ingredient list")
-                uploadRecipeIngredientList(recipeId, ingredientList)
-
-                onChangeUploadState("start uploading recipe step info list")
-                uploadRecipeStepInfoList(recipeId, stepInfoList)
-
-                onChangeUploadState("start uploading recipe thumbnail image")
-                uploadRecipeThumbnail(recipeId, thumbnailUri)
-
-                onEndUpload()
-            }
-            catch (e: Exception){
-                throw IOException("IOException in uploadRecipe.\nmessage -> ${e.message}")
-            }
-        }
-    }
-
     override suspend fun uploadRecipeBasicInfo(basicInfo: RecipeBasicInfo) {
         try {
             database
@@ -103,6 +66,7 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
                 )
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeUploadRepositoryImpl :: uploadRecipeBasicInfo() -> $e")
             throw IOException("IOException in uploadRecipeBasicInfo.\nRecipeBasicInfo -> $basicInfo\nmessage -> ${e.message}")
         }
     }
@@ -120,6 +84,7 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
 
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeUploadRepositoryImpl :: uploadRecipeIngredientList() -> $e")
             throw IOException("IOException in uploadRecipeIngredientList.\ningredientList -> $ingredientList\nmessage -> ${e.message}")
         }
     }
@@ -155,6 +120,7 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
             }
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeUploadRepositoryImpl :: uploadRecipeStepInfoList() -> $e")
             throw IOException("IOException in uploadRecipeStepInfoList.\nstepInfoList -> $stepInfoList\nmessage -> ${e.message}")
         }
     }
@@ -172,6 +138,7 @@ class RecipeUploadRepositoryImpl(private val context: Context): RecipeUploadRepo
             )
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeUploadRepositoryImpl :: uploadRecipeThumbnail() -> $e")
             throw IOException("IOException in uploadRecipeIngredientList.\nthumbnailUri -> $thumbnailUri\nmessage -> ${e.message}")
         }
     }

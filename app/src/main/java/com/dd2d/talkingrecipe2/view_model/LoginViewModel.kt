@@ -74,7 +74,7 @@ class LoginViewModel(
             try {
                 _loginState.value = LoginState.OnTask("login()::start fetch user data for login. user id : $userId.")
                 val user = userFetchRepo.fetchUserById(userId)
-                _loginState.value = LoginState.OnLogin("login()::finished fetch user data for login. success login.\nuser : $user.")
+                _loginState.value = LoginState.OnLogin("login()::finished fetch user data for login. success login.")
                 user
             }
             catch (e: Exception){

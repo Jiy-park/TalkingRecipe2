@@ -1,6 +1,7 @@
 package com.dd2d.talkingrecipe2.model.user
 
 import android.net.Uri
+import android.util.Log
 import com.dd2d.talkingrecipe2.BuildConfig
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.UserDTO
@@ -76,63 +77,83 @@ class UserUploadRepositoryImpl: UserUploadRepository{
                 )
         }
         catch (e :Exception){
+            Log.e("LOG_CHECK", "UserUploadRepositoryImpl :: uploadUser() -> $e")
             throw IOException("IOException in UserUploadRepositoryImpl.\nuser : $user.\nerror : $e")
         }
     }
 
     override suspend fun updateUserName(userId: String, name: String) {
-        database.from(UserTable).update(
-            update = {
-                set(UserName, name)
-            },
-            request = {
-                filter {
-                    eq(UserIdEqualTo, userId)
+        try {
+            database.from(UserTable).update(
+                update = {
+                    set(UserName, name)
+                },
+                request = {
+                    filter {
+                        eq(UserIdEqualTo, userId)
+                    }
                 }
-            }
-        )
+            )
+        }
+        catch (e: Exception){
+            Log.e("LOG_CHECK", "UserUploadRepositoryImpl :: updateUserName() -> $e")
+            throw IOException("IOException in updateUserName.\nuser id : $userId.\nuse name : $name.\nerror : $e")
+        }
     }
 
     override suspend fun updateUserRecentRecipe(userId: String, recipeId: String) {
-        database.from(UserTable).update(
-            update = {
-                set(RecentRecipeId, recipeId)
-            },
-            request = {
-                filter {
-                    eq(UserIdEqualTo, userId)
+        try{
+            database.from(UserTable).update(
+                update = {
+                    set(RecentRecipeId, recipeId)
+                },
+                request = {
+                    filter {
+                        eq(UserIdEqualTo, userId)
+                    }
                 }
-            }
-        )
+            )
+        }
+        catch (e: Exception){
+            Log.e("LOG_CHECK", "UserUploadRepositoryImpl :: updateUserRecentRecipe() -> $e")
+            throw IOException("IOException in updateUserRecentRecipe.\nuser id : $userId.\nrecipe id : $recipeId.\nerror : $e")
+        }
     }
 
+//        TODO("유저 프로필 이미지 경로에 대해 생각해보기")
     override suspend fun updateUserProfileImage(
         userId: String,
         image: Uri,
         onTask: (msg: String) -> Unit
     ) {
-        val bucketApi = database.storage.from("$UserImageTable/$userId")
-        val uploadPath = "profile.jpeg"
+        try {
+            val bucketApi = database.storage.from("$UserImageTable/$userId")
+            val uploadPath = "profile.jpeg"
 
-        onTask("updateUserProfileImage()::start update user profile path")
-        database.from(UserTable).update(
-            update = {
-                set(UserProfilePath, uploadPath)
-            },
-            request = {
-                filter {
-                    eq(UserIdEqualTo, userId)
+            onTask("updateUserProfileImage()::start update user profile path")
+            database.from(UserTable).update(
+                update = {
+                    set(UserProfilePath, uploadPath)
+                },
+                request = {
+                    filter {
+                        eq(UserIdEqualTo, userId)
+                    }
                 }
-            }
-        )
-        onTask("updateUserProfileImage()::finished update user profile path")
-        uploadImage(
-            bucketApi = bucketApi,
-            uploadPath = "profile.jpeg",
-            imageUri = image,
-            callFrom = "uploadUserProfileImage",
-            onTask = { msg-> onTask(msg) }
-        )
+            )
+            onTask("updateUserProfileImage()::finished update user profile path")
+            uploadImage(
+                bucketApi = bucketApi,
+                uploadPath = "profile.jpeg",
+                imageUri = image,
+                callFrom = "uploadUserProfileImage",
+                onTask = { msg-> onTask(msg) }
+            )
+        }
+        catch (e: Exception){
+            Log.e("LOG_CHECK", "UserUploadRepositoryImpl :: updateUserProfileImage() -> $e")
+            throw IOException("IOException in updateUserProfileImage.\nuser id : $userId.\nimage uri : $image.\nerror : $e")
+        }
     }
 
     override suspend fun updateUserBackgroundImage(
@@ -140,29 +161,35 @@ class UserUploadRepositoryImpl: UserUploadRepository{
         image: Uri,
         onTask: (msg: String) -> Unit
     ) {
-        val bucketApi = database.storage.from("$UserImageTable/$userId")
-        val uploadPath = "background.jpeg"
+        try {
+            val bucketApi = database.storage.from("$UserImageTable/$userId")
+            val uploadPath = "background.jpeg"
 
-        onTask("updateUserProfileImage()::start update user profile path")
-        database.from(UserTable).update(
-            update = {
-                set(UserBackgroundPath, uploadPath)
-            },
-            request = {
-                filter {
-                    eq(UserIdEqualTo, userId)
+            onTask("updateUserProfileImage()::start update user profile path")
+            database.from(UserTable).update(
+                update = {
+                    set(UserBackgroundPath, uploadPath)
+                },
+                request = {
+                    filter {
+                        eq(UserIdEqualTo, userId)
+                    }
                 }
-            }
-        )
-        onTask("updateUserProfileImage()::finished update user profile path")
+            )
+            onTask("updateUserProfileImage()::finished update user profile path")
 
-        uploadImage(
-            bucketApi = bucketApi,
-            uploadPath = uploadPath,
-            imageUri = image,
-            callFrom = "uploadUserBackgroundImage",
-            onTask = { msg-> onTask(msg) }
-        )
+            uploadImage(
+                bucketApi = bucketApi,
+                uploadPath = uploadPath,
+                imageUri = image,
+                callFrom = "uploadUserBackgroundImage",
+                onTask = { msg-> onTask(msg) }
+            )
+        }
+        catch (e: Exception){
+            Log.e("LOG_CHECK", "UserUploadRepositoryImpl :: updateUserBackgroundImage() -> $e")
+            throw IOException("IOException in updateUserBackgroundImage.\nuser id : $userId.\nimage uri : $image.\nerror : $e")
+        }
     }
 
     /** 새로운 유저 등록. 해당 함수는 [UserLoginTable], [UserTable]에 새로운 유저를 추가하는 과정이 포함돼 있음.
@@ -175,18 +202,24 @@ class UserUploadRepositoryImpl: UserUploadRepository{
         userName: String,
         onTaskState: (taskMessage: String)->Unit,
     ): User {
-        val createdAt = System.currentTimeMillis()
-        onTaskState("joinNewUser()::start insert new user to user login table.")
-        insertNewUserToLoginTable(createdAt, userId, userPassword)
+        try {
+            val createdAt = System.currentTimeMillis()
+            onTaskState("joinNewUser()::start insert new user to user login table.")
+            insertNewUserToLoginTable(createdAt, userId, userPassword)
 
-        onTaskState("joinNewUser()::start insert new user to user table.")
-        insertNewUserToUserTable(createdAt, userId, userName)
+            onTaskState("joinNewUser()::start insert new user to user table.")
+            insertNewUserToUserTable(createdAt, userId, userName)
 
-        return User.Empty.copy(
-            userId = userId,
-            name = userName,
-            createdAt = createdAt,
-        )
+            return User.Empty.copy(
+                userId = userId,
+                name = userName,
+                createdAt = createdAt,
+            )
+        }
+        catch (e: Exception){
+            Log.e("LOG_CHECK", "UserUploadRepositoryImpl :: joinNewUser() -> $e")
+            throw IOException("IOException in joinNewUser.\nuser id : $userId.\nuser password : $userPassword\nuser name : $userName\nerror : $e")
+        }
     }
 
     /** 유저 로그인 테이블 ( = [UserLoginTable])에 새로운 유저의 정보를 추가함.
@@ -208,6 +241,7 @@ class UserUploadRepositoryImpl: UserUploadRepository{
             }
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserUploadRepositoryImpl :: insertNewUserToLoginTable() -> $e")
             throw IOException("IOException in insertNewUserToLoginTable.\n" +
                     "userId: $userId\n" +
                     "userPassword: $userPassword\n" +
@@ -237,6 +271,7 @@ class UserUploadRepositoryImpl: UserUploadRepository{
 
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserUploadRepositoryImpl :: insertNewUserToUserTable() -> $e")
             throw IOException("IOException in insertNewUserToUserTable.\n" +
                     "userId: $userId\n" +
                     "userName: $userName\n" +

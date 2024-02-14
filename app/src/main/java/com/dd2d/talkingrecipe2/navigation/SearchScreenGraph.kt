@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dd2d.talkingrecipe2.view.recipe_search_screen.RecipeSearchScreen
 
-fun NavGraphBuilder.recipeSearchScreenGraph(
+fun NavGraphBuilder.searchScreenGraph(
     navController: NavController
 ){
     composable(route = Screen.Search.route){

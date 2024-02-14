@@ -12,7 +12,7 @@ import com.dd2d.talkingrecipe2.ui.theme.BackgroundGradient
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    onClickSearchTrigger: () -> Unit,
+    onClickSearch: () -> Unit,
     onClickSavePost: ()->Unit,
     onClickCreate: ()->Unit,
     onClickMyPost: ()->Unit,
@@ -28,7 +28,7 @@ fun MainScreen(
     ){
         MainScreenTopView()
         MainScreenCenterView(
-            onClickSearchTrigger = { onClickSearchTrigger() }
+            onClickSearch = { onClickSearch() }
         )
         MainScreenBottomView(
             onClickSavePost = { onClickSavePost() },

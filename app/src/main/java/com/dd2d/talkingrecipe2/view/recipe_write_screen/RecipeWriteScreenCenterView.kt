@@ -1,12 +1,13 @@
 package com.dd2d.talkingrecipe2.view.recipe_write_screen
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.dd2d.talkingrecipe2.data_struct.Recipe
 import com.dd2d.talkingrecipe2.data_struct.recipe_write.RecipeWriteStep
 import com.dd2d.talkingrecipe2.view.recipe_write_screen.write_step.WriteRecipeBasicInfo
@@ -21,13 +22,21 @@ fun RecipeWriteScreenCenterView(
     onChangeRecipe: (Recipe)->Unit,
     writeStep: RecipeWriteStep,
 ){
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = Color.White)
-    ){
-        when(writeStep){
+    AnimatedContent(
+        modifier = modifier,
+        targetState = writeStep, label = "",
+        transitionSpec = {
+            if(initialState.ordinal < targetState.ordinal){
+                slideInHorizontally { it } + fadeIn() togetherWith
+                        slideOutHorizontally { -it } + fadeOut()
+            }
+            else {
+                slideInHorizontally { -it } + fadeIn() togetherWith
+                        slideOutHorizontally { it } + fadeOut()
+            }
+        }
+    ) { step->
+        when(step){
             RecipeWriteStep.RecipeBasicInfo -> {
                 WriteRecipeBasicInfo(
                     basicInfo = recipe.basicInfo,

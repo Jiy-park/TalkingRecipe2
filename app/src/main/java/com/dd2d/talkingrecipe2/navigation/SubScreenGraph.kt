@@ -9,6 +9,8 @@ import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.Friend
 import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.MyPost
 import com.dd2d.talkingrecipe2.navigation.SubScreenDestination.SavePost
 import com.dd2d.talkingrecipe2.view.sub_screen.SubScreen
+import com.dd2d.talkingrecipe2.view_model.RecipeViewModel
+import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode
 import com.dd2d.talkingrecipe2.view_model.UserViewModel
 
 /** [Screen.Sub]의 세부 종착점.
@@ -24,6 +26,7 @@ enum class SubScreenDestination(val route: String, val description: String){
 fun NavGraphBuilder.subScreenGraph(
     navController: NavController,
     userViewModel: UserViewModel,
+    recipeViewModel: RecipeViewModel
 ){
     composable(route = "${Screen.Sub.route}/{destination}"){ backStack->
         val user by userViewModel.user.collectAsState()
@@ -50,7 +53,9 @@ fun NavGraphBuilder.subScreenGraph(
             destination = selectedTab,
             onClickBack = { navController.navigateUp() },
             onClickPost = { recipePost ->
-                navController.navigate(route = "${Screen.RecipeRead.route}/${recipePost.recipeBasicInfo.recipeId}")
+                val mode = RecipeViewModelMode.ReadMode.name
+                navController.navigate(route = "${Screen.Recipe.route}/${mode}")
+                recipeViewModel.fetchRecipeByPost(recipePost)
             },
             onClickFriend = {
 

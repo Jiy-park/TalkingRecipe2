@@ -1,10 +1,10 @@
 package com.dd2d.talkingrecipe2.model.user
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toUri
 import com.dd2d.talkingrecipe2.BuildConfig
 import com.dd2d.talkingrecipe2.R
-import com.dd2d.talkingrecipe2.alog
 import com.dd2d.talkingrecipe2.data_struct.FriendInfoDTO
 import com.dd2d.talkingrecipe2.data_struct.User
 import com.dd2d.talkingrecipe2.data_struct.UserDTO
@@ -84,6 +84,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             return res.isNotBlank()
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: isExistId() -> $e")
             throw IOException("IOException in isExistId().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -99,6 +100,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
                 .decodeString()
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: fetchUserNameById() -> $e")
             throw IOException("IOException in fetchUserNameById().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -120,6 +122,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             return res == userPassword
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: validateUser() -> $e")
             throw IOException("IOException in validateUser().\nuser id -> $userId.\nuser password -> $userPassword.\nmessage -> ${e.message}")
         }
     }
@@ -143,6 +146,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             }
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: fetchUserById() -> $e")
             throw IOException("IOException in fetchUserById().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -161,6 +165,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             }
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: fetchFriendListByUserId() -> $e")
             throw IOException("IOException in fetchFriendListByUserId().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -176,6 +181,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
                 .decodeSingle<UserDTO>()
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: fetchUserDTOById() -> $e")
             throw IOException("IOException in fetchUserDTOById().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -201,6 +207,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             }
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: fetchUserProfileImageUriById() -> $e")
             throw IOException("IOException in fetchUserProfileImageUriById().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -218,6 +225,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
                 .toUri()
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: fetchUserProfileImageUriById() -> $e")
             throw IOException("IOException in fetchUserProfileImageUriById().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -237,6 +245,7 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             else { res.toSupabaseUrl().toUri() }
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "UserFetchRepositoryImpl :: fetchUserBackgroundImageUriById() -> $e")
             throw IOException("IOException in fetchUserBackgroundImageUriById().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }

@@ -41,7 +41,7 @@ suspend fun uploadImage(
         catch (e: Exception){
             throw IOException("IOException in uploadImage from $callFrom().\n" +
                     "imageUri: $imageUri, uploadPath: $uploadPath\n" +
-                    "error: $e")
+                    "error: $e.")
         }
     }
 }

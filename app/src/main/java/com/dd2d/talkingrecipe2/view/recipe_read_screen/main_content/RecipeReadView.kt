@@ -75,8 +75,6 @@ fun RecipeReadView(
             RecipeIngredientView(ingredientList = recipe.ingredientList)
             RecipeStepInfoView(stepInfoList = recipe.stepInfoList)
         }
-        RecipeReadScreenBottomView {
-            onClickTalkingRecipe()
-        }
+        RecipeReadScreenBottomView { onClickTalkingRecipe() }
     }
 }

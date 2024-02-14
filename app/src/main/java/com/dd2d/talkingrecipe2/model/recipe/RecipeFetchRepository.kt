@@ -1,6 +1,7 @@
 package com.dd2d.talkingrecipe2.model.recipe
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toUri
 import com.dd2d.talkingrecipe2.BuildConfig
 import com.dd2d.talkingrecipe2.R
@@ -87,6 +88,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
                 .toLong()
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeFetchRepositoryImpl :: checkRecipeVersion() -> $e")
             throw IOException("IOException in checkRecipeVersion().\nrecipe id -> $recipeId    .\nmessage -> ${e.message}")
         }
     }
@@ -106,6 +108,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
 
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeFetchRepositoryImpl :: fetchMyRecipeListByUserId() -> $e")
             throw IOException("IOException in fetchRecipeIdListByUserId().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -123,6 +126,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
                 .decodeList<SavePostDTO>()
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeFetchRepositoryImpl :: fetchSavePostIdListByUserId() -> $e")
             throw IOException("IOException in fetchSavePostIdListByUserId().\nuser id -> $userId.\nmessage -> ${e.message}")
         }
     }
@@ -140,6 +144,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
 
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeFetchRepositoryImpl :: fetchRecipeBasicInfoById() -> $e")
             throw IOException("IOException in fetchRecipeBasicInfoById().\nrecipe id -> $recipeId    .\nmessage -> ${e.message}")
         }
     }
@@ -162,6 +167,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
                 }
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeFetchRepositoryImpl :: fetchRecipeIngredientListById() -> $e")
             throw IOException("IOException in fetchRecipeIngredientListById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
         }
     }
@@ -189,6 +195,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
                 }
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeFetchRepositoryImpl :: fetchRecipeStepInfoListById() -> $e")
             throw IOException("IOException in fetchRecipeStepInfoListById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
         }
     }
@@ -203,6 +210,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
                 .toUri()
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeFetchRepositoryImpl :: fetchRecipeThumbnailUriById() -> $e")
             throw IOException("IOException in fetchRecipeThumbnailUriById().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
         }
     }
@@ -239,6 +247,7 @@ class RecipeFetchRepositoryImpl: RecipeFetchRepository {
             )
         }
         catch (e: Exception){
+            Log.e("LOG_CHECK", "RecipeFetchRepositoryImpl :: fetchRecipeAuthorInfo() -> $e")
             throw IOException("IOException in fetchRecipeAuthorInfo().\nrecipe id -> $recipeId.\nmessage -> ${e.message}")
         }
     }

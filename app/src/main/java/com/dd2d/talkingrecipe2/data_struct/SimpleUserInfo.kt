@@ -17,6 +17,13 @@ data class SimpleUserInfo(
     val userProfileImageUri: Uri
 ) {
     val fullName = "$userName @$userId"
+    override fun toString() = "" +
+            "SimpleUserInfo(\n" +
+            "\tuserId : $userId\n" +
+            "\tuserName : $userName\n" +
+            "\tuserProfileImageUri : $userProfileImageUri\n" +
+            ")"
+
     companion object{
         val Empty = SimpleUserInfo(
             userId = "empty user id",

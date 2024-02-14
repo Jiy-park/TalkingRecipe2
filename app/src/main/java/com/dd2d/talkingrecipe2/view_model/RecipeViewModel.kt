@@ -1,6 +1,5 @@
 package com.dd2d.talkingrecipe2.view_model
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd2d.talkingrecipe2.data_struct.Recipe
@@ -9,16 +8,12 @@ import com.dd2d.talkingrecipe2.data_struct.SimpleUserInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.Ingredient
 import com.dd2d.talkingrecipe2.data_struct.recipe.RecipeBasicInfo
 import com.dd2d.talkingrecipe2.data_struct.recipe.StepInfo
-import com.dd2d.talkingrecipe2.logging
 import com.dd2d.talkingrecipe2.model.recipe.RecipeFetchRepositoryImpl
 import com.dd2d.talkingrecipe2.model.recipe.RecipeUploadRepositoryImpl
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode.ModifyMode
-import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode.OnModeError
-import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode.ReadMode
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode.WriteMode
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModelState.OnConnected
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModelState.OnError
-import com.dd2d.talkingrecipe2.view_model.RecipeViewModelState.OnInit
 import com.dd2d.talkingrecipe2.view_model.RecipeViewModelState.OnStable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -47,68 +42,13 @@ data class RecipeInterestInfo(
     }
 }
 
-/** [RecipeViewModel]의 모드. 현재 레시피에 대해 어떠한 작업을 진행하는지 결정.
- * * [ReadMode]
- * * [WriteMode]
- * * [ModifyMode]
- * * [OnModeError]*/
-sealed class RecipeViewModelMode(val name: String){
-    /** 레시피를 읽는 모드.*/
-    object ReadMode: RecipeViewModelMode("Read")
 
-    /** 레시피를 새롭게 작성하는 모드.*/
-    object WriteMode: RecipeViewModelMode("Write")
-
-    /** 레시피를 수정하는 모드.*/
-    object ModifyMode: RecipeViewModelMode("Modify")
-
-    /** 모드 선택 중 에러 발생. */
-    object OnModeError: RecipeViewModelMode("Error")
-    companion object{
-        fun nameOf(modeName: String): RecipeViewModelMode {
-            return when(modeName){
-                "Write" -> { WriteMode }
-                "Read" -> { ReadMode }
-                "Modify" -> { ModifyMode }
-                else -> { OnModeError }
-            }
-        }
-    }
-}
-
-
-/** [RecipeViewModel]의 상태를 나타내는 값.
- * * [OnInit]
- * * [OnStable]
- * * [OnConnected]
- * * [OnError]*/
-sealed class RecipeViewModelState{
-    /** 뷰모델이 초기화된 상태. 해당 단계에서 [RecipeViewModelMode]를 선택한다.*/
-    object OnInit: RecipeViewModelState(){
-        init { Log.d("LOG_CHECK", "RecipeViewModelState : OnInit -> init RecipeViewModel.") }
-    }
-    /** 안정적 상태. 레시피와 관련된 작업 중 어떠한 문제도 발생하지 않은 상태이다.
-     * @param msg 전반적인 상태 변경에 대한 정보를 받는다. 예를 들어 [RecipeViewModelMode]변경, [RecipeViewModelState]변경 등이 있다.*/
-    class OnStable(msg: String): RecipeViewModelState(){
-        init { Log.d("LOG_CHECK", "RecipeViewModelState : OnStable -> $msg") }
-    }
-    /** 데이터베이스와 연결된 상태. 레시피에 대한 정보를 주고 받는 상태이다.
-     * @param msg 데이터 다운에 관한 정보를 받는다.*/
-    class OnConnected(msg: String): RecipeViewModelState(){
-        init { Log.d("LOG_CHECK", "RecipeViewModelState : OnFetching -> $msg") }
-    }
-    /** 에러가 발생한 상태. 데이터를 다운 받는 중 에러가 발생한 상태이다.
-     * @param msg 에러에 대한 정보를 받는다.*/
-    class OnError(val msg: String): RecipeViewModelState(){
-        init { Log.d("LOG_CHECK", "RecipeViewModelState : OnError -> $msg") }
-    }
-}
 
 class RecipeViewModel(
     private val recipeFetchRepo: RecipeFetchRepositoryImpl,
     private val recipeUploadRepo: RecipeUploadRepositoryImpl,
 ): ViewModel() {
-    private var _state = MutableStateFlow<RecipeViewModelState>(OnInit)
+    private var _state = MutableStateFlow<RecipeViewModelState>(OnStable(msg = "init()::viewModel is on stable."))
     val state: StateFlow<RecipeViewModelState> get() = _state.asStateFlow()
 
     private var _recipe = MutableStateFlow<Recipe>(Recipe.EmptyRecipe)
@@ -126,10 +66,16 @@ class RecipeViewModel(
 
     fun initUser(user: SimpleUserInfo){
         userInfo = user
+        _state.value = OnStable(msg = "userInfo -> $userInfo")
+    }
+    /** 레시피 작성 또는 수정 후 레시피를 확인할 때 [_state] 값을 변경시킴.*/
+    fun moveToMain(){
+        _state.value = OnStable(msg = "moveToMain()::viedwModel is on stable.")
     }
 
-    init {
-        logging("eq")
+    /** 뷰 단에서 코드가 진행 중 상태의 변화가 필요할 때 사용. */
+    fun requestState(state: RecipeViewModelState){
+        _state.value = state
     }
 
     private fun createRecipeId(): String{
@@ -137,7 +83,7 @@ class RecipeViewModel(
         val createdAt = LocalDateTime.now().format(format)
         val authorId = userInfo.userId
         val recipeId = "${authorId}_$createdAt"
-        _state.value = OnStable("createRecipeId()::recipe id is created. author id -> $authorId. recipe id -> $recipeId")
+        _state.value = OnStable(msg = "createRecipeId()::recipe id is created. author id -> $authorId. recipe id -> $recipeId")
         return recipeId
     }
 
@@ -187,7 +133,7 @@ class RecipeViewModel(
                         authorInfo = authorInfo.await()
                     )
                 }
-                _state.value = OnStable("fetchRecipe()::finished fetching recipe. recipe id -> $recipeId")
+                _state.value = OnStable(msg = "fetchRecipe()::finished fetching recipe. recipe id -> $recipeId")
             }
         }
         catch (e: Exception){
@@ -230,7 +176,7 @@ class RecipeViewModel(
                         authorInfo = authorInfo.await()
                     )
                 }
-                _state.value = OnStable("fetchRecipeByPost()::finished fetching recipe. recipe id -> $recipeId")
+                _state.value = OnStable(msg = "fetchRecipeByPost()::finished fetching recipe. recipe id -> $recipeId")
             }
         }
         catch (e: Exception){
@@ -239,43 +185,42 @@ class RecipeViewModel(
     }
 
     @Suppress("DeferredResultUnused")
-    fun uploadRecipe(      ){
-//        if(_mode.value is WriteMode){
-//            val recipeId = createRecipeId()
-//            val updateBasicInfo = _recipe.value.basicInfo
-//                .copy(
-//                    recipeId = recipeId,
-//                    authorId = authorInfo.userId
-//                )
-//            _recipe.value = _recipe.value.copy(basicInfo = updateBasicInfo)
-//        }
+    fun uploadRecipe(mode: RecipeViewModelMode){
+        when(mode){
+            is WriteMode -> { setForNewRecipe() }
+            is ModifyMode -> { updateRecipeVersion() }
+            else -> {
+                _state.value = OnError("uploadRecipe()::value of RecipeViewModelMode is unexpected value")
+                return
+            }
+        }
 
         try {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 val recipe = _recipe.value
                 val recipeId = recipe.basicInfo.recipeId
                 with(recipeUploadRepo) {
-                    async {
-                        _state.value = OnConnected("uploadRecipe()::start upload recipe basic info.")
-                        uploadRecipeBasicInfo(recipe.basicInfo)
-                    }
+                    _state.value = OnConnected("uploadRecipe()::start upload recipe basic info.")
+                    uploadRecipeBasicInfo(recipe.basicInfo)
+                    launch {
+                        async {
+                            _state.value = OnConnected("uploadRecipe()::start upload recipe ingredient list.")
+                            uploadRecipeIngredientList(recipeId, recipe.ingredientList)
+                        }
 
-                    async {
-                        _state.value = OnConnected("uploadRecipe()::start upload recipe ingredient list.")
-                        uploadRecipeIngredientList(recipeId, recipe.ingredientList)
-                    }
+                        async {
+                            _state.value = OnConnected("uploadRecipe()::start upload recipe step info list.")
+                            uploadRecipeStepInfoList(recipeId, recipe.stepInfoList)
+                        }
 
-                    async {
-                        _state.value = OnConnected("uploadRecipe()::start upload recipe step info list.")
-                        uploadRecipeStepInfoList(recipeId, recipe.stepInfoList)
-                    }
+                        async {
+                            _state.value = OnConnected("uploadRecipe()::start upload recipe thumbnail.")
+                            uploadRecipeThumbnail(recipeId, recipe.thumbnailUri)
+                        }
 
-                    async {
-                        _state.value = OnConnected("uploadRecipe()::start upload recipe thumbnail.")
-                        uploadRecipeThumbnail(recipeId, recipe.thumbnailUri)
-                    }
+                    }.join()
                 }
-                _state.value = OnStable("uploadRecipe()::finished upload recipe. recipe id -> $recipeId")
+                _state.value = OnStable(onEnd = true, msg = "uploadRecipe()::finished upload recipe. recipe id -> $recipeId")
             }
         }
         catch (e: Exception){
@@ -283,7 +228,7 @@ class RecipeViewModel(
         }
     }
 
-    /** 레시피가 수정되었을 경우 레시피의 버전을 업데이트한다.
+    /** 레시피의 작성이 완료된 후, [uploadRecipe]가 호출되는 시점을 기준으로 레시피의 버전을 업데이트한다.
      * 버전은 [System.currentTimeMillis]을 사용하여 업데이트 시점으로 한다.
      * * 업데이트 대상
      * * [RecipeBasicInfo]
@@ -305,5 +250,25 @@ class RecipeViewModel(
                 stepInfo.copy(version = version)
             }
         )
+    }
+
+    /** 새롭게 작성된 레시피에 필요한 부분을 채워준다.
+     * * 레시피 버전 관리 - [updateRecipeVersion]
+     * * [userInfo] = [SimpleUserInfo]
+     * 1. [RecipeBasicInfo.recipeId] : [createRecipeId]
+     * 2. [RecipeBasicInfo.authorId] : [SimpleUserInfo.userId]
+     * 3. [Recipe.authorInfo] : [SimpleUserInfo]사용*/
+    private fun setForNewRecipe(){
+        val recipeId = createRecipeId()
+        val updateBasicInfo = _recipe.value.basicInfo
+            .copy(
+                recipeId = recipeId,
+                authorId = userInfo.userId,
+            )
+        _recipe.value = _recipe.value.copy(
+            basicInfo = updateBasicInfo,
+            authorInfo = userInfo
+        )
+        updateRecipeVersion()
     }
 }

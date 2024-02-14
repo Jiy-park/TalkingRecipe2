@@ -24,7 +24,7 @@ import com.dd2d.talkingrecipe2.ui.theme.kopupFontFamily
 @Composable
 fun MainScreenCenterView(
     modifier: Modifier = Modifier,
-    onClickSearchTrigger: ()->Unit,
+    onClickSearch: ()->Unit,
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -35,7 +35,7 @@ fun MainScreenCenterView(
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
-                .clickableWithoutRipple { onClickSearchTrigger() }
+                .clickableWithoutRipple { onClickSearch() }
         ){
             Image(
                 painter = painterResource(id = R.drawable.main_screen_search),
