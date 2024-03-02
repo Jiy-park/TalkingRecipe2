@@ -16,7 +16,6 @@ import com.dd2d.talkingrecipe2.view_model.UserState.OnStable
 import com.dd2d.talkingrecipe2.view_model.UserState.OnTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -62,6 +61,7 @@ class UserViewModel(
 
     private var _user = MutableStateFlow<User>(User.Empty)
     val user: StateFlow<User> get() = _user.asStateFlow()
+    val userId: String get() = _user.value.userId
 
     private var _friendList = MutableStateFlow<List<SimpleUserInfo>>(emptyList())
     val friendList: StateFlow<List<SimpleUserInfo>> get() = _friendList.asStateFlow()
@@ -72,107 +72,107 @@ class UserViewModel(
     private var _savePostList = MutableStateFlow<List<RecipePost>>(emptyList())
     val savePostList: StateFlow<List<RecipePost>> get() = _savePostList.asStateFlow()
 
-    /** 유저가 작성한 레시피를 불러온다.*/
-    private fun fetchMyPost(){
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                _userState.value = OnTask("fetchMyPost()::start fetch user's post list.")
-                val myPostIdList = recipeFetchRepo.fetchMyRecipeListByUserId(_user.value.userId)
-                _myPostList.value = myPostIdList.mapIndexed { index, recipeBasicInfo ->
-                    async {
-                        _userState.value = OnTask("fetchMyPost()::start fetch [$index]. post")
+//    /** 유저가 작성한 레시피를 불러온다.*/
+//    private fun fetchMyPost(){
+//        viewModelScope.launch(Dispatchers.IO) {
+//            try {
+//                _userState.value = OnTask("fetchMyPost()::start fetch user's post list.")
+//                val myPostIdList = recipeFetchRepo.fetchMyRecipeListByUserId(_user.value.userId)
+//                _myPostList.value = myPostIdList.mapIndexed { index, recipeBasicInfo ->
+//                    async {
+//                        _userState.value = OnTask("fetchMyPost()::start fetch [$index]. post")
+//
+//                        val thumbnailImageUri = recipeFetchRepo.fetchRecipeThumbnailUriById(recipeBasicInfo.recipeId)
+//                        val authorId = recipeBasicInfo.authorId
+//                        val authorName = userFetchRepo.fetchUserNameById(authorId)
+//
+//                        _userState.value = OnTask("fetchMyPost()::finished fetch [$index]. post")
+//
+//                        RecipePost(
+//                            recipeBasicInfo = recipeBasicInfo,
+//                            thumbnailImageUri = thumbnailImageUri,
+//                            author = "$authorName @$authorId"
+//                        )
+//                    }
+//                }.awaitAll()
+//                _userState.value = OnStable("fetchMyPost()::finished fetch user's post list. list size : ${_myPostList.value.size}")
+//            }
+//            catch (e: Exception){
+//                _userState.value = OnError("fetchMyPost()::fail to fetch user's post.\nmessage -> $e")
+//            }
+//        }
+//    }
 
-                        val thumbnailImageUri = recipeFetchRepo.fetchRecipeThumbnailUriById(recipeBasicInfo.recipeId)
-                        val authorId = recipeBasicInfo.authorId
-                        val authorName = userFetchRepo.fetchUserNameById(authorId)
-
-                        _userState.value = OnTask("fetchMyPost()::finished fetch [$index]. post")
-
-                        RecipePost(
-                            recipeBasicInfo = recipeBasicInfo,
-                            thumbnailImageUri = thumbnailImageUri,
-                            author = "$authorName @$authorId"
-                        )
-                    }
-                }.awaitAll()
-                _userState.value = OnStable("fetchMyPost()::finished fetch user's post list. list size : ${_myPostList.value.size}")
-            }
-            catch (e: Exception){
-                _userState.value = OnError("fetchMyPost()::fail to fetch user's post.\nmessage -> $e")
-            }
-        }
-    }
-
-    /** 유저의 친구 목록을 불러온다.*/
-    private fun fetchFriend(){
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                _userState.value = UserState.OnTask("fetchFriend()::start fetch user's friend list.")
-                val friendIdList = userFetchRepo.fetchFriendListByUserId(_user.value.userId)
-
-                _friendList.value = friendIdList.mapIndexed { index, friendDTO ->
-                    async {
-                        val friendId = friendDTO.friendId
-                        _userState.value = UserState.OnTask("fetchFriend()::start fetch [$index]. friend")
-                        val profileImageUri = userFetchRepo.fetchUserProfileImageUriById(userId = friendId)
-                        val friendName = userFetchRepo.fetchUserNameById(friendId)
-                        _userState.value = UserState.OnTask("fetchFriend()::finished fetch [$index]. friend")
-                        SimpleUserInfo(
-                            userId = friendId,
-                            userName = friendName,
-                            userProfileImageUri = profileImageUri
-                        )
-                    }
-                }.awaitAll()
-                _userState.value = UserState.OnStable("fetchFriend()::finished fetch user's friend list. list size : ${_friendList.value.size}")
-            }
-            catch (e: Exception){
-                _userState.value = UserState.OnError("fetchFriend()::fail to fetch user's friend.\nmessage -> $e")
-            }
-        }
-    }
-
-    /** 유저가 저장한 레시피 목록을 불러옴.*/
-    private fun fetchSavePost() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                _userState.value = UserState.OnTask("fetchSavePost()::start fetch user's save post list.")
-                val savePostList = recipeFetchRepo.fetchSavePostIdListByUserId(_user.value.userId)
-
-                _savePostList.value = savePostList.mapIndexed { index, savePostDTO ->
-                    async {
-                        _userState.value = UserState.OnTask("fetchSavePost()::start fetch [$index]. post")
-
-                        val savePostId = savePostDTO.recipeId
-
-                        val recipeBasicInfo = recipeFetchRepo.fetchRecipeBasicInfoById(savePostId)
-                        val thumbnailImageUri = recipeFetchRepo.fetchRecipeThumbnailUriById(savePostId)
-                        val authorId = recipeBasicInfo.authorId
-                        val authorName = userFetchRepo.fetchUserNameById(authorId)
-                        _userState.value = UserState.OnTask("fetchSavePost()::finished fetch [$index]. post")
-
-                        RecipePost(
-                            recipeBasicInfo = recipeBasicInfo,
-                            thumbnailImageUri = thumbnailImageUri,
-                            author = "$authorName @$authorId"
-                        )
-                    }
-                }.awaitAll()
-                _userState.value = UserState.OnStable("fetchSavePost()::finished fetch user's save post list. list size : ${_savePostList.value.size}")
-            }
-            catch (e: Exception){
-                _userState.value = UserState.OnError("fetchSavePost()::fail to fetch user's save post.\nmessage -> $e")
-            }
-        }
-    }
+//    /** 유저의 친구 목록을 불러온다.*/
+//    private fun fetchFriend(){
+//        viewModelScope.launch(Dispatchers.IO) {
+//            try {
+//                _userState.value = UserState.OnTask("fetchFriend()::start fetch user's friend list.")
+//                val friendIdList = userFetchRepo.fetchFriendListByUserId(_user.value.userId)
+//
+//                _friendList.value = friendIdList.mapIndexed { index, friendDTO ->
+//                    async {
+//                        val friendId = friendDTO.friendId
+//                        _userState.value = UserState.OnTask("fetchFriend()::start fetch [$index]. friend")
+//                        val profileImageUri = userFetchRepo.fetchUserProfileImageUriById(userId = friendId)
+//                        val friendName = userFetchRepo.fetchUserNameById(friendId)
+//                        _userState.value = UserState.OnTask("fetchFriend()::finished fetch [$index]. friend")
+//                        SimpleUserInfo(
+//                            userId = friendId,
+//                            userName = friendName,
+//                            userProfileImageUri = profileImageUri
+//                        )
+//                    }
+//                }.awaitAll()
+//                _userState.value = UserState.OnStable("fetchFriend()::finished fetch user's friend list. list size : ${_friendList.value.size}")
+//            }
+//            catch (e: Exception){
+//                _userState.value = UserState.OnError("fetchFriend()::fail to fetch user's friend.\nmessage -> $e")
+//            }
+//        }
+//    }
+//
+//    /** 유저가 저장한 레시피 목록을 불러옴.*/
+//    private fun fetchSavePost() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            try {
+//                _userState.value = UserState.OnTask("fetchSavePost()::start fetch user's save post list.")
+//                val savePostList = recipeFetchRepo.fetchSavePostIdListByUserId(_user.value.userId)
+//
+//                _savePostList.value = savePostList.mapIndexed { index, savePostDTO ->
+//                    async {
+//                        _userState.value = UserState.OnTask("fetchSavePost()::start fetch [$index]. post")
+//
+//                        val savePostId = savePostDTO.recipeId
+//
+//                        val recipeBasicInfo = recipeFetchRepo.fetchRecipeBasicInfoById(savePostId)
+//                        val thumbnailImageUri = recipeFetchRepo.fetchRecipeThumbnailUriById(savePostId)
+//                        val authorId = recipeBasicInfo.authorId
+//                        val authorName = userFetchRepo.fetchUserNameById(authorId)
+//                        _userState.value = UserState.OnTask("fetchSavePost()::finished fetch [$index]. post")
+//
+//                        RecipePost(
+//                            recipeBasicInfo = recipeBasicInfo,
+//                            thumbnailImageUri = thumbnailImageUri,
+//                            author = "$authorName @$authorId"
+//                        )
+//                    }
+//                }.awaitAll()
+//                _userState.value = UserState.OnStable("fetchSavePost()::finished fetch user's save post list. list size : ${_savePostList.value.size}")
+//            }
+//            catch (e: Exception){
+//                _userState.value = UserState.OnError("fetchSavePost()::fail to fetch user's save post.\nmessage -> $e")
+//            }
+//        }
+//    }
 
     /** 유저가 로그인 시 필요한 데이터를 받아온다.
      * @see fetchMyPost*/
     private fun init(){
         viewModelScope.launch {
-            async { fetchMyPost() }
-            async { fetchFriend() }
-            async { fetchSavePost() }
+//            async { fetchMyPost() }
+//            async { fetchFriend() }
+//            async { fetchSavePost() }
 
         }
     }

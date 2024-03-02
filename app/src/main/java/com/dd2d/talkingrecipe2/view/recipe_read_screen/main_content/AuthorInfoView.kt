@@ -49,7 +49,6 @@ fun AuthorInfoView(
     onClickSave: (Boolean)->Unit,
     onClickModify: ()->Unit,
 ){
-    val user = LocalUser.current
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
@@ -82,11 +81,11 @@ fun AuthorInfoView(
                 IconButton(onClick = { onClickSave(!isSavePost) }) {
                     Icon(imageVector = Icons.Default.Star, tint = if(isSavePost) SubColor else HintText, contentDescription = "save this recipe")
                 }
-                if(authorInfo.userId == user.userId){
                     IconButton(onClick = { onClickModify() }) {
                         Icon(imageVector = Icons.Default.Edit, tint = HintText, contentDescription = "modify this recipe")
                     }
-                }
+//                if(authorInfo.userId == user.userId){
+//                }
             }
         }
         AsyncImage(

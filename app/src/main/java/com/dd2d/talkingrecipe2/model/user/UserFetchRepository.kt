@@ -132,16 +132,16 @@ class UserFetchRepositoryImpl: UserFetchRepository {
             val userDTO = fetchUserDTOById(userId)
 
             withContext(Dispatchers.IO){
-                val userProfileImageUri = async { fetchUserProfileImageUriById(userId, userDTO.profileImagePath) }.await()
-                val userBackgroundImageUri = async { fetchUserBackgroundImageUriById(userId, userDTO.backgroundImagePath) }.await()
+                val userProfileImageUri = async { fetchUserProfileImageUriById(userId, userDTO.profileImagePath) }
+                val userBackgroundImageUri = async { fetchUserBackgroundImageUriById(userId, userDTO.backgroundImagePath) }
 
                 User(
                     createdAt = userDTO.createdAt,
                     userId = userId,
                     name = userDTO.name,
                     recentRecipeId = userDTO.recentRecipeId,
-                    profileImageUri = userProfileImageUri,
-                    backgroundImageUri = userBackgroundImageUri,
+                    profileImageUri = userProfileImageUri.await(),
+                    backgroundImageUri = userBackgroundImageUri.await(),
                 )
             }
         }

@@ -25,7 +25,6 @@ fun NavGraphBuilder.recipeScreenGraph(
 ){
     composable(route = "${Screen.Recipe.route}/{recipeViewModelMode}"){ backStack->
         val modeArgument = backStack.arguments?.getString("recipeViewModelMode")?: "Error"
-        val recipeIdArgument = backStack.arguments?.getString("recipeId")?: ""
 
         var mode by remember { mutableStateOf(RecipeViewModelMode.nameOf(modeArgument)) }
 

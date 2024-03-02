@@ -40,14 +40,13 @@ import com.dd2d.talkingrecipe2.ui.theme.MainText
 import com.dd2d.talkingrecipe2.ui.theme.MapleFontFamily
 import com.dd2d.talkingrecipe2.ui.theme.kotex
 import com.dd2d.talkingrecipe2.ui.theme.matex
-import com.dd2d.talkingrecipe2.view_model.RecipeViewModelMode
 
 @Composable
 fun TempView(
     modifier: Modifier = Modifier,
     label: String,
     color: Color,
-    onClick: (RecipeViewModelMode) -> Unit
+    onClick: () -> Unit
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -56,15 +55,8 @@ fun TempView(
             .fillMaxSize()
             .background(color = color)
     ){
-        kotex(text = label)
-        TextButton(onClick = { onClick(RecipeViewModelMode.ReadMode) }) {
-            kotex(text = "read")
-        }
-        TextButton(onClick = { onClick(RecipeViewModelMode.WriteMode) }) {
-            kotex(text = "write")
-        }
-        TextButton(onClick = { onClick(RecipeViewModelMode.ModifyMode) }) {
-            kotex(text = "modify")
+        TextButton(onClick = { onClick() }) {
+            kotex(text = label)
         }
     }
 }

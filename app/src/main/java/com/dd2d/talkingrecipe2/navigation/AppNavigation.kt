@@ -22,6 +22,7 @@ import com.dd2d.talkingrecipe2.view_model.UserViewModel
 fun AppNavigation(
     modifier: Modifier = Modifier,
 ) {
+
     val context = LocalContext.current
     val userViewModel = viewModel {
         UserViewModel(

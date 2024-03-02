@@ -79,6 +79,7 @@ data class User(
             profileImageUri = R.drawable.default_image.toUriWithDrawable(),
             backgroundImageUri = R.drawable.default_image.toUriWithDrawable(),
         )
+        const val ErrorInId = "user id is empty"
     }
 }
 

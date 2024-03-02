@@ -18,13 +18,14 @@ fun NavGraphBuilder.mainGraph(
     composable(route = Screen.Main.route){
         MainScreen(
             onClickSearch = { navController.navigate(route = Screen.Search.route) },
-            onClickSavePost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.SavePost.route}") },
+            onClickSavePost = { navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.SavePost.route}/${userViewModel.userId}") },
             onClickCreate = {
                 val mode = RecipeViewModelMode.WriteMode
                 navController.navigate(route = "${Screen.Recipe.route}/${mode.name}")
             },
             onClickMyPost = {
-                navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.MyPost.route}")
+                userViewModel.userId
+                navController.navigate(route = "${Screen.Sub.route}/${SubScreenDestination.MyPost.route}/${userViewModel.userId}")
             },
             onClickSetting = {
                 /*TODO("다이얼로그로 ")*/
